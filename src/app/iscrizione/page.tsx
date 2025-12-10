@@ -3,6 +3,7 @@ import Navigation from "@/components/Navigation";
 import PageHero from "@/components/PageHero";
 import Footer from "@/components/Footer";
 import RegistrationWizard from "@/components/RegistrationWizard";
+import PaymentInfo from "@/components/PaymentInfo";
 
 export const metadata: Metadata = {
   title: "Iscrizione | Mini & Basket Camp 2025",
@@ -36,7 +37,7 @@ export default function IscrizionePage() {
                     Mini & Basket Camp 2025
                   </h3>
                   <p className="text-brand-gray">
-                    29 Giugno - 6 Luglio 2025 • Centro Sportivo Comunale, Milano
+                    29 Giugno - 6 Luglio 2025 • Villaggio Residence Bahja, Paola (CS)
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
@@ -51,6 +52,11 @@ export default function IscrizionePage() {
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Payment Information */}
+            <div className="max-w-4xl mx-auto mb-10">
+              <PaymentInfo />
             </div>
 
             {/* Registration Wizard */}
@@ -119,7 +125,7 @@ export default function IscrizionePage() {
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <a
-                    href="tel:+390212345678"
+                    href="tel:+393398775790"
                     className="inline-flex items-center justify-center gap-2 border-2 border-brand-green text-brand-green font-bold py-2 px-6 rounded-full hover:bg-brand-green hover:text-white transition-all duration-300"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

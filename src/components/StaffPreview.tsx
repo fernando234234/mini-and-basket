@@ -21,7 +21,7 @@ export default function StaffPreview() {
     {
       name: "GIANLUCA TUCCI",
       role: "Allenatore",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80",
+      avatar: "/images/staff/GianlucaTucci.webp",
       bio: "Allenatore professionista con esperienza nel basket giovanile.",
       speciality: "Tecnica & Tattica",
       experience: "15+ anni",
@@ -37,13 +37,13 @@ export default function StaffPreview() {
       color: "from-yellow-500 to-amber-600",
     },
     {
-      name: "CATERINA MATTERA",
-      role: "Nazionale Italiana #20",
-      avatar: "https://images.unsplash.com/photo-1594381898411-846e7d193883?w=300&q=80",
-      bio: "Giocatrice della Nazionale Italiana, modello di riferimento per le giovani atlete.",
+      name: "ALESSANDRA FINAMORE",
+      role: "Allenatrice",
+      avatar: "/images/staff/AlessandraFinamore.webp",
+      bio: "Allenatrice professionista con grande esperienza nel basket femminile e giovanile.",
       speciality: "Tecnica Individuale",
-      experience: "Nazionale",
-      color: "from-blue-500 to-indigo-600",
+      experience: "10+ anni",
+      color: "from-pink-500 to-rose-600",
     },
   ];
 

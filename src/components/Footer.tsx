@@ -29,7 +29,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed mb-6">
-              Dal 2015, uno dei principali Basket Camp d&apos;Italia per giovani cestisti dai 6 ai 14 anni.
+              Dal 2015, uno dei principali Basket Camp d&apos;Italia per giovani cestisti dai 6 ai 14 anni. 🏀
               Competenza, Qualità, Affidabilità, Professionalità!
             </p>
             {/* Social Links */}

@@ -5,6 +5,7 @@ import ExperienceSection from "@/components/ExperienceSection";
 import ProgramHighlights from "@/components/ProgramHighlights";
 import FacilitiesGrid from "@/components/FacilitiesGrid";
 import PricingCards from "@/components/PricingCards";
+import PaymentInfo from "@/components/PaymentInfo";
 import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 import StaffPreview from "@/components/StaffPreview";
 import GalleryPreview from "@/components/GalleryPreview";
@@ -27,6 +28,7 @@ export default function Home() {
             <ProgramHighlights />
             <FacilitiesGrid />
             <PricingCards />
+            <PaymentInfo />
           </div>
 
           {/* Right Column (Sidebar) */}

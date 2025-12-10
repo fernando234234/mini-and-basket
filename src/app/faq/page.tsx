@@ -162,7 +162,7 @@ export default function FAQPage() {
                 </div>
                 <div className="bg-white rounded-xl p-4 shadow-sm">
                   <h4 className="font-bold text-brand-green mb-2">👥 Età</h4>
-                  <p className="text-brand-gray">11-18 anni</p>
+                  <p className="text-brand-gray">6-14 anni</p>
                 </div>
                 <div className="bg-white rounded-xl p-4 shadow-sm">
                   <h4 className="font-bold text-brand-green mb-2">💰 Quote</h4>

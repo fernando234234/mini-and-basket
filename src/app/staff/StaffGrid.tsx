@@ -29,98 +29,98 @@ const staffMembers: StaffMember[] = [
     name: "Gianluca Tucci",
     role: "Allenatore",
     category: "Allenatori",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80",
+    avatar: "/images/staff/GianlucaTucci.webp",
     color: "from-brand-orange to-red-500",
   },
   {
     name: "Elia Confessore",
     role: "Allenatore",
     category: "Allenatori",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&q=80",
+    avatar: "/images/staff/EliaConfessore.webp",
     color: "from-blue-500 to-indigo-600",
   },
   {
-    name: "Gianluca Morena",
+    name: "Gianluca Moreno",
     role: "Allenatore",
     category: "Allenatori",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&q=80",
+    avatar: "/images/staff/GianlucaMoreno.webp",
     color: "from-purple-500 to-violet-600",
   },
   {
     name: "Alessandra Finamore",
     role: "Allenatrice",
     category: "Allenatori",
-    avatar: "https://images.unsplash.com/photo-1594381898411-846e7d193883?w=300&q=80",
+    avatar: "/images/staff/AlessandraFinamore.webp",
     color: "from-pink-500 to-rose-600",
   },
   {
     name: "Matteo De Rosa",
     role: "Allenatore",
     category: "Allenatori",
-    avatar: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=300&q=80",
+    avatar: "/images/staff/MatteoDeRosa.webp",
     color: "from-teal-500 to-cyan-600",
   },
   {
     name: "Mimmo Montuori",
     role: "Allenatore",
     category: "Allenatori",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80",
+    avatar: "/images/staff/MimmoMontuori.webp",
     color: "from-amber-500 to-orange-600",
   },
   {
     name: "Enzo Patrizio",
     role: "Allenatore",
     category: "Allenatori",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&q=80",
+    avatar: "/images/staff/EnzoPatrizio.webp",
     color: "from-lime-500 to-green-600",
   },
   {
     name: "Ciro Falasconi",
     role: "Allenatore",
     category: "Allenatori",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&q=80",
+    avatar: "/images/staff/CiroFalasconi.jpg",
     color: "from-brand-green to-emerald-600",
   },
   {
     name: "Sergio Luise",
     role: "Allenatore",
     category: "Allenatori",
-    avatar: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=300&q=80",
+    avatar: "/images/staff/SergioLuise.jpg",
     color: "from-brand-orange to-red-500",
   },
   {
     name: "Walter De Raffaele",
     role: "Allenatore",
     category: "Allenatori",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80",
+    avatar: "/images/staff/WalterDeRaffaele.jpg",
     color: "from-blue-500 to-indigo-600",
   },
   {
     name: "Vincenzo Di Meglio",
     role: "Allenatore",
     category: "Allenatori",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&q=80",
+    avatar: "/images/staff/VincenzoDiMeglio.jpg",
     color: "from-purple-500 to-violet-600",
   },
   {
     name: "Giovanni Benedetto",
     role: "Allenatore",
     category: "Allenatori",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&q=80",
+    avatar: "/images/staff/GiovanniBenedetto.jpg",
     color: "from-teal-500 to-cyan-600",
   },
   {
     name: "Francesco Ponticiello",
     role: "Allenatore",
     category: "Allenatori",
-    avatar: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=300&q=80",
+    avatar: "/images/staff/FrancescoPonticiello.jpg",
     color: "from-amber-500 to-orange-600",
   },
   {
     name: "Alfredo Lamberti",
     role: "Allenatore",
     category: "Allenatori",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80",
+    avatar: "/images/staff/AlfredoLamberti.jpg",
     color: "from-lime-500 to-green-600",
   },
   // Campioni / Guest Stars
@@ -272,7 +272,7 @@ export default function StaffGrid() {
                       />
                       {member.category === "Campioni" && (
                         <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center border-2 border-white">
-                          <span className="text-xs">⭐</span>
+                          <span className="text-xs">🏆</span>
                         </div>
                       )}
                     </div>

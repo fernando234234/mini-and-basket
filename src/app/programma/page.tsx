@@ -198,7 +198,7 @@ export default function ProgrammaPage() {
                     </h3>
                     <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
                       <h4 className="text-xl font-bold text-brand-orange mb-2">
-                        Villaggio Residence Bahja ⭐⭐⭐⭐
+                        Villaggio Residence Bahja 🏆🏆🏆🏆
                       </h4>
                       <p className="text-white/80 mb-4">Paola (CS) - Calabria</p>
                       <p className="text-white/70 text-sm leading-relaxed">
@@ -212,9 +212,9 @@ export default function ProgrammaPage() {
                         <span>🎯</span> A Chi È Rivolto
                       </h4>
                       <div className="flex flex-wrap gap-3">
-                        <span className="bg-brand-green/20 text-brand-green px-4 py-2 rounded-full text-sm font-semibold border border-brand-green/30">
-                          Ragazzi 11-18 anni
-                        </span>
+                          <span className="bg-brand-green/20 text-brand-green px-4 py-2 rounded-full text-sm font-semibold border border-brand-green/30">
+                            Ragazzi 6-14 anni
+                          </span>
                         <span className="bg-brand-orange/20 text-brand-orange px-4 py-2 rounded-full text-sm font-semibold border border-brand-orange/30">
                           Tutti i livelli
                         </span>
