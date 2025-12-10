@@ -30,7 +30,7 @@ const staffMembers: StaffMember[] = [
     color: "from-blue-500 to-indigo-600",
   },
   {
-    name: "Gianluca Moreno",
+    name: "Gianluca Morena",
     role: "Allenatore",
     category: "Allenatori",
     avatar: "/images/staff/GianlucaMoreno.webp",

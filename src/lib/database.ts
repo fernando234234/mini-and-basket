@@ -610,3 +610,164 @@ export async function updateContactSubmissionStatus(
     throw new Error(`Failed to update contact submission: ${error.message}`)
   }
 }
+
+// ============================================
+// STORAGE FUNCTIONS
+// ============================================
+
+/**
+ * Upload a gallery photo to Supabase Storage
+ */
+export async function uploadGalleryPhoto(
+  file: File,
+  metadata: { title: string; category: 'allenamenti' | 'partite' | 'attivita' | 'gruppo'; year?: number }
+): Promise<string> {
+  if (!isSupabaseConfigured()) {
+    // Return mock URL for demo mode
+    const mockUrl = URL.createObjectURL(file)
+    console.log('[Mock] Uploaded gallery photo:', mockUrl)
+    return mockUrl
+  }
+
+  // Generate unique filename
+  const fileExt = file.name.split('.').pop()
+  const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+  
+  // Upload to Supabase Storage
+  const { error: uploadError } = await supabase.storage
+    .from('gallery')
+    .upload(fileName, file, {
+      cacheControl: '3600',
+      upsert: false
+    })
+  
+  if (uploadError) {
+    console.error('Error uploading photo:', uploadError)
+    throw new Error(`Failed to upload photo: ${uploadError.message}`)
+  }
+  
+  // Get public URL
+  const { data: { publicUrl } } = supabase.storage
+    .from('gallery')
+    .getPublicUrl(fileName)
+  
+  // Insert record into gallery_photos table
+  const { error: dbError } = await supabase
+    .from('gallery_photos')
+    .insert({
+      url: publicUrl,
+      alt_text: metadata.title,
+      category: metadata.category,
+      year: metadata.year || new Date().getFullYear(),
+      featured: false,
+      sort_order: 0,
+    })
+  
+  if (dbError) {
+    console.error('Error saving photo record:', dbError)
+    // Try to delete the uploaded file
+    await supabase.storage.from('gallery').remove([fileName])
+    throw new Error(`Failed to save photo record: ${dbError.message}`)
+  }
+  
+  return publicUrl
+}
+
+/**
+ * Delete a gallery photo from storage and database
+ */
+export async function deleteGalleryPhoto(id: string, url: string): Promise<void> {
+  if (!isSupabaseConfigured()) {
+    console.log('[Mock] Deleted gallery photo:', id)
+    return
+  }
+
+  // Extract filename from URL
+  const urlParts = url.split('/')
+  const fileName = urlParts[urlParts.length - 1]
+
+  // Delete from storage
+  const { error: storageError } = await supabase.storage
+    .from('gallery')
+    .remove([fileName])
+
+  if (storageError) {
+    console.error('Error deleting photo from storage:', storageError)
+    // Continue to delete the record anyway
+  }
+
+  // Delete from database
+  const { error: dbError } = await supabase
+    .from('gallery_photos')
+    .delete()
+    .eq('id', id)
+
+  if (dbError) {
+    console.error('Error deleting photo record:', dbError)
+    throw new Error(`Failed to delete photo record: ${dbError.message}`)
+  }
+}
+
+/**
+ * Upload a document to Supabase Storage (private bucket)
+ */
+export async function uploadDocument(
+  file: File,
+  registrationId: string,
+  documentType: string
+): Promise<string> {
+  if (!isSupabaseConfigured()) {
+    const mockUrl = URL.createObjectURL(file)
+    console.log('[Mock] Uploaded document:', mockUrl)
+    return mockUrl
+  }
+
+  // Generate unique filename with registration ID prefix
+  const fileExt = file.name.split('.').pop()
+  const fileName = `${registrationId}/${documentType}-${Date.now()}.${fileExt}`
+  
+  // Upload to Supabase Storage (documents bucket)
+  const { error: uploadError } = await supabase.storage
+    .from('documents')
+    .upload(fileName, file, {
+      cacheControl: '3600',
+      upsert: false
+    })
+  
+  if (uploadError) {
+    console.error('Error uploading document:', uploadError)
+    throw new Error(`Failed to upload document: ${uploadError.message}`)
+  }
+  
+  // Get signed URL for private bucket (valid for 1 hour)
+  const { data, error: urlError } = await supabase.storage
+    .from('documents')
+    .createSignedUrl(fileName, 3600)
+  
+  if (urlError) {
+    console.error('Error creating signed URL:', urlError)
+    throw new Error(`Failed to get document URL: ${urlError.message}`)
+  }
+  
+  return data.signedUrl
+}
+
+/**
+ * Get a signed URL for a private document
+ */
+export async function getDocumentUrl(filePath: string): Promise<string> {
+  if (!isSupabaseConfigured()) {
+    return '/mock-document-url'
+  }
+
+  const { data, error } = await supabase.storage
+    .from('documents')
+    .createSignedUrl(filePath, 3600) // 1 hour expiry
+
+  if (error) {
+    console.error('Error creating signed URL:', error)
+    throw new Error(`Failed to get document URL: ${error.message}`)
+  }
+
+  return data.signedUrl
+}
