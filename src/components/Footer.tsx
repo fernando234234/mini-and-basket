@@ -29,7 +29,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed mb-6">
-              Dal 2004, uno dei principali Basket Camp d&apos;Italia per giovani cestisti dagli 11 ai 18 anni.
+              Dal 2015, uno dei principali Basket Camp d&apos;Italia per giovani cestisti dai 6 ai 14 anni.
               Competenza, Qualità, Affidabilità, Professionalità!
             </p>
             {/* Social Links */}
@@ -180,7 +180,7 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             {/* Copyright */}
             <p className="text-gray-500 text-sm text-center md:text-left">
-              © {currentYear} Mini & Basket Camp - Since 2004. P.IVA 92042810637
+              © {currentYear} Mini & Basket Camp - Dal 2015. P.IVA 92042810637
             </p>
 
             {/* Legal Links */}

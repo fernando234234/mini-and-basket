@@ -68,8 +68,8 @@ export default function InfoBar() {
         </svg>
       ),
       value: "DAL",
-      label: "2013",
-      tooltip: "Oltre 10 anni di esperienza e 500+ alumni",
+      label: "2015",
+      tooltip: "10 anni di esperienza e passione per il basket giovanile",
       href: null,
       delay: "400ms",
     },
