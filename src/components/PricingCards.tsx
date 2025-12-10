@@ -8,10 +8,17 @@ import PaymentMethods from "./PaymentMethods";
 const KlarnaSmallIcon = () => (
   <svg viewBox="0 0 48 32" className="w-8 h-5" aria-label="Klarna">
     <rect width="48" height="32" rx="4" fill="#FFB3C7" />
-    <path
-      d="M10 11h3.2v10H10V11zm14.6 0h-3c0 2.2-.9 4.2-2.4 5.6l-.8.7 3.5 4.7h3.8l-3.2-4.2c1.4-1.8 2.1-4 2.1-6.3v-.5zm-6.6 0h3v10h-3V11zm12 8c-.8 0-1.5-.7-1.5-1.5s.7-1.5 1.5-1.5 1.5.7 1.5 1.5-.7 1.5-1.5 1.5zm6.5-8h3v10h-3V11z"
+    <text
+      x="24"
+      y="19"
+      textAnchor="middle"
+      fontFamily="Arial, sans-serif"
+      fontWeight="800"
+      fontSize="10"
       fill="#0A0B09"
-    />
+    >
+      Klarna
+    </text>
   </svg>
 );
 
