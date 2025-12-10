@@ -238,6 +238,28 @@ body {
   }
 }
 
+/* Confetti Fall Animation */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  25% {
+    transform: translateY(100px) rotate(90deg) scale(0.9);
+  }
+  50% {
+    transform: translateY(200px) rotate(180deg) scale(0.8);
+  }
+  75% {
+    transform: translateY(300px) rotate(270deg) scale(0.7);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(500px) rotate(360deg) scale(0.5);
+    opacity: 0;
+  }
+}
+
 /* === Animation Classes === */
 .animate-float {
   animation: float 4s ease-in-out infinite;
@@ -297,6 +319,10 @@ body {
 
 .animate-basketball-bounce {
   animation: basketball-bounce 1.5s infinite;
+}
+
+.animate-confetti-fall {
+  animation: confetti-fall 2s ease-out forwards;
 }
 
 /* Sparkle Effect */

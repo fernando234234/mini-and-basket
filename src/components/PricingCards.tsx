@@ -2,6 +2,18 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import PaymentMethods from "./PaymentMethods";
+
+// Klarna icon for installment display
+const KlarnaSmallIcon = () => (
+  <svg viewBox="0 0 48 32" className="w-8 h-5" aria-label="Klarna">
+    <rect width="48" height="32" rx="4" fill="#FFB3C7" />
+    <path
+      d="M10 11h3.2v10H10V11zm14.6 0h-3c0 2.2-.9 4.2-2.4 5.6l-.8.7 3.5 4.7h3.8l-3.2-4.2c1.4-1.8 2.1-4 2.1-6.3v-.5zm-6.6 0h3v10h-3V11zm12 8c-.8 0-1.5-.7-1.5-1.5s.7-1.5 1.5-1.5 1.5.7 1.5 1.5-.7 1.5-1.5 1.5zm6.5-8h3v10h-3V11z"
+      fill="#0A0B09"
+    />
+  </svg>
+);
 
 export default function PricingCards() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
@@ -11,8 +23,10 @@ export default function PricingCards() {
       title: "PACCHETTO GIORNALIERO",
       subtitle: "Prova l'esperienza",
       price: "€250",
+      priceInCents: 25000,
       originalPrice: null,
       perDay: "€35/giorno",
+      installment: "3 × €84",
       features: [
         { text: "Alloggio Incluso", included: true },
         { text: "3 Pasti al Giorno", included: true },
@@ -31,8 +45,10 @@ export default function PricingCards() {
       title: "SETTIMANA COMPLETA",
       subtitle: "L'esperienza completa",
       price: "€450",
+      priceInCents: 45000,
       originalPrice: "€550",
       perDay: "€56/giorno",
+      installment: "3 × €150",
       features: [
         { text: "Alloggio Incluso", included: true },
         { text: "3 Pasti al Giorno", included: true },
@@ -51,8 +67,10 @@ export default function PricingCards() {
       title: "PACCHETTO WEEKEND",
       subtitle: "Avventura breve",
       price: "€150",
+      priceInCents: 15000,
       originalPrice: null,
       perDay: "€75/giorno",
+      installment: "3 × €50",
       features: [
         { text: "Alloggio Incluso", included: true },
         { text: "3 Pasti al Giorno", included: true },
@@ -163,6 +181,12 @@ export default function PricingCards() {
                       </span>
                     </div>
                     <p className="text-sm text-brand-gray mt-2">{plan.perDay}</p>
+                    
+                    {/* Klarna Installment Badge */}
+                    <div className="mt-3 flex items-center justify-center gap-1.5 bg-pink-50 text-pink-700 text-xs font-medium px-3 py-1.5 rounded-full">
+                      <KlarnaSmallIcon />
+                      <span>oppure {plan.installment}</span>
+                    </div>
                   </div>
 
                   {/* Divider */}
@@ -238,11 +262,32 @@ export default function PricingCards() {
         })}
       </div>
 
+      {/* Klarna Info Banner */}
+      <div className="mt-10 bg-gradient-to-r from-pink-50 to-pink-100 border border-pink-200 rounded-2xl p-5">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm">
+              <KlarnaSmallIcon />
+            </div>
+            <div>
+              <h4 className="font-bold text-brand-dark">Paga in 3 rate senza interessi</h4>
+              <p className="text-sm text-brand-gray">
+                Con Klarna puoi dividere il pagamento in 3 comode rate mensili
+              </p>
+            </div>
+          </div>
+          <div className="text-center md:text-right">
+            <p className="text-xs text-brand-gray">Esempio per Settimana Completa</p>
+            <p className="font-bold text-pink-600">3 × €150/mese</p>
+          </div>
+        </div>
+      </div>
+
       {/* Bottom Trust Badges */}
-      <div className="mt-12 flex flex-wrap justify-center gap-6">
+      <div className="mt-10 flex flex-wrap justify-center gap-6">
         {[
           { icon: "🔒", text: "Pagamenti Sicuri" },
-          { icon: "💳", text: "Rate Disponibili" },
+          { icon: "💳", text: "Rate con Klarna" },
           { icon: "📞", text: "Supporto 24/7" },
         ].map((badge, i) => (
           <div key={i} className="flex items-center gap-2 text-sm text-brand-gray">
@@ -250,6 +295,12 @@ export default function PricingCards() {
             <span>{badge.text}</span>
           </div>
         ))}
+      </div>
+
+      {/* Payment Methods */}
+      <div className="mt-8 text-center">
+        <p className="text-sm text-brand-gray mb-3">Metodi di pagamento accettati</p>
+        <PaymentMethods variant="compact" className="justify-center" />
       </div>
     </section>
   );

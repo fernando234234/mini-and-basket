@@ -1,12 +1,24 @@
 'use client'
 
 import Link from 'next/link'
-import { mockRegistrations, getRegistrationStats, getRecentRegistrations } from '@/lib/mockData'
+import { 
+  mockRegistrations, 
+  getRegistrationStats, 
+  getRecentRegistrations,
+  getSizeDistribution,
+  getAgeDistribution,
+  getExperienceDistribution,
+  getSpecialNeedsCount
+} from '@/lib/mockData'
 import StatsCard from '@/components/admin/StatsCard'
 
 export default function AdminDashboardPage() {
   const stats = getRegistrationStats()
   const recentRegistrations = getRecentRegistrations(5)
+  const sizeDistribution = getSizeDistribution()
+  const ageDistribution = getAgeDistribution()
+  const experienceDistribution = getExperienceDistribution()
+  const specialNeeds = getSpecialNeedsCount()
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('it-IT', {
@@ -27,6 +39,12 @@ export default function AdminDashboardPage() {
     pending: { label: 'In attesa', class: 'bg-amber-100 text-amber-800' },
     confirmed: { label: 'Confermato', class: 'bg-green-100 text-green-800' },
     cancelled: { label: 'Annullato', class: 'bg-red-100 text-red-800' },
+  }
+
+  const packagePrices = {
+    giornaliero: 250,
+    completa: 450,
+    weekend: 150,
   }
 
   return (
@@ -58,7 +76,7 @@ export default function AdminDashboardPage() {
         <StatsCard
           title="In Attesa"
           value={stats.pending}
-          subtitle="Da confermare"
+          subtitle={`${stats.pendingPayments} pagamenti da ricevere`}
           icon={
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -200,17 +218,17 @@ export default function AdminDashboardPage() {
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Iscrizioni per Pacchetto</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
-            { type: 'giornaliero', label: 'Giornaliero', price: 50 },
-            { type: 'completa', label: 'Settimana Completa', price: 350 },
-            { type: 'weekend', label: 'Weekend', price: 150 },
+            { type: 'giornaliero', label: 'Giornaliero', price: packagePrices.giornaliero, color: 'blue' },
+            { type: 'completa', label: 'Settimana Completa', price: packagePrices.completa, color: 'purple' },
+            { type: 'weekend', label: 'Weekend', price: packagePrices.weekend, color: 'teal' },
           ].map((pkg) => {
-            const count = mockRegistrations.filter(r => r.package_type === pkg.type).length
+            const count = mockRegistrations.filter(r => r.package_type === pkg.type && r.status !== 'cancelled').length
             const confirmed = mockRegistrations.filter(r => r.package_type === pkg.type && r.status === 'confirmed').length
             return (
-              <div key={pkg.type} className="p-4 bg-gray-50 rounded-lg">
+              <div key={pkg.type} className={`p-4 bg-${pkg.color}-50 rounded-lg border border-${pkg.color}-100`}>
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-medium text-gray-900">{pkg.label}</h3>
-                  <span className="text-sm text-gray-500">{formatCurrency(pkg.price)}</span>
+                  <span className={`text-sm font-semibold text-${pkg.color}-600`}>{formatCurrency(pkg.price)}</span>
                 </div>
                 <div className="flex items-end justify-between">
                   <div>
@@ -225,6 +243,166 @@ export default function AdminDashboardPage() {
               </div>
             )
           })}
+        </div>
+      </div>
+
+      {/* T-Shirt Size Distribution & Age Distribution */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* T-Shirt Sizes */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <svg className="w-5 h-5 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
+            Distribuzione Taglie Magliette
+          </h2>
+          <div className="space-y-4">
+            {Object.entries(sizeDistribution).map(([size, count]) => {
+              const total = Object.values(sizeDistribution).reduce((a, b) => a + b, 0)
+              const percentage = total > 0 ? (count / total) * 100 : 0
+              return (
+                <div key={size} className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <span className="font-bold text-gray-700">{size}</span>
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium text-gray-700">{count} magliett{count === 1 ? 'a' : 'e'}</span>
+                      <span className="text-sm text-gray-500">{percentage.toFixed(0)}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-brand-orange h-2 rounded-full transition-all duration-500" 
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <p className="text-sm text-gray-500">
+              Totale: <span className="font-semibold text-gray-900">{Object.values(sizeDistribution).reduce((a, b) => a + b, 0)} magliette</span>
+            </p>
+          </div>
+        </div>
+
+        {/* Age Distribution */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <svg className="w-5 h-5 text-brand-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m9 5.197v-1a6 6 0 00-9-5.197" />
+            </svg>
+            Distribuzione per Età
+          </h2>
+          <div className="space-y-4">
+            {Object.entries(ageDistribution).map(([range, count]) => {
+              const total = Object.values(ageDistribution).reduce((a, b) => a + b, 0)
+              const percentage = total > 0 ? (count / total) * 100 : 0
+              const colors: Record<string, string> = {
+                '6-8': 'bg-blue-500',
+                '9-11': 'bg-green-500',
+                '12-14': 'bg-purple-500',
+                '15+': 'bg-orange-500',
+              }
+              return (
+                <div key={range} className="flex items-center gap-4">
+                  <div className="w-16 text-sm font-medium text-gray-700">{range} anni</div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium text-gray-700">{count} camper</span>
+                      <span className="text-sm text-gray-500">{percentage.toFixed(0)}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className={`${colors[range]} h-2 rounded-full transition-all duration-500`}
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <p className="text-sm text-gray-500">
+              Totale: <span className="font-semibold text-gray-900">{Object.values(ageDistribution).reduce((a, b) => a + b, 0)} camper attivi</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Experience & Special Needs */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Experience Distribution */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+            </svg>
+            Livello di Esperienza
+          </h2>
+          <div className="grid grid-cols-3 gap-4">
+            {[
+              { key: 'nessuna', label: 'Principianti', icon: '🌱', color: 'blue' },
+              { key: '1-2-anni', label: '1-2 anni', icon: '🏀', color: 'green' },
+              { key: '3+-anni', label: '3+ anni', icon: '⭐', color: 'purple' },
+            ].map((exp) => (
+              <div key={exp.key} className={`p-4 bg-${exp.color}-50 rounded-lg text-center`}>
+                <span className="text-2xl">{exp.icon}</span>
+                <p className="text-2xl font-bold text-gray-900 mt-2">
+                  {experienceDistribution[exp.key as keyof typeof experienceDistribution]}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">{exp.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Special Needs / Allergies */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            Allergie e Note Mediche
+          </h2>
+          <p className="text-sm text-gray-500 mb-4">Importante per catering e sicurezza</p>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-4 bg-red-50 rounded-lg border border-red-100">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xl">⚠️</span>
+                <span className="text-sm font-medium text-red-700">Con Allergie</span>
+              </div>
+              <p className="text-3xl font-bold text-red-600">{specialNeeds.withAllergies}</p>
+              <p className="text-xs text-gray-500 mt-1">su {specialNeeds.total} iscritti</p>
+            </div>
+            <div className="p-4 bg-orange-50 rounded-lg border border-orange-100">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xl">📋</span>
+                <span className="text-sm font-medium text-orange-700">Note Mediche</span>
+              </div>
+              <p className="text-3xl font-bold text-orange-600">{specialNeeds.withMedicalNotes}</p>
+              <p className="text-xs text-gray-500 mt-1">su {specialNeeds.total} iscritti</p>
+            </div>
+          </div>
+          <div className="mt-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
+            <div className="flex items-center gap-2">
+              <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-sm font-medium text-amber-800">
+                {specialNeeds.withAnyNotes} camper richiedono attenzione speciale
+              </span>
+            </div>
+          </div>
+          <Link
+            href="/admin/iscrizioni?hasNotes=true"
+            className="mt-4 inline-flex items-center gap-2 text-sm text-brand-green hover:underline"
+          >
+            Visualizza tutti →
+          </Link>
         </div>
       </div>
     </div>

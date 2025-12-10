@@ -1,15 +1,15 @@
 import { Registration } from '@/types/registration'
 import { GalleryPhoto } from '@/types/gallery'
 
-// Mock Registrations Data
+// Mock Registrations Data - Diverse data for testing
 export const mockRegistrations: Registration[] = [
   {
-    id: '1',
+    id: '1a2b3c4d',
     created_at: '2025-01-15T10:30:00Z',
     package_type: 'completa',
     camper_nome: 'Marco',
     camper_cognome: 'Rossi',
-    camper_data_nascita: '2015-03-20',
+    camper_data_nascita: '2015-03-20', // 9-10 anni
     camper_taglia: 'M',
     camper_esperienza: '1-2-anni',
     camper_allergie: '',
@@ -26,18 +26,23 @@ export const mockRegistrations: Registration[] = [
     status: 'confirmed',
     terms_accepted: true,
     privacy_accepted: true,
+    payment_status: 'paid',
+    payment_type: 'full',
+    amount_paid: 450,
+    amount_due: 0,
+    payment_date: '2025-01-15T10:35:00Z',
   },
   {
-    id: '2',
+    id: '2b3c4d5e',
     created_at: '2025-01-18T14:20:00Z',
     package_type: 'giornaliero',
     camper_nome: 'Luca',
     camper_cognome: 'Bianchi',
-    camper_data_nascita: '2013-07-12',
+    camper_data_nascita: '2013-07-12', // 11-12 anni
     camper_taglia: 'L',
     camper_esperienza: '3+-anni',
-    camper_allergie: 'Arachidi',
-    camper_note_mediche: 'Asma lieve',
+    camper_allergie: 'Arachidi e frutta secca',
+    camper_note_mediche: 'Asma lieve - porta sempre inalatore',
     genitore_nome: 'Paolo',
     genitore_cognome: 'Bianchi',
     genitore_email: 'paolo.bianchi@email.com',
@@ -47,18 +52,23 @@ export const mockRegistrations: Registration[] = [
     emergenza_nome: 'Anna Bianchi',
     emergenza_relazione: 'Madre',
     emergenza_telefono: '+39 340 4433221',
-    status: 'pending',
+    status: 'confirmed',
     terms_accepted: true,
     privacy_accepted: true,
+    payment_status: 'paid',
+    payment_type: 'full',
+    amount_paid: 250,
+    amount_due: 0,
+    payment_date: '2025-01-18T14:25:00Z',
   },
   {
-    id: '3',
+    id: '3c4d5e6f',
     created_at: '2025-01-20T09:15:00Z',
     package_type: 'weekend',
     camper_nome: 'Sofia',
     camper_cognome: 'Verdi',
-    camper_data_nascita: '2016-11-05',
-    camper_taglia: 'S',
+    camper_data_nascita: '2018-11-05', // 6-7 anni (piccola)
+    camper_taglia: 'XS',
     camper_esperienza: 'nessuna',
     camper_allergie: '',
     camper_note_mediche: '',
@@ -74,14 +84,19 @@ export const mockRegistrations: Registration[] = [
     status: 'confirmed',
     terms_accepted: true,
     privacy_accepted: true,
+    payment_status: 'paid',
+    payment_type: 'full',
+    amount_paid: 150,
+    amount_due: 0,
+    payment_date: '2025-01-20T09:20:00Z',
   },
   {
-    id: '4',
+    id: '4d5e6f7g',
     created_at: '2025-01-22T16:45:00Z',
     package_type: 'completa',
     camper_nome: 'Alessandro',
     camper_cognome: 'Ferrari',
-    camper_data_nascita: '2014-04-28',
+    camper_data_nascita: '2014-04-28', // 10-11 anni
     camper_taglia: 'M',
     camper_esperienza: '1-2-anni',
     camper_allergie: 'Lattosio',
@@ -98,14 +113,19 @@ export const mockRegistrations: Registration[] = [
     status: 'pending',
     terms_accepted: true,
     privacy_accepted: true,
+    payment_status: 'partial',
+    payment_type: 'deposit',
+    amount_paid: 150,
+    amount_due: 300,
+    payment_date: '2025-01-22T16:50:00Z',
   },
   {
-    id: '5',
+    id: '5e6f7g8h',
     created_at: '2025-01-25T11:00:00Z',
     package_type: 'giornaliero',
     camper_nome: 'Giulia',
     camper_cognome: 'Romano',
-    camper_data_nascita: '2012-09-15',
+    camper_data_nascita: '2010-09-15', // 14-15 anni (grande)
     camper_taglia: 'L',
     camper_esperienza: '3+-anni',
     camper_allergie: '',
@@ -122,18 +142,23 @@ export const mockRegistrations: Registration[] = [
     status: 'confirmed',
     terms_accepted: true,
     privacy_accepted: true,
+    payment_status: 'paid',
+    payment_type: 'full',
+    amount_paid: 250,
+    amount_due: 0,
+    payment_date: '2025-01-25T11:05:00Z',
   },
   {
-    id: '6',
+    id: '6f7g8h9i',
     created_at: '2025-01-28T08:30:00Z',
     package_type: 'completa',
     camper_nome: 'Matteo',
     camper_cognome: 'Colombo',
-    camper_data_nascita: '2015-01-10',
-    camper_taglia: 'M',
+    camper_data_nascita: '2017-01-10', // 7-8 anni
+    camper_taglia: 'S',
     camper_esperienza: '1-2-anni',
     camper_allergie: '',
-    camper_note_mediche: 'Porta occhiali',
+    camper_note_mediche: 'Porta occhiali - necessita protezione',
     genitore_nome: 'Davide',
     genitore_cognome: 'Colombo',
     genitore_email: 'davide.colombo@email.com',
@@ -146,14 +171,16 @@ export const mockRegistrations: Registration[] = [
     status: 'pending',
     terms_accepted: true,
     privacy_accepted: true,
+    payment_status: 'pending',
+    amount_due: 450,
   },
   {
-    id: '7',
+    id: '7g8h9i0j',
     created_at: '2025-02-01T13:20:00Z',
     package_type: 'weekend',
     camper_nome: 'Emma',
     camper_cognome: 'Ricci',
-    camper_data_nascita: '2017-06-22',
+    camper_data_nascita: '2019-06-22', // 5-6 anni (più piccola)
     camper_taglia: 'XS',
     camper_esperienza: 'nessuna',
     camper_allergie: '',
@@ -170,18 +197,23 @@ export const mockRegistrations: Registration[] = [
     status: 'confirmed',
     terms_accepted: true,
     privacy_accepted: true,
+    payment_status: 'paid',
+    payment_type: 'full',
+    amount_paid: 150,
+    amount_due: 0,
+    payment_date: '2025-02-01T13:25:00Z',
   },
   {
-    id: '8',
+    id: '8h9i0j1k',
     created_at: '2025-02-03T10:00:00Z',
     package_type: 'completa',
     camper_nome: 'Lorenzo',
     camper_cognome: 'Martini',
-    camper_data_nascita: '2013-12-03',
+    camper_data_nascita: '2012-12-03', // 12-13 anni
     camper_taglia: 'L',
     camper_esperienza: '3+-anni',
     camper_allergie: 'Glutine',
-    camper_note_mediche: 'Celiachia',
+    camper_note_mediche: 'Celiachia diagnosticata - richiede pasti speciali',
     genitore_nome: 'Simone',
     genitore_cognome: 'Martini',
     genitore_email: 'simone.martini@email.com',
@@ -194,15 +226,19 @@ export const mockRegistrations: Registration[] = [
     status: 'cancelled',
     terms_accepted: true,
     privacy_accepted: true,
+    payment_status: 'refunded',
+    payment_type: 'full',
+    amount_paid: 0,
+    amount_due: 0,
   },
   {
-    id: '9',
+    id: '9i0j1k2l',
     created_at: '2025-02-05T15:45:00Z',
     package_type: 'giornaliero',
     camper_nome: 'Chiara',
     camper_cognome: 'Gallo',
-    camper_data_nascita: '2014-08-17',
-    camper_taglia: 'M',
+    camper_data_nascita: '2016-08-17', // 8-9 anni
+    camper_taglia: 'S',
     camper_esperienza: '1-2-anni',
     camper_allergie: '',
     camper_note_mediche: '',
@@ -218,14 +254,16 @@ export const mockRegistrations: Registration[] = [
     status: 'pending',
     terms_accepted: true,
     privacy_accepted: true,
+    payment_status: 'failed',
+    amount_due: 250,
   },
   {
-    id: '10',
+    id: '0j1k2l3m',
     created_at: '2025-02-08T12:30:00Z',
     package_type: 'completa',
     camper_nome: 'Federico',
     camper_cognome: 'Russo',
-    camper_data_nascita: '2015-02-25',
+    camper_data_nascita: '2017-02-25', // 7-8 anni
     camper_taglia: 'S',
     camper_esperienza: 'nessuna',
     camper_allergie: '',
@@ -242,14 +280,19 @@ export const mockRegistrations: Registration[] = [
     status: 'confirmed',
     terms_accepted: true,
     privacy_accepted: true,
+    payment_status: 'paid',
+    payment_type: 'full',
+    amount_paid: 450,
+    amount_due: 0,
+    payment_date: '2025-02-08T12:35:00Z',
   },
   {
-    id: '11',
+    id: '1k2l3m4n',
     created_at: '2025-02-10T09:00:00Z',
     package_type: 'weekend',
     camper_nome: 'Aurora',
     camper_cognome: 'Conti',
-    camper_data_nascita: '2016-05-08',
+    camper_data_nascita: '2016-05-08', // 8-9 anni
     camper_taglia: 'S',
     camper_esperienza: '1-2-anni',
     camper_allergie: 'Uova',
@@ -266,14 +309,19 @@ export const mockRegistrations: Registration[] = [
     status: 'pending',
     terms_accepted: true,
     privacy_accepted: true,
+    payment_status: 'partial',
+    payment_type: 'deposit',
+    amount_paid: 50,
+    amount_due: 100,
+    payment_date: '2025-02-10T09:05:00Z',
   },
   {
-    id: '12',
+    id: '2l3m4n5o',
     created_at: '2025-02-12T14:15:00Z',
     package_type: 'completa',
     camper_nome: 'Riccardo',
     camper_cognome: 'De Luca',
-    camper_data_nascita: '2012-10-30',
+    camper_data_nascita: '2009-10-30', // 15-16 anni (più grande)
     camper_taglia: 'XL',
     camper_esperienza: '3+-anni',
     camper_allergie: '',
@@ -290,6 +338,237 @@ export const mockRegistrations: Registration[] = [
     status: 'confirmed',
     terms_accepted: true,
     privacy_accepted: true,
+    payment_status: 'paid',
+    payment_type: 'full',
+    amount_paid: 450,
+    amount_due: 0,
+    payment_date: '2025-02-12T14:20:00Z',
+  },
+  {
+    id: '3m4n5o6p',
+    created_at: '2025-02-14T11:30:00Z',
+    package_type: 'giornaliero',
+    camper_nome: 'Beatrice',
+    camper_cognome: 'Santoro',
+    camper_data_nascita: '2015-07-19', // 9-10 anni
+    camper_taglia: 'M',
+    camper_esperienza: '1-2-anni',
+    camper_allergie: 'Pesce',
+    camper_note_mediche: 'Allergia moderata - no contaminazione crociata',
+    genitore_nome: 'Fabio',
+    genitore_cognome: 'Santoro',
+    genitore_email: 'fabio.santoro@email.com',
+    genitore_telefono: '+39 351 9876543',
+    genitore_codice_fiscale: 'SNTFBA77P13H501A',
+    genitore_indirizzo: 'Via Verona 88, 37100 Verona',
+    emergenza_nome: 'Cristina Santoro',
+    emergenza_relazione: 'Madre',
+    emergenza_telefono: '+39 351 3456789',
+    status: 'confirmed',
+    terms_accepted: true,
+    privacy_accepted: true,
+    payment_status: 'paid',
+    payment_type: 'full',
+    amount_paid: 250,
+    amount_due: 0,
+    payment_date: '2025-02-14T11:35:00Z',
+  },
+  {
+    id: '4n5o6p7q',
+    created_at: '2025-02-16T16:00:00Z',
+    package_type: 'completa',
+    camper_nome: 'Tommaso',
+    camper_cognome: 'Mancini',
+    camper_data_nascita: '2013-03-11', // 11-12 anni
+    camper_taglia: 'M',
+    camper_esperienza: '3+-anni',
+    camper_allergie: '',
+    camper_note_mediche: 'Diabete tipo 1 - porta sempre insulina e glucometro',
+    genitore_nome: 'Massimo',
+    genitore_cognome: 'Mancini',
+    genitore_email: 'massimo.mancini@email.com',
+    genitore_telefono: '+39 352 1122334',
+    genitore_codice_fiscale: 'MNCMSM75D14F839B',
+    genitore_indirizzo: 'Piazza Brescia 22, 25100 Brescia',
+    emergenza_nome: 'Paola Mancini',
+    emergenza_relazione: 'Madre',
+    emergenza_telefono: '+39 352 4433221',
+    status: 'confirmed',
+    terms_accepted: true,
+    privacy_accepted: true,
+    payment_status: 'paid',
+    payment_type: 'full',
+    amount_paid: 450,
+    amount_due: 0,
+    payment_date: '2025-02-16T16:05:00Z',
+  },
+  {
+    id: '5o6p7q8r',
+    created_at: '2025-02-18T10:45:00Z',
+    package_type: 'weekend',
+    camper_nome: 'Giorgia',
+    camper_cognome: 'Pellegrini',
+    camper_data_nascita: '2018-01-28', // 6-7 anni
+    camper_taglia: 'XS',
+    camper_esperienza: 'nessuna',
+    camper_allergie: '',
+    camper_note_mediche: '',
+    genitore_nome: 'Enrico',
+    genitore_cognome: 'Pellegrini',
+    genitore_email: 'enrico.pellegrini@email.com',
+    genitore_telefono: '+39 353 5566778',
+    genitore_codice_fiscale: 'PLLNRC80E15A944C',
+    genitore_indirizzo: 'Via Padova 55, 35100 Padova',
+    emergenza_nome: 'Monica Pellegrini',
+    emergenza_relazione: 'Madre',
+    emergenza_telefono: '+39 353 8877665',
+    status: 'pending',
+    terms_accepted: true,
+    privacy_accepted: true,
+    payment_status: 'pending',
+    amount_due: 150,
+  },
+  {
+    id: '6p7q8r9s',
+    created_at: '2025-02-20T14:30:00Z',
+    package_type: 'giornaliero',
+    camper_nome: 'Leonardo',
+    camper_cognome: 'Vitale',
+    camper_data_nascita: '2011-09-05', // 13-14 anni
+    camper_taglia: 'L',
+    camper_esperienza: '3+-anni',
+    camper_allergie: 'Latte e derivati',
+    camper_note_mediche: '',
+    genitore_nome: 'Antonio',
+    genitore_cognome: 'Vitale',
+    genitore_email: 'antonio.vitale@email.com',
+    genitore_telefono: '+39 354 9988776',
+    genitore_codice_fiscale: 'VTLNTN72F16L219D',
+    genitore_indirizzo: 'Corso Trieste 33, 34100 Trieste',
+    emergenza_nome: 'Rosa Vitale',
+    emergenza_relazione: 'Madre',
+    emergenza_telefono: '+39 354 6677889',
+    status: 'confirmed',
+    terms_accepted: true,
+    privacy_accepted: true,
+    payment_status: 'paid',
+    payment_type: 'full',
+    amount_paid: 250,
+    amount_due: 0,
+    payment_date: '2025-02-20T14:35:00Z',
+  },
+  {
+    id: '7q8r9s0t',
+    created_at: '2025-02-22T09:15:00Z',
+    package_type: 'completa',
+    camper_nome: 'Camilla',
+    camper_cognome: 'Lombardi',
+    camper_data_nascita: '2014-11-22', // 10-11 anni
+    camper_taglia: 'M',
+    camper_esperienza: '1-2-anni',
+    camper_allergie: '',
+    camper_note_mediche: '',
+    genitore_nome: 'Claudio',
+    genitore_cognome: 'Lombardi',
+    genitore_email: 'claudio.lombardi@email.com',
+    genitore_telefono: '+39 355 1234567',
+    genitore_codice_fiscale: 'LMBCLD74G17H501E',
+    genitore_indirizzo: 'Via Parma 44, 43100 Parma',
+    emergenza_nome: 'Ilaria Lombardi',
+    emergenza_relazione: 'Madre',
+    emergenza_telefono: '+39 355 7654321',
+    status: 'pending',
+    terms_accepted: true,
+    privacy_accepted: true,
+    payment_status: 'partial',
+    payment_type: 'deposit',
+    amount_paid: 150,
+    amount_due: 300,
+    payment_date: '2025-02-22T09:20:00Z',
+  },
+  {
+    id: '8r9s0t1u',
+    created_at: '2025-02-24T13:00:00Z',
+    package_type: 'weekend',
+    camper_nome: 'Gabriele',
+    camper_cognome: 'Moretti',
+    camper_data_nascita: '2015-06-14', // 9-10 anni
+    camper_taglia: 'M',
+    camper_esperienza: '1-2-anni',
+    camper_allergie: 'Nichel (contatto)',
+    camper_note_mediche: 'Evitare contatto con metalli contenenti nichel',
+    genitore_nome: 'Filippo',
+    genitore_cognome: 'Moretti',
+    genitore_email: 'filippo.moretti@email.com',
+    genitore_telefono: '+39 356 2233445',
+    genitore_codice_fiscale: 'MRTFPP78H18F205F',
+    genitore_indirizzo: 'Via Modena 66, 41100 Modena',
+    emergenza_nome: 'Serena Moretti',
+    emergenza_relazione: 'Madre',
+    emergenza_telefono: '+39 356 5544332',
+    status: 'confirmed',
+    terms_accepted: true,
+    privacy_accepted: true,
+    payment_status: 'paid',
+    payment_type: 'full',
+    amount_paid: 150,
+    amount_due: 0,
+    payment_date: '2025-02-24T13:05:00Z',
+  },
+  {
+    id: '9s0t1u2v',
+    created_at: '2025-02-26T11:45:00Z',
+    package_type: 'giornaliero',
+    camper_nome: 'Vittoria',
+    camper_cognome: 'Bruno',
+    camper_data_nascita: '2012-04-03', // 12-13 anni
+    camper_taglia: 'L',
+    camper_esperienza: '3+-anni',
+    camper_allergie: '',
+    camper_note_mediche: '',
+    genitore_nome: 'Riccardo',
+    genitore_cognome: 'Bruno',
+    genitore_email: 'riccardo.bruno@email.com',
+    genitore_telefono: '+39 357 6677889',
+    genitore_codice_fiscale: 'BRNRCC71I19G273G',
+    genitore_indirizzo: 'Piazza Reggio 11, 42100 Reggio Emilia',
+    emergenza_nome: 'Daniela Bruno',
+    emergenza_relazione: 'Madre',
+    emergenza_telefono: '+39 357 9988776',
+    status: 'confirmed',
+    terms_accepted: true,
+    privacy_accepted: true,
+    payment_status: 'paid',
+    payment_type: 'full',
+    amount_paid: 250,
+    amount_due: 0,
+    payment_date: '2025-02-26T11:50:00Z',
+  },
+  {
+    id: '0t1u2v3w',
+    created_at: '2025-02-28T15:30:00Z',
+    package_type: 'completa',
+    camper_nome: 'Andrea',
+    camper_cognome: 'Fontana',
+    camper_data_nascita: '2010-12-08', // 14-15 anni
+    camper_taglia: 'XL',
+    camper_esperienza: '3+-anni',
+    camper_allergie: '',
+    camper_note_mediche: '',
+    genitore_nome: 'Nicola',
+    genitore_cognome: 'Fontana',
+    genitore_email: 'nicola.fontana@email.com',
+    genitore_telefono: '+39 358 1122334',
+    genitore_codice_fiscale: 'FNTNCL73L20A944H',
+    genitore_indirizzo: 'Via Ferrara 77, 44100 Ferrara',
+    emergenza_nome: 'Angela Fontana',
+    emergenza_relazione: 'Madre',
+    emergenza_telefono: '+39 358 4433221',
+    status: 'pending',
+    terms_accepted: true,
+    privacy_accepted: true,
+    payment_status: 'pending',
+    amount_due: 450,
   },
 ]
 
@@ -584,18 +863,78 @@ export const getRegistrationStats = () => {
   const confirmed = mockRegistrations.filter(r => r.status === 'confirmed').length
   const cancelled = mockRegistrations.filter(r => r.status === 'cancelled').length
   
-  // Calculate revenue based on packages
-  const packagePrices = {
-    giornaliero: 50,
-    completa: 350,
-    weekend: 150,
-  }
-  
+  // Calculate revenue based on actual payments
   const revenue = mockRegistrations
-    .filter(r => r.status === 'confirmed')
-    .reduce((sum, r) => sum + packagePrices[r.package_type], 0)
+    .filter(r => r.status === 'confirmed' || r.payment_status === 'paid' || r.payment_status === 'partial')
+    .reduce((sum, r) => sum + (r.amount_paid || 0), 0)
   
-  return { total, pending, confirmed, cancelled, revenue }
+  // Count pending payments
+  const pendingPayments = mockRegistrations.filter(
+    r => r.payment_status === 'pending' || r.payment_status === 'partial'
+  ).length
+  
+  return { total, pending, confirmed, cancelled, revenue, pendingPayments }
+}
+
+// Calculate age helper
+const calculateAge = (birthDate: string) => {
+  const today = new Date()
+  const birth = new Date(birthDate)
+  let age = today.getFullYear() - birth.getFullYear()
+  const monthDiff = today.getMonth() - birth.getMonth()
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--
+  }
+  return age
+}
+
+// Get t-shirt size distribution
+export const getSizeDistribution = () => {
+  const sizes = { XS: 0, S: 0, M: 0, L: 0, XL: 0 }
+  mockRegistrations
+    .filter(r => r.status !== 'cancelled')
+    .forEach(r => {
+      sizes[r.camper_taglia]++
+    })
+  return sizes
+}
+
+// Get age distribution
+export const getAgeDistribution = () => {
+  const ages = { '6-8': 0, '9-11': 0, '12-14': 0, '15+': 0 }
+  mockRegistrations
+    .filter(r => r.status !== 'cancelled')
+    .forEach(r => {
+      const age = calculateAge(r.camper_data_nascita)
+      if (age >= 6 && age <= 8) ages['6-8']++
+      else if (age >= 9 && age <= 11) ages['9-11']++
+      else if (age >= 12 && age <= 14) ages['12-14']++
+      else if (age >= 15) ages['15+']++
+    })
+  return ages
+}
+
+// Get experience distribution
+export const getExperienceDistribution = () => {
+  const experience = { nessuna: 0, '1-2-anni': 0, '3+-anni': 0 }
+  mockRegistrations
+    .filter(r => r.status !== 'cancelled')
+    .forEach(r => {
+      experience[r.camper_esperienza]++
+    })
+  return experience
+}
+
+// Get special needs count (allergies/medical notes)
+export const getSpecialNeedsCount = () => {
+  const active = mockRegistrations.filter(r => r.status !== 'cancelled')
+  const withAllergies = active.filter(r => r.camper_allergie && r.camper_allergie.trim() !== '').length
+  const withMedicalNotes = active.filter(r => r.camper_note_mediche && r.camper_note_mediche.trim() !== '').length
+  const withAnyNotes = active.filter(r => 
+    (r.camper_allergie && r.camper_allergie.trim() !== '') || 
+    (r.camper_note_mediche && r.camper_note_mediche.trim() !== '')
+  ).length
+  return { withAllergies, withMedicalNotes, withAnyNotes, total: active.length }
 }
 
 export const getRecentRegistrations = (limit: number = 5) => {

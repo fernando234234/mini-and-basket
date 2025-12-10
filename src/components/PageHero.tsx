@@ -100,7 +100,7 @@ export default function PageHero({
       </div>
 
       {/* Bottom Decorative Wave */}
-      <div className="absolute bottom-0 left-0 right-0">
+      <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
         <svg viewBox="0 0 1440 60" className="w-full h-auto fill-brand-beige">
           <path d="M0,32L48,34.7C96,37,192,43,288,40C384,37,480,27,576,24C672,21,768,27,864,32C960,37,1056,43,1152,40C1248,37,1344,27,1392,21.3L1440,16L1440,60L1392,60C1344,60,1248,60,1152,60C1056,60,960,60,864,60C768,60,672,60,576,60C480,60,384,60,288,60C192,60,96,60,48,60L0,60Z" />
         </svg>

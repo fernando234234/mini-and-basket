@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import type { RegistrationInsert } from "@/types/registration";
+import StripeCheckout from "./StripeCheckout";
+import { validatePhoneNumber, validateCodiceFiscale, validationMessages } from "@/lib/validation";
 
 // Types
 interface CamperInfo {
@@ -127,12 +130,16 @@ export default function RegistrationWizard() {
   const [registrationId, setRegistrationId] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  const router = useRouter();
+  const [showPayment, setShowPayment] = useState(false);
+
   const steps = [
     { number: 1, title: "Pacchetto", icon: "📦" },
     { number: 2, title: "Atleta", icon: "🏀" },
     { number: 3, title: "Genitore", icon: "👤" },
     { number: 4, title: "Emergenza", icon: "🚨" },
     { number: 5, title: "Conferma", icon: "✅" },
+    { number: 6, title: "Pagamento", icon: "💳" },
   ];
 
   const validateStep = (step: number): boolean => {
@@ -175,9 +182,13 @@ export default function RegistrationWizard() {
         }
         if (!formData.parent.phone.trim()) {
           newErrors["parent.phone"] = "Il telefono è obbligatorio";
+        } else if (!validatePhoneNumber(formData.parent.phone)) {
+          newErrors["parent.phone"] = validationMessages.phoneInvalid;
         }
         if (!formData.parent.codiceFiscale.trim()) {
           newErrors["parent.codiceFiscale"] = "Il codice fiscale è obbligatorio";
+        } else if (!validateCodiceFiscale(formData.parent.codiceFiscale)) {
+          newErrors["parent.codiceFiscale"] = validationMessages.codiceFiscaleInvalid;
         }
         if (!formData.parent.address.trim()) {
           newErrors["parent.address"] = "L'indirizzo è obbligatorio";
@@ -198,6 +209,8 @@ export default function RegistrationWizard() {
         }
         if (!formData.emergency.phone.trim()) {
           newErrors["emergency.phone"] = "Il telefono è obbligatorio";
+        } else if (!validatePhoneNumber(formData.emergency.phone)) {
+          newErrors["emergency.phone"] = validationMessages.phoneInvalid;
         }
         break;
       case 5:
@@ -216,7 +229,7 @@ export default function RegistrationWizard() {
 
   const handleNext = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep((prev) => Math.min(prev + 1, 5));
+      setCurrentStep((prev) => Math.min(prev + 1, 6));
     }
   };
 
@@ -295,12 +308,36 @@ export default function RegistrationWizard() {
       }
 
       setIsSubmitting(false);
-      setIsSubmitted(true);
+      // Move to payment step instead of showing success
+      setCurrentStep(6);
     } catch (error) {
       console.error('Submit error:', error);
       setSubmitError('Si è verificato un errore imprevisto. Riprova più tardi.');
       setIsSubmitting(false);
     }
+  };
+
+  const handlePaymentSuccess = (paymentType: 'full' | 'deposit', sessionId: string) => {
+    // Navigate to success page with registration details
+    const params = new URLSearchParams({
+      session_id: sessionId,
+      registration_id: registrationId || '',
+      payment_type: paymentType,
+      camper_name: `${formData.camper.firstName} ${formData.camper.lastName}`,
+      package: formData.package,
+      email: formData.parent.email,
+    });
+    router.push(`/iscrizione/success?${params.toString()}`);
+  };
+
+  const handlePaymentCancel = () => {
+    // Go back to review step
+    setCurrentStep(5);
+  };
+
+  const handlePayLater = () => {
+    // Skip payment and go to success without payment
+    setIsSubmitted(true);
   };
 
   const updateFormData = (
@@ -452,7 +489,7 @@ export default function RegistrationWizard() {
           <div className="absolute top-6 left-0 right-0 h-1 bg-gray-200 -z-10">
             <div
               className="h-full bg-gradient-to-r from-brand-green to-brand-orange transition-all duration-500"
-              style={{ width: `${((currentStep - 1) / 4) * 100}%` }}
+              style={{ width: `${((currentStep - 1) / 5) * 100}%` }}
             />
           </div>
 
@@ -504,15 +541,31 @@ export default function RegistrationWizard() {
               Seleziona il pacchetto più adatto alle tue esigenze
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 relative z-10">
               {packages.map((pkg) => (
-                <button
+                <div
                   key={pkg.id}
-                  onClick={() => updateFormData("package", "", pkg.id)}
-                  className={`relative p-6 rounded-2xl text-left transition-all duration-300 ${
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => {
+                    setFormData(prev => ({ ...prev, package: pkg.id }));
+                    if (errors.package) {
+                      setErrors(prev => ({ ...prev, package: "" }));
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setFormData(prev => ({ ...prev, package: pkg.id }));
+                      if (errors.package) {
+                        setErrors(prev => ({ ...prev, package: "" }));
+                      }
+                    }
+                  }}
+                  className={`relative p-6 rounded-2xl text-left transition-all duration-300 cursor-pointer select-none ${
                     formData.package === pkg.id
-                      ? "ring-4 ring-brand-green shadow-xl scale-[1.02]"
-                      : "border-2 border-gray-200 hover:border-brand-green hover:shadow-lg"
+                      ? "ring-4 ring-brand-green shadow-xl scale-[1.02] bg-brand-green/5"
+                      : "border-2 border-gray-200 hover:border-brand-green hover:shadow-lg bg-white"
                   }`}
                 >
                   {pkg.popular && (
@@ -556,7 +609,7 @@ export default function RegistrationWizard() {
                       </div>
                     </div>
                   )}
-                </button>
+                </div>
               ))}
             </div>
             {errors.package && (
@@ -793,6 +846,11 @@ export default function RegistrationWizard() {
                   type="tel"
                   value={formData.parent.phone}
                   onChange={(e) => updateFormData("parent", "phone", e.target.value)}
+                  onBlur={() => {
+                    if (formData.parent.phone.trim() && !validatePhoneNumber(formData.parent.phone)) {
+                      setErrors(prev => ({ ...prev, "parent.phone": validationMessages.phoneInvalid }));
+                    }
+                  }}
                   className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
                     errors["parent.phone"]
                       ? "border-red-400 bg-red-50"
@@ -813,6 +871,11 @@ export default function RegistrationWizard() {
                   type="text"
                   value={formData.parent.codiceFiscale}
                   onChange={(e) => updateFormData("parent", "codiceFiscale", e.target.value.toUpperCase())}
+                  onBlur={() => {
+                    if (formData.parent.codiceFiscale.trim() && !validateCodiceFiscale(formData.parent.codiceFiscale)) {
+                      setErrors(prev => ({ ...prev, "parent.codiceFiscale": validationMessages.codiceFiscaleInvalid }));
+                    }
+                  }}
                   className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none uppercase ${
                     errors["parent.codiceFiscale"]
                       ? "border-red-400 bg-red-50"
@@ -954,6 +1017,11 @@ export default function RegistrationWizard() {
                   type="tel"
                   value={formData.emergency.phone}
                   onChange={(e) => updateFormData("emergency", "phone", e.target.value)}
+                  onBlur={() => {
+                    if (formData.emergency.phone.trim() && !validatePhoneNumber(formData.emergency.phone)) {
+                      setErrors(prev => ({ ...prev, "emergency.phone": validationMessages.phoneInvalid }));
+                    }
+                  }}
                   className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
                     errors["emergency.phone"]
                       ? "border-red-400 bg-red-50"
@@ -1133,84 +1201,122 @@ export default function RegistrationWizard() {
           </div>
         )}
 
-        {/* Navigation Buttons */}
-        <div className="flex justify-between mt-8 pt-6 border-t border-gray-200">
-          {currentStep > 1 ? (
-            <button
-              onClick={handlePrev}
-              className="flex items-center gap-2 text-brand-gray hover:text-brand-dark font-semibold transition-colors"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Indietro
-            </button>
-          ) : (
-            <div />
-          )}
+        {/* Step 6: Payment */}
+        {currentStep === 6 && (
+          <div className="animate-fade-in">
+            <h2 className="text-2xl font-bold text-brand-dark mb-2">
+              Pagamento
+            </h2>
+            <p className="text-brand-gray mb-6">
+              Completa il pagamento per confermare la tua iscrizione
+            </p>
 
-          {currentStep < 5 ? (
-            <button
-              onClick={handleNext}
-              className="bg-gradient-to-r from-brand-green to-emerald-500 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 hover:shadow-lg hover:scale-105 flex items-center gap-2"
-            >
-              Avanti
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          ) : (
-            <div className="flex flex-col items-end gap-2">
-              {submitError && (
-                <p className="text-sm text-red-500 bg-red-50 px-4 py-2 rounded-lg">
-                  {submitError}
-                </p>
-              )}
+            <StripeCheckout
+              packageType={formData.package}
+              registrationData={{
+                id: registrationId || undefined,
+                participantName: `${formData.camper.firstName} ${formData.camper.lastName}`,
+                email: formData.parent.email,
+              }}
+              onSuccess={handlePaymentSuccess}
+              onCancel={handlePaymentCancel}
+            />
+
+            {/* Pay Later Option */}
+            <div className="mt-8 pt-6 border-t border-gray-200">
               <button
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                className={`bg-gradient-to-r from-brand-orange to-red-500 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 flex items-center gap-2 ${
-                  isSubmitting
-                    ? "opacity-70 cursor-not-allowed"
-                    : "hover:shadow-lg hover:scale-105"
-                }`}
+                onClick={handlePayLater}
+                className="w-full text-center text-brand-gray hover:text-brand-dark font-medium transition-colors"
               >
-                {isSubmitting ? (
-                  <>
-                    <svg
-                      className="animate-spin h-5 w-5 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    <span>Invio in corso...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>CONFERMA ISCRIZIONE</span>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </>
-                )}
+                Preferisci pagare dopo? <span className="underline">Completa senza pagamento</span>
               </button>
+              <p className="text-sm text-brand-gray text-center mt-2">
+                Nota: Il tuo posto sarà riservato ma non confermato fino al pagamento
+              </p>
             </div>
-          )}
-        </div>
+          </div>
+        )}
+
+        {/* Navigation Buttons - Only show for steps 1-5 */}
+        {currentStep <= 5 && (
+          <div className="flex justify-between mt-8 pt-6 border-t border-gray-200">
+            {currentStep > 1 ? (
+              <button
+                onClick={handlePrev}
+                className="flex items-center gap-2 text-brand-gray hover:text-brand-dark font-semibold transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                Indietro
+              </button>
+            ) : (
+              <div />
+            )}
+
+            {currentStep < 5 ? (
+              <button
+                onClick={handleNext}
+                className="bg-gradient-to-r from-brand-green to-emerald-500 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 hover:shadow-lg hover:scale-105 flex items-center gap-2"
+              >
+                Avanti
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            ) : (
+              <div className="flex flex-col items-end gap-2">
+                {submitError && (
+                  <p className="text-sm text-red-500 bg-red-50 px-4 py-2 rounded-lg">
+                    {submitError}
+                  </p>
+                )}
+                <button
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  className={`bg-gradient-to-r from-brand-orange to-red-500 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 flex items-center gap-2 ${
+                    isSubmitting
+                      ? "opacity-70 cursor-not-allowed"
+                      : "hover:shadow-lg hover:scale-105"
+                  }`}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <svg
+                        className="animate-spin h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      <span>Invio in corso...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>PROCEDI AL PAGAMENTO</span>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
