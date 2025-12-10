@@ -1,10 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
+import { mockGalleryPhotos } from "@/lib/mockData";
+import { GalleryPhoto, GALLERY_CATEGORIES, GALLERY_YEARS } from "@/types/gallery";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 interface GalleryImage {
-  id: number;
+  id: string;
   src: string;
   alt: string;
   category: string;
@@ -12,41 +15,73 @@ interface GalleryImage {
   featured?: boolean;
 }
 
-const galleryImages: GalleryImage[] = [
-  // 2024
-  { id: 1, src: "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80", alt: "Partita in corso", category: "Partite", year: "2024", featured: true },
-  { id: 2, src: "https://images.unsplash.com/photo-1574623452334-1e0ac2b3ccb4?w=800&q=80", alt: "Allenamento tecnico", category: "Allenamenti", year: "2024" },
-  { id: 3, src: "https://images.unsplash.com/photo-1519861531473-9200262188bf?w=800&q=80", alt: "Pallone sul campo", category: "Allenamenti", year: "2024" },
-  { id: 4, src: "https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=800&q=80", alt: "Giovani atleti", category: "Gruppo", year: "2024", featured: true },
-  { id: 5, src: "https://images.unsplash.com/photo-1608245449230-4ac19066d2d0?w=800&q=80", alt: "Partita serale", category: "Partite", year: "2024" },
-  { id: 6, src: "https://images.unsplash.com/photo-1544919982-b61976f0ba43?w=800&q=80", alt: "Attività ricreativa", category: "Attività", year: "2024" },
-  { id: 7, src: "https://images.unsplash.com/photo-1559692048-79a3f837883d?w=800&q=80", alt: "Team building", category: "Gruppo", year: "2024" },
-  // 2023
-  { id: 8, src: "https://images.unsplash.com/photo-1628891890467-b79f2c8ba9dc?w=800&q=80", alt: "Esercizi di tiro", category: "Allenamenti", year: "2023", featured: true },
-  { id: 9, src: "https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=800&q=80", alt: "Coach in campo", category: "Allenamenti", year: "2023" },
-  { id: 10, src: "https://images.unsplash.com/photo-1518063319789-7217e6706b04?w=800&q=80", alt: "Partita amichevole", category: "Partite", year: "2023" },
-  { id: 11, src: "https://images.unsplash.com/photo-1516802273409-68526ee1bdd6?w=800&q=80", alt: "Gioco di squadra", category: "Partite", year: "2023" },
-  { id: 12, src: "https://images.unsplash.com/photo-1591491719565-9e7a8e5e7c6d?w=800&q=80", alt: "Merenda insieme", category: "Attività", year: "2023" },
-  { id: 13, src: "https://images.unsplash.com/photo-1577471488278-16eec37ffcc2?w=800&q=80", alt: "Foto di gruppo 2023", category: "Gruppo", year: "2023", featured: true },
-  { id: 14, src: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800&q=80", alt: "Difesa", category: "Allenamenti", year: "2023" },
-  // 2022
-  { id: 15, src: "https://images.unsplash.com/photo-1560012057-4372e14c5085?w=800&q=80", alt: "Riscaldamento", category: "Allenamenti", year: "2022" },
-  { id: 16, src: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80", alt: "Partita finale 2022", category: "Partite", year: "2022", featured: true },
-  { id: 17, src: "https://images.unsplash.com/photo-1627627256672-027a4613d028?w=800&q=80", alt: "Premiazione", category: "Attività", year: "2022" },
-  { id: 18, src: "https://images.unsplash.com/photo-1591491719550-c3c5ee0c6e04?w=800&q=80", alt: "Momenti insieme", category: "Gruppo", year: "2022" },
-  { id: 19, src: "https://images.unsplash.com/photo-1475180098004-ca77a66827be?w=800&q=80", alt: "Esercizio difensivo", category: "Allenamenti", year: "2022" },
-  { id: 20, src: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=800&q=80", alt: "Attività all'aperto", category: "Attività", year: "2022" },
-  { id: 21, src: "https://images.unsplash.com/photo-1543852786-1cf6624b9987?w=800&q=80", alt: "Foto ricordo", category: "Gruppo", year: "2022" },
-];
+// Map category values to display labels
+const categoryLabels: Record<string, string> = {
+  allenamenti: "Allenamenti",
+  partite: "Partite",
+  attivita: "Attività",
+  gruppo: "Gruppo",
+};
 
-const years = ["Tutti", "2024", "2023", "2022"];
-const categories = ["Tutti", "Allenamenti", "Partite", "Attività", "Gruppo"];
+const years = ["Tutti", ...GALLERY_YEARS.map(String)];
+const categories = ["Tutti", ...GALLERY_CATEGORIES.map(c => c.label)];
 
 export default function GalleryGrid() {
   const [selectedYear, setSelectedYear] = useState("Tutti");
   const [selectedCategory, setSelectedCategory] = useState("Tutti");
-  const [selectedImage, setSelectedImage] = useState<number | null>(null);
-  const [hoveredImage, setHoveredImage] = useState<number | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [hoveredImage, setHoveredImage] = useState<string | null>(null);
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Transform GalleryPhoto to GalleryImage format
+  const transformPhotos = (photos: GalleryPhoto[]): GalleryImage[] => {
+    return photos.map(photo => ({
+      id: photo.id,
+      src: photo.url,
+      alt: photo.alt_text,
+      category: categoryLabels[photo.category] || photo.category,
+      year: String(photo.year),
+      featured: photo.featured,
+    }));
+  };
+
+  // Fetch photos from Supabase or use mock data
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      setLoading(true);
+      
+      if (isSupabaseConfigured()) {
+        try {
+          const { data, error } = await supabase
+            .from('gallery_photos')
+            .select('*')
+            .order('sort_order', { ascending: true });
+          
+          if (error) {
+            console.error('Error fetching gallery photos:', error);
+            // Fall back to mock data
+            setGalleryImages(transformPhotos(mockGalleryPhotos));
+          } else if (data && data.length > 0) {
+            setGalleryImages(transformPhotos(data));
+          } else {
+            // No data in Supabase, use mock
+            setGalleryImages(transformPhotos(mockGalleryPhotos));
+          }
+        } catch (error) {
+          console.error('Error fetching gallery photos:', error);
+          setGalleryImages(transformPhotos(mockGalleryPhotos));
+        }
+      } else {
+        // Use mock data when Supabase is not configured
+        setGalleryImages(transformPhotos(mockGalleryPhotos));
+      }
+      
+      setLoading(false);
+    };
+
+    fetchPhotos();
+  }, []);
 
   const filteredImages = galleryImages.filter((image) => {
     const yearMatch = selectedYear === "Tutti" || image.year === selectedYear;
@@ -132,8 +167,15 @@ export default function GalleryGrid() {
         </div>
       </div>
 
+      {/* Loading State */}
+      {loading && (
+        <div className="flex items-center justify-center py-12">
+          <div className="w-10 h-10 border-4 border-brand-green border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
+
       {/* Photo Grid - Masonry Style */}
-      <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
+      {!loading && <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
         {filteredImages.map((image, index) => {
           const isHovered = hoveredImage === image.id;
           const aspectRatio = image.featured ? "aspect-[3/4]" : index % 3 === 0 ? "aspect-square" : "aspect-[4/3]";
@@ -217,7 +259,7 @@ export default function GalleryGrid() {
             </div>
           );
         })}
-      </div>
+      </div>}
 
       {/* Video Section */}
       <div className="mt-16">
