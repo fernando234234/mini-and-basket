@@ -14,17 +14,7 @@ interface StaffMember {
 }
 
 const staffMembers: StaffMember[] = [
-  // Direzione
-  {
-    name: "Antonio Nappi",
-    role: "Responsabile Mini&Basket Camp",
-    category: "Direzione",
-    avatar: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=300&q=80",
-    bio: "Fondatore e direttore del Mini&Basket Camp dal 2004. La sua visione e passione hanno reso questo camp uno dei principali in Italia.",
-    specializations: ["Leadership", "Organizzazione", "Formazione giovanile"],
-    color: "from-brand-green to-emerald-600",
-  },
-  // Allenatori
+  // Allenatori - Only trainers with real photos
   {
     name: "Gianluca Tucci",
     role: "Allenatore",
@@ -123,72 +113,9 @@ const staffMembers: StaffMember[] = [
     avatar: "/images/staff/AlfredoLamberti.jpg",
     color: "from-lime-500 to-green-600",
   },
-  // Campioni / Guest Stars
-  {
-    name: "Linton Johnson",
-    role: "NBA / Guest Star",
-    category: "Campioni",
-    avatar: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=300&q=80",
-    bio: "Ex giocatore NBA, protagonista del One Day Camp. Un'esperienza unica per i giovani cestisti.",
-    specializations: ["NBA Experience", "Tecnica individuale"],
-    color: "from-yellow-500 to-amber-600",
-  },
-  {
-    name: "Gasper Vidmar",
-    role: "Serie A / Umana",
-    category: "Campioni",
-    avatar: "https://images.unsplash.com/photo-1546961342-ea5f71b193f3?w=300&q=80",
-    bio: "Giocatore professionista di Serie A, porta la sua esperienza ai giovani atleti del camp.",
-    color: "from-red-500 to-rose-600",
-  },
-  {
-    name: "Caterina Mattera",
-    role: "Nazionale Italiana #20",
-    category: "Campioni",
-    avatar: "https://images.unsplash.com/photo-1594381898411-846e7d193883?w=300&q=80",
-    bio: "Giocatrice della Nazionale Italiana, modello di riferimento per le giovani atlete.",
-    color: "from-blue-500 to-indigo-600",
-  },
-  {
-    name: "Pino Corvo",
-    role: "Nazionale Italiana",
-    category: "Campioni",
-    avatar: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=300&q=80",
-    bio: "Ex nazionale italiano con importanti trofei nel suo palmares.",
-    color: "from-green-500 to-emerald-600",
-  },
-  {
-    name: "Marida Orazzo",
-    role: "Nazionale Italiana",
-    category: "Campioni",
-    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&q=80",
-    bio: "Giocatrice della Nazionale Italiana femminile.",
-    color: "from-pink-500 to-rose-600",
-  },
-  {
-    name: "Antonio Gallo",
-    role: "Giocatore Professionista",
-    category: "Campioni",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80",
-    color: "from-purple-500 to-violet-600",
-  },
-  {
-    name: "Antonio Sabatino",
-    role: "Staff Camp",
-    category: "Campioni",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&q=80",
-    color: "from-teal-500 to-cyan-600",
-  },
-  {
-    name: "Alessandro Morgillo",
-    role: "Staff Camp",
-    category: "Campioni",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&q=80",
-    color: "from-orange-500 to-red-600",
-  },
 ];
 
-const categories = ["Tutti", "Direzione", "Allenatori", "Campioni"];
+const categories = ["Tutti", "Allenatori"];
 
 export default function StaffGrid() {
   const [selectedCategory, setSelectedCategory] = useState("Tutti");
@@ -312,18 +239,8 @@ export default function StaffGrid() {
       <div className="mt-12 text-center">
         <div className="inline-flex items-center gap-6 bg-white rounded-2xl px-8 py-4 shadow-lg">
           <div className="text-center">
-            <div className="text-2xl font-black text-brand-green">1</div>
-            <div className="text-xs text-brand-gray">Direttore</div>
-          </div>
-          <div className="w-px h-8 bg-gray-200" />
-          <div className="text-center">
             <div className="text-2xl font-black text-brand-orange">14</div>
-            <div className="text-xs text-brand-gray">Allenatori</div>
-          </div>
-          <div className="w-px h-8 bg-gray-200" />
-          <div className="text-center">
-            <div className="text-2xl font-black text-yellow-500">8+</div>
-            <div className="text-xs text-brand-gray">Guest Stars</div>
+            <div className="text-xs text-brand-gray">Allenatori Professionisti</div>
           </div>
         </div>
       </div>

@@ -10,15 +10,6 @@ export default function StaffPreview() {
 
   const staffMembers = [
     {
-      name: "ANTONIO NAPPI",
-      role: "Direttore Camp",
-      avatar: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=300&q=80",
-      bio: "Fondatore e responsabile del Mini&Basket Camp dal 2015. La sua visione e passione hanno reso questo camp uno dei principali in Italia.",
-      speciality: "Leadership & Organizzazione",
-      experience: "10+ anni",
-      color: "from-brand-green to-emerald-600",
-    },
-    {
       name: "GIANLUCA TUCCI",
       role: "Allenatore",
       avatar: "/images/staff/GianlucaTucci.webp",
@@ -28,15 +19,6 @@ export default function StaffPreview() {
       color: "from-brand-orange to-red-500",
     },
     {
-      name: "LINTON JOHNSON",
-      role: "NBA Guest Star",
-      avatar: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=300&q=80",
-      bio: "Ex giocatore NBA, protagonista del One Day Camp. Un'esperienza unica per i giovani cestisti.",
-      speciality: "NBA Experience",
-      experience: "Pro NBA",
-      color: "from-yellow-500 to-amber-600",
-    },
-    {
       name: "ALESSANDRA FINAMORE",
       role: "Allenatrice",
       avatar: "/images/staff/AlessandraFinamore.webp",
@@ -44,6 +26,24 @@ export default function StaffPreview() {
       speciality: "Tecnica Individuale",
       experience: "10+ anni",
       color: "from-pink-500 to-rose-600",
+    },
+    {
+      name: "WALTER DE RAFFAELE",
+      role: "Allenatore",
+      avatar: "/images/staff/WalterDeRaffaele.jpg",
+      bio: "Allenatore esperto con anni di esperienza nel settore giovanile.",
+      speciality: "Fondamentali",
+      experience: "12+ anni",
+      color: "from-blue-500 to-indigo-600",
+    },
+    {
+      name: "ENZO PATRIZIO",
+      role: "Allenatore",
+      avatar: "/images/staff/EnzoPatrizio.webp",
+      bio: "Coach dedicato alla crescita tecnica e personale dei giovani atleti.",
+      speciality: "Preparazione Atletica",
+      experience: "10+ anni",
+      color: "from-lime-500 to-green-600",
     },
   ];
 
