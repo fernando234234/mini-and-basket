@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Registration, paymentStatusLabels } from '@/types/registration'
+import { MockRegistration } from '@/lib/mockData'
+import { paymentStatusLabels } from '@/types/registration'
 import RegistrationDetail from './RegistrationDetail'
 
 interface RegistrationsTableProps {
-  registrations: Registration[]
+  registrations: MockRegistration[]
   onStatusChange?: (id: string, status: 'pending' | 'confirmed' | 'cancelled') => void
   onSendPaymentReminder?: (id: string, email: string) => void
   onDelete?: (id: string) => void
@@ -18,22 +19,20 @@ const statusLabels = {
 }
 
 const packageLabels = {
-  giornaliero: { label: 'Giornaliero', color: 'bg-blue-100 text-blue-800' },
-  completa: { label: 'Settimana Completa', color: 'bg-purple-100 text-purple-800' },
-  weekend: { label: 'Weekend', color: 'bg-teal-100 text-teal-800' },
+  standard: { label: 'Camp Standard', color: 'bg-blue-100 text-blue-800' },
+  alta_specializzazione: { label: 'Alta Specializzazione', color: 'bg-purple-100 text-purple-800' },
 }
 
 const packagePrices = {
-  giornaliero: 250,
-  completa: 450,
-  weekend: 150,
+  standard: 610,
+  alta_specializzazione: 800,
 }
 
-const sizeOptions = ['XS', 'S', 'M', 'L', 'XL'] as const
+const sizeOptions = ['XXS', 'XS', 'S', 'M', 'L', 'XL'] as const
 const experienceOptions = [
-  { value: 'nessuna', label: 'Nessuna esperienza' },
-  { value: '1-2-anni', label: '1-2 anni' },
-  { value: '3+-anni', label: '3+ anni' },
+  { value: 'principiante', label: 'Principiante' },
+  { value: 'intermedio', label: 'Intermedio' },
+  { value: 'avanzato', label: 'Avanzato' },
 ] as const
 
 const ageRanges = [
@@ -66,7 +65,7 @@ export default function RegistrationsTable({
   const [paymentTypeFilter, setPaymentTypeFilter] = useState<string>('all')
 
   // Table state
-  const [selectedRegistration, setSelectedRegistration] = useState<Registration | null>(null)
+  const [selectedRegistration, setSelectedRegistration] = useState<MockRegistration | null>(null)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [sendingReminder, setSendingReminder] = useState<string | null>(null)
@@ -82,6 +81,15 @@ export default function RegistrationsTable({
       age--
     }
     return age
+  }
+
+  // Helper to extract initials from full name
+  const getInitials = (fullName: string) => {
+    const parts = fullName.split(' ')
+    if (parts.length >= 2) {
+      return parts[0].charAt(0) + parts[parts.length - 1].charAt(0)
+    }
+    return fullName.substring(0, 2).toUpperCase()
   }
 
   // Count active filters
@@ -122,12 +130,10 @@ export default function RegistrationsTable({
     return registrations.filter(reg => {
       // Search filter
       const matchesSearch =
-        reg.camper_nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        reg.camper_cognome.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        reg.camper_nome_cognome.toLowerCase().includes(searchQuery.toLowerCase()) ||
         reg.genitore_email.toLowerCase().includes(searchQuery.toLowerCase()) ||
         reg.genitore_telefono.includes(searchQuery) ||
-        reg.genitore_nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        reg.genitore_cognome.toLowerCase().includes(searchQuery.toLowerCase())
+        reg.genitore_nome_cognome.toLowerCase().includes(searchQuery.toLowerCase())
       
       // Basic filters
       const matchesStatus = statusFilter === 'all' || reg.status === statusFilter
@@ -160,8 +166,8 @@ export default function RegistrationsTable({
       // Has notes filter
       let matchesHasNotes = true
       if (hasNotesFilter) {
-        const hasAllergies = Boolean(reg.camper_allergie && reg.camper_allergie.trim() !== '')
-        const hasMedical = Boolean(reg.camper_note_mediche && reg.camper_note_mediche.trim() !== '')
+        const hasAllergies = Boolean(reg.allergie_intolleranze && reg.allergie_intolleranze.trim() !== '')
+        const hasMedical = Boolean(reg.patologie_note && reg.patologie_note.trim() !== '')
         matchesHasNotes = hasAllergies || hasMedical
       }
       
@@ -209,19 +215,18 @@ export default function RegistrationsTable({
       : filteredRegistrations
 
     const headers = [
-      'ID', 'Data Iscrizione', 'Pacchetto', 'Nome Camper', 'Cognome Camper', 
+      'ID', 'Data Iscrizione', 'Pacchetto', 'Nome Camper', 
       'Data Nascita', 'Età', 'Taglia', 'Esperienza', 'Allergie', 'Note Mediche',
-      'Nome Genitore', 'Cognome Genitore', 'Email', 'Telefono', 'CF', 'Indirizzo',
-      'Contatto Emergenza', 'Relazione', 'Tel. Emergenza', 'Stato', 'Stato Pagamento', 'Importo Pagato'
+      'Nome Genitore', 'Email', 'Telefono', 'CF', 'Indirizzo',
+      'Stato', 'Stato Pagamento', 'Importo Pagato'
     ]
 
     const rows = dataToExport.map(r => [
-      r.id, formatDate(r.created_at!), r.package_type, r.camper_nome, r.camper_cognome,
+      r.id, formatDate(r.created_at!), r.package_type, r.camper_nome_cognome,
       r.camper_data_nascita, calculateAge(r.camper_data_nascita), r.camper_taglia, r.camper_esperienza, 
-      r.camper_allergie || '', r.camper_note_mediche || '', r.genitore_nome, r.genitore_cognome, 
-      r.genitore_email, r.genitore_telefono, r.genitore_codice_fiscale, r.genitore_indirizzo,
-      r.emergenza_nome, r.emergenza_relazione, r.emergenza_telefono, r.status, 
-      r.payment_status || 'pending', r.amount_paid || 0
+      r.allergie_intolleranze || '', r.patologie_note || '', r.genitore_nome_cognome, 
+      r.genitore_email, r.genitore_telefono, r.genitore_codice_fiscale || '', r.genitore_indirizzo,
+      r.status, r.payment_status || 'pending', r.amount_paid || 0
     ])
 
     const csvContent = [headers, ...rows]
@@ -282,9 +287,8 @@ export default function RegistrationsTable({
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-green focus:border-transparent min-w-[180px]"
           >
             <option value="all">Tutti i pacchetti</option>
-            <option value="giornaliero">Giornaliero</option>
-            <option value="completa">Settimana Completa</option>
-            <option value="weekend">Weekend</option>
+            <option value="standard">Camp Standard</option>
+            <option value="alta_specializzazione">Alta Specializzazione</option>
           </select>
 
           {/* Payment Status Filter */}
@@ -520,12 +524,12 @@ export default function RegistrationsTable({
               ) : (
                 paginatedRegistrations.map((registration) => {
                   const age = calculateAge(registration.camper_data_nascita)
-                  const hasAllergies = registration.camper_allergie && registration.camper_allergie.trim() !== ''
-                  const hasMedical = registration.camper_note_mediche && registration.camper_note_mediche.trim() !== ''
+                  const hasAllergies = registration.allergie_intolleranze && registration.allergie_intolleranze.trim() !== ''
+                  const hasMedical = registration.patologie_note && registration.patologie_note.trim() !== ''
                   const hasNotes = hasAllergies || hasMedical
                   const paymentStatus = registration.payment_status || 'pending'
                   const paymentInfo = paymentStatusLabels[paymentStatus]
-                  const price = packagePrices[registration.package_type]
+                  const price = packagePrices[registration.package_type] + (registration.bus_transfer ? 60 : 0)
                   const amountPaid = registration.amount_paid || 0
 
                   return (
@@ -550,7 +554,7 @@ export default function RegistrationsTable({
                       </td>
                       <td className="px-3 py-4">
                         <div className="font-medium text-gray-900">
-                          {registration.camper_nome} {registration.camper_cognome}
+                          {registration.camper_nome_cognome}
                         </div>
                         <div className="text-sm text-gray-500">
                           {age} anni
@@ -558,7 +562,7 @@ export default function RegistrationsTable({
                       </td>
                       <td className="px-3 py-4">
                         <div className="text-sm text-gray-900">
-                          {registration.genitore_nome} {registration.genitore_cognome}
+                          {registration.genitore_nome_cognome}
                         </div>
                         <div className="text-xs text-gray-500 flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                           <a href={`tel:${registration.genitore_telefono}`} className="hover:text-brand-green">
@@ -570,6 +574,11 @@ export default function RegistrationsTable({
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${packageLabels[registration.package_type].color}`}>
                           {packageLabels[registration.package_type].label}
                         </span>
+                        {registration.bus_transfer && (
+                          <span className="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-gray-100 text-gray-600">
+                            🚌
+                          </span>
+                        )}
                       </td>
                       <td className="px-3 py-4">
                         <span className="inline-flex items-center justify-center w-8 h-8 bg-gray-100 rounded-lg text-sm font-bold text-gray-700">
@@ -597,7 +606,7 @@ export default function RegistrationsTable({
                             {hasAllergies && (
                               <span 
                                 className="inline-flex items-center justify-center w-6 h-6 bg-red-100 rounded-full text-red-600"
-                                title={`Allergie: ${registration.camper_allergie}`}
+                                title={`Allergie: ${registration.allergie_intolleranze}`}
                               >
                                 ⚠️
                               </span>
@@ -605,7 +614,7 @@ export default function RegistrationsTable({
                             {hasMedical && (
                               <span 
                                 className="inline-flex items-center justify-center w-6 h-6 bg-orange-100 rounded-full text-orange-600"
-                                title={`Note: ${registration.camper_note_mediche}`}
+                                title={`Note: ${registration.patologie_note}`}
                               >
                                 📋
                               </span>

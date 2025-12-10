@@ -12,86 +12,88 @@ export const metadata: Metadata = {
 
 const faqCategories = [
   {
+    title: "Arrivi e Partenze",
+    icon: "🚗",
+    items: [
+      {
+        question: "Quali sono gli orari di arrivo e partenza?",
+        answer: "Nel giorno di arrivo al Camp, l'accoglienza apre alle ore 15:30. La pensione completa inizia con la cena. L'ultimo giorno è prevista la premiazione alle ore 10:30 circa, a seguire i ragazzi hanno il pranzo e possono essere ritirati a partire dalle ore 14:30. Siamo a disposizione per esigenze particolari dovute a viaggi con mezzi (bus, aereo, treno)."
+      },
+      {
+        question: "È previsto un servizio transfer da e per il villaggio?",
+        answer: "Sì, è possibile prenotare il servizio navetta inviando la richiesta via e-mail entro due settimane dall'inizio del turno. Vi è la possibilità di organizzare un trasferimento con bus privato con partenza da Napoli e/o provincia e arrivo direttamente in villaggio al costo di €60,00 A/R. Tale servizio è attivabile solo al raggiungimento della capienza massima consentita e potrebbe variare al momento della prenotazione."
+      }
+    ]
+  },
+  {
+    title: "Cosa Portare",
+    icon: "🎒",
+    items: [
+      {
+        question: "Cosa devo mettere in valigia?",
+        answer: "Il soggiorno dura una settimana e i ragazzi si allenano quasi tutti i giorni sia la mattina che il pomeriggio. I capi e le quantità che consigliamo sono: 7-8 slip, 10 calze o calzettoni di spugna, 4 pantaloncini da gioco, 5 T-shirt da gioco o canotte, 1 paio di scarpe da gioco (noi daremo loro un completo da gioco composto da pantaloncino e canotta/t-shirt), abiti per la sera e il tempo libero (pantaloni, jeans o bermuda, se ragazze anche gonne, vestitini...), magliette per il tempo libero e le attività serali, 2 costumi, almeno 1 asciugamano da mare, un paio di felpe, una maglia e un giubbino per la sera, pigiama, materiale per l'igiene personale, crema solare, fazzoletti di carta, ciabatte per la camera, ciabatte da mare, scarpe/ciabatte/sandali per il tempo libero, un ombrellino/k-way, un sacchetto per la biancheria sporca, un accappatoio."
+      },
+      {
+        question: "Quali documenti devono essere consegnati?",
+        answer: "Il camper dovrà avere il certificato medico, la stampa firmata della mail di avvenuta iscrizione e la ricevuta di versamento della caparra."
+      },
+      {
+        question: "Che tipo di certificazione medica serve?",
+        answer: "Serve il certificato per attività sportiva agonistica rilasciato dal medico sportivo o una fotocopia del certificato medico per attività sportiva già presente presso la società sportiva di appartenenza (si ricorda che il certificato ha validità annuale). In caso di terapie farmacologiche in corso sarà necessario consegnare tutti i medicinali al personale del M&B Camp unitamente a certificazione medica con posologia relativa e delega del genitore alla somministrazione."
+      }
+    ]
+  },
+  {
+    title: "Sicurezza e Assistenza",
+    icon: "🏥",
+    items: [
+      {
+        question: "Com'è garantita la sicurezza durante la settimana?",
+        answer: "La sicurezza del singolo partecipante e dell'intero entourage dipende da una efficace prevenzione e da un costante monitoraggio. Tutte le attività saranno realizzate all'interno della struttura che è adeguatamente attrezzata per le nostre esigenze. Non saranno ammesse all'interno persone estranee. Saranno valutati dallo staff sanitario eventuali interventi mirati su situazioni particolari che dovessero manifestarsi."
+      },
+      {
+        question: "C'è uno staff sanitario nella struttura?",
+        answer: "Sì, c'è uno Staff sanitario (medico ed infermiere) al seguito ed a supporto dei ragazzi. Sarà garantita un'assistenza costante a tutela del benessere di tutti i partecipanti."
+      },
+      {
+        question: "Ci sono altri ospiti nel villaggio?",
+        answer: "No, l'intero villaggio sarà esclusivamente a disposizione del Camp. Non sono ammesse persone estranee."
+      }
+    ]
+  },
+  {
+    title: "Comunicazioni e Visite",
+    icon: "📞",
+    items: [
+      {
+        question: "A chi posso rivolgermi per avere info su mio figlio durante la settimana?",
+        answer: "Per ogni domanda, necessità, chiarimento o in caso in cui il ragazzo non dovesse rispondere al proprio telefono cellulare, è possibile chiamare il numero di telefono di infoline 339 877 5790 oppure inviare una mail all'indirizzo di posta elettronica dedicato (info@miniandbasketcamp.it)."
+      },
+      {
+        question: "Sono previste visite di genitori in struttura?",
+        answer: "Sì, previa richiesta all'organizzazione. Contattaci per concordare data e orario della visita."
+      }
+    ]
+  },
+  {
     title: "Iscrizioni e Pagamenti",
     icon: "💳",
     items: [
       {
         question: "Come posso iscrivere mio figlio al camp?",
-        answer: "L'iscrizione può essere effettuata direttamente online attraverso il nostro sito web nella sezione 'Iscriviti'. Il processo è semplice e guidato: dovrai compilare i dati del partecipante, del genitore/tutore e scegliere il pacchetto desiderato. Una volta completata la registrazione, riceverai una email di conferma con tutti i dettagli."
+        answer: "Iscriversi al Camp è semplice e veloce. Prenota subito il tuo posto al Mini&Basket Camp compilando il modulo online nella sezione Iscrizioni. Per iscriversi è necessario effettuare un versamento dell'anticipo di €200 o dell'intero importo, specificando nella causale 'Anticipo Camp' o 'Quota Camp' ed il Nome e Cognome del partecipante."
       },
       {
-        question: "Quali sono le modalità di pagamento accettate?",
-        answer: "Accettiamo diverse modalità di pagamento per venire incontro alle esigenze di tutti: carta di credito/debito (Visa, Mastercard, American Express), bonifico bancario, PayPal. È possibile anche richiedere il pagamento in 2 rate per i pacchetti settimanali. Tutti i pagamenti sono sicuri e criptati."
+        question: "Quali sono i metodi di pagamento accettati?",
+        answer: "È possibile pagare tramite bonifico bancario intestato a ASD CA75 Basket Casalnuovo (IBAN: IT68S0100503401000000000033) oppure tramite carta di credito/debito attraverso il nostro sistema di pagamento sicuro online."
+      },
+      {
+        question: "Entro quando va saldato l'importo?",
+        answer: "L'intera quota va saldata entro e non oltre il 31 Maggio 2025. Per usufruire della tariffa Early Bird (sconto €20) l'iscrizione deve essere completata entro il 28 Febbraio 2025."
       },
       {
         question: "È possibile ottenere un rimborso in caso di disdetta?",
-        answer: "Sì, offriamo una politica di rimborso flessibile. In caso di disdetta comunicata almeno 30 giorni prima dell'inizio del camp, è previsto il rimborso totale della quota versata. Per disdette tra 15 e 30 giorni, il rimborso sarà del 50%. Per disdette entro 15 giorni dall'inizio, non è previsto rimborso ma è possibile cedere l'iscrizione a un altro partecipante."
-      },
-      {
-        question: "Sono previsti sconti per fratelli o sorelle?",
-        answer: "Assolutamente sì! Offriamo uno sconto del 15% sulla seconda iscrizione e del 20% dalla terza iscrizione in poi per famiglie con più figli. Gli sconti vengono applicati automaticamente al momento del checkout quando vengono registrati più partecipanti con lo stesso genitore/tutore."
-      }
-    ]
-  },
-  {
-    title: "Il Camp",
-    icon: "🏀",
-    items: [
-      {
-        question: "Qual è l'età minima e massima per partecipare?",
-        answer: "Il Mini & Basket Camp è aperto a giovani atleti dai 6 ai 14 anni. Abbiamo gruppi differenziati per fasce d'età: Minibasket (6-8 anni), Esordienti (9-11 anni) e Under 14 (12-14 anni). Ogni gruppo segue un programma adattato alle specifiche esigenze di sviluppo."
-      },
-      {
-        question: "Cosa deve portare mio figlio al camp?",
-        answer: "Ogni partecipante dovrà portare: abbigliamento sportivo (magliette, pantaloncini, calze), scarpe da basket (indoor), borraccia personale, cambio per attività all'aperto, costume da bagno e asciugamano, cappellino e crema solare. Il kit camp (maglietta ufficiale, pallone e gadget) viene fornito da noi. Ti invieremo una lista dettagliata via email dopo l'iscrizione."
-      },
-      {
-        question: "Come è strutturata una giornata tipo al camp?",
-        answer: "Una giornata tipo inizia alle 8:30 con l'accoglienza e riscaldamento. Dalle 9:00 alle 12:30 si svolgono le sessioni di allenamento tecnico. Dopo il pranzo (13:00-14:00) c'è un momento di relax. Nel pomeriggio (14:30-17:30) si alternano giochi, partite e attività ricreative. La giornata si conclude alle 18:00 con i saluti. I programmi possono variare leggermente in base all'età del gruppo."
-      },
-      {
-        question: "Il pranzo è incluso nel prezzo?",
-        answer: "Sì, il pranzo è sempre incluso in tutti i nostri pacchetti. Offriamo un menù equilibrato e adatto agli sportivi, preparato giornalmente dalla nostra cucina. Possiamo gestire esigenze alimentari specifiche (allergie, intolleranze, diete vegetariane) se segnalate al momento dell'iscrizione."
-      }
-    ]
-  },
-  {
-    title: "Logistica",
-    icon: "📍",
-    items: [
-      {
-        question: "Dove si trova esattamente il camp?",
-        answer: "Il Mini & Basket Camp si svolge presso il Centro Sportivo Comunale, situato in Via dello Sport 15, Milano. La struttura dispone di 3 campi da basket coperti, 2 campi all'aperto, spogliatoi moderni, area ristoro e ampi spazi verdi per le attività ricreative. È facilmente raggiungibile con i mezzi pubblici (metro linea 2, fermata Sport) e dispone di un ampio parcheggio gratuito."
-      },
-      {
-        question: "È disponibile un servizio di trasporto?",
-        answer: "Offriamo un servizio navetta opzionale con diversi punti di raccolta in città. Il costo aggiuntivo è di €50 per l'intera settimana o €10 al giorno. I punti di raccolta e gli orari verranno comunicati una settimana prima dell'inizio del camp. Per richiedere il servizio, seleziona l'opzione durante l'iscrizione o contattaci."
-      },
-      {
-        question: "Quali sono gli orari di ingresso e uscita?",
-        answer: "L'ingresso è previsto dalle 8:00 alle 8:30, mentre l'uscita è dalle 17:30 alle 18:00. È disponibile un servizio di pre-camp (dalle 7:30) e post-camp (fino alle 19:00) su richiesta, senza costi aggiuntivi. Ti chiediamo di rispettare gli orari per garantire un'organizzazione ottimale delle attività."
-      },
-      {
-        question: "È possibile venire a trovare mio figlio durante il camp?",
-        answer: "I genitori possono visitare il camp durante le attività ricreative pomeridiane (16:00-17:00) previo accordo con la segreteria. Organizziamo inoltre un Open Day finale l'ultimo giorno del camp, dove le famiglie sono invitate a partecipare alla cerimonia di chiusura e alla partita dimostrativa. Per motivi di sicurezza, non sono ammesse visite non programmate."
-      }
-    ]
-  },
-  {
-    title: "Sicurezza e Salute",
-    icon: "🏥",
-    items: [
-      {
-        question: "Il personale del camp è qualificato?",
-        answer: "Tutto il nostro staff è altamente qualificato. Gli allenatori sono certificati FIBA e FIP con esperienza pluriennale nel basket giovanile. I preparatori atletici sono laureati in Scienze Motorie. Tutto il personale ha completato corsi di primo soccorso (BLS) e sicurezza. Ogni gruppo di 10-12 ragazzi è seguito da almeno 2 operatori dedicati."
-      },
-      {
-        question: "È presente un medico o personale sanitario?",
-        answer: "Sì, durante tutte le attività è presente un fisioterapista sportivo qualificato. Inoltre, abbiamo una convenzione con un medico sportivo reperibile in 15 minuti e siamo a meno di 5 minuti dal pronto soccorso più vicino. Tutto lo staff è formato per gestire le emergenze e disponiamo di un defibrillatore (DAE) in struttura."
-      },
-      {
-        question: "Come vengono gestite le allergie alimentari?",
-        answer: "Prendiamo molto seriamente le allergie e le intolleranze alimentari. Durante l'iscrizione, chiediamo di segnalare qualsiasi esigenza alimentare. La nostra cucina prepara menù personalizzati e i pasti vengono etichettati per evitare contaminazioni. Il nostro personale è formato sulla gestione delle emergenze allergiche e abbiamo sempre disponibili farmaci di emergenza (previa autorizzazione medica)."
+        answer: "Se un partecipante iscritto rinuncia, ha diritto al rimborso delle somme versate. La caparra verrà restituita interamente in caso di rinunce avvenute entro la data del saldo. Oltre il suddetto termine non saranno possibili rimborsi. Nessun rimborso è accordato a chi: non si presenta agli arrivi, si ritira durante lo svolgimento, non è in possesso dell'idoneità fisica o viene espulso dal Camp. La rinuncia al camp dovrà essere comunicata per iscritto tramite posta elettronica all'indirizzo info@miniandbasketcamp.it."
       }
     ]
   }
@@ -146,8 +148,31 @@ export default function FAQPage() {
               ))}
             </div>
 
+            {/* Camp Info Summary */}
+            <div className="mt-16 bg-gradient-to-br from-brand-green/5 to-brand-orange/5 rounded-3xl p-8 border border-gray-100">
+              <h3 className="text-xl font-bold text-brand-dark mb-6 text-center">📋 Riepilogo Informazioni Camp 2025</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-white rounded-xl p-4 shadow-sm">
+                  <h4 className="font-bold text-brand-green mb-2">📅 Date</h4>
+                  <p className="text-brand-gray">29 Giugno - 6 Luglio 2025</p>
+                </div>
+                <div className="bg-white rounded-xl p-4 shadow-sm">
+                  <h4 className="font-bold text-brand-green mb-2">📍 Location</h4>
+                  <p className="text-brand-gray">Villaggio Residence Bahja****, Paola (CS)</p>
+                </div>
+                <div className="bg-white rounded-xl p-4 shadow-sm">
+                  <h4 className="font-bold text-brand-green mb-2">👥 Età</h4>
+                  <p className="text-brand-gray">11-18 anni</p>
+                </div>
+                <div className="bg-white rounded-xl p-4 shadow-sm">
+                  <h4 className="font-bold text-brand-green mb-2">💰 Quote</h4>
+                  <p className="text-brand-gray">Standard: €610 (€590 Early Bird)<br/>Alta Specializzazione: €800 (€760 Early Bird)</p>
+                </div>
+              </div>
+            </div>
+
             {/* Still Have Questions */}
-            <div className="mt-16 bg-gradient-to-br from-brand-green/10 to-brand-orange/10 rounded-3xl p-8 text-center">
+            <div className="mt-12 bg-gradient-to-br from-brand-green/10 to-brand-orange/10 rounded-3xl p-8 text-center">
               <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-br from-brand-green to-brand-orange rounded-full flex items-center justify-center">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -170,13 +195,13 @@ export default function FAQPage() {
                   Contattaci
                 </Link>
                 <a
-                  href="tel:+390212345678"
+                  href="tel:+393398775790"
                   className="inline-flex items-center justify-center gap-2 border-2 border-brand-green text-brand-green font-bold py-3 px-8 rounded-full transition-all duration-300 hover:bg-brand-green hover:text-white"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
-                  +39 02 1234567
+                  +39 339 877 5790
                 </a>
               </div>
             </div>

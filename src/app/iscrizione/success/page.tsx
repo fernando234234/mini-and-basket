@@ -73,10 +73,11 @@ function SuccessContent() {
 
   // Map package IDs
   const packageMap: Record<string, PackageType> = {
-    giornaliero: "giornaliero",
-    settimanale: "completa",
-    weekend: "weekend",
-    completa: "completa",
+    standard: "standard",
+    alta_specializzazione: "alta_specializzazione",
+    // Legacy fallbacks
+    completa: "standard",
+    settimanale: "standard",
   };
 
   // Fetch session data from Stripe with timeout and fallback

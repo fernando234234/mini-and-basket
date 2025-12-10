@@ -1,10 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { Registration, paymentStatusLabels } from '@/types/registration'
+import { MockRegistration } from '@/lib/mockData'
+import { paymentStatusLabels } from '@/types/registration'
 
 interface RegistrationDetailProps {
-  registration: Registration
+  registration: MockRegistration
   onClose: () => void
   onStatusChange?: (id: string, status: 'pending' | 'confirmed' | 'cancelled') => void
   onSendReminder?: (id: string, email: string, type: 'confirmation' | 'payment') => void
@@ -18,18 +19,18 @@ const statusLabels = {
 }
 
 const packageLabels = {
-  giornaliero: { label: 'Giornaliero', price: 250, color: 'bg-blue-100 text-blue-800' },
-  completa: { label: 'Settimana Completa', price: 450, color: 'bg-purple-100 text-purple-800' },
-  weekend: { label: 'Weekend', price: 150, color: 'bg-teal-100 text-teal-800' },
+  standard: { label: 'Camp Standard', price: 610, color: 'bg-blue-100 text-blue-800' },
+  alta_specializzazione: { label: 'Alta Specializzazione', price: 800, color: 'bg-purple-100 text-purple-800' },
 }
 
 const experienceLabels = {
-  nessuna: { label: 'Nessuna esperienza', icon: '🌱' },
-  '1-2-anni': { label: '1-2 anni di esperienza', icon: '🏀' },
-  '3+-anni': { label: '3+ anni di esperienza', icon: '⭐' },
+  principiante: { label: 'Principiante', icon: '🌱' },
+  intermedio: { label: 'Intermedio', icon: '🏀' },
+  avanzato: { label: 'Avanzato', icon: '⭐' },
 }
 
-const sizeLabels = {
+const sizeLabels: Record<string, string> = {
+  XXS: 'Extra Extra Small',
   XS: 'Extra Small',
   S: 'Small',
   M: 'Medium',
@@ -101,11 +102,12 @@ export default function RegistrationDetail({
   const paymentStatus = registration.payment_status || 'pending'
   const paymentInfo = paymentStatusLabels[paymentStatus]
   const amountPaid = registration.amount_paid || 0
-  const amountDue = registration.amount_due || packageInfo.price
+  const totalPrice = packageInfo.price + (registration.bus_transfer ? 60 : 0)
+  const amountDue = registration.amount_due || totalPrice
   const age = calculateAge(registration.camper_data_nascita)
 
-  const hasAllergies = registration.camper_allergie && registration.camper_allergie.trim() !== ''
-  const hasMedicalNotes = registration.camper_note_mediche && registration.camper_note_mediche.trim() !== ''
+  const hasAllergies = registration.allergie_intolleranze && registration.allergie_intolleranze.trim() !== ''
+  const hasMedicalNotes = registration.patologie_note && registration.patologie_note.trim() !== ''
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -160,6 +162,9 @@ export default function RegistrationDetail({
                     {packageInfo.label}
                   </span>
                   <p className="text-lg font-bold text-gray-900 mt-2">{formatCurrency(packageInfo.price)}</p>
+                  {registration.bus_transfer && (
+                    <p className="text-sm text-gray-500 mt-1">+ Bus transfer: {formatCurrency(60)}</p>
+                  )}
                 </div>
                 <div className="bg-white rounded-lg p-4 shadow-sm">
                   <p className="text-sm text-gray-500 mb-1">Stato Pagamento</p>
@@ -204,13 +209,18 @@ export default function RegistrationDetail({
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="bg-white rounded-lg p-4 shadow-sm">
                   <p className="text-sm text-gray-500 mb-1">Nome Completo</p>
-                  <p className="font-semibold text-gray-900 text-lg">{registration.camper_nome} {registration.camper_cognome}</p>
+                  <p className="font-semibold text-gray-900 text-lg">{registration.camper_nome_cognome}</p>
                 </div>
                 <div className="bg-white rounded-lg p-4 shadow-sm">
-                  <p className="text-sm text-gray-500 mb-1">Data di Nascita</p>
+                  <p className="text-sm text-gray-500 mb-1">Codice Fiscale</p>
+                  <p className="font-mono font-medium text-gray-900">{registration.camper_codice_fiscale}</p>
+                </div>
+                <div className="bg-white rounded-lg p-4 shadow-sm">
+                  <p className="text-sm text-gray-500 mb-1">Data e Luogo di Nascita</p>
                   <p className="font-medium text-gray-900">{formatDate(registration.camper_data_nascita)}</p>
+                  <p className="text-sm text-gray-500">{registration.camper_luogo_nascita}</p>
                   <p className="text-sm text-brand-green font-semibold">
-                    {age} anni
+                    {age} anni • {registration.camper_sesso === 'M' ? 'Maschio' : 'Femmina'}
                   </p>
                 </div>
                 <div className="bg-white rounded-lg p-4 shadow-sm">
@@ -218,22 +228,37 @@ export default function RegistrationDetail({
                   <p className="font-semibold text-gray-900 text-2xl">{registration.camper_taglia}</p>
                   <p className="text-xs text-gray-500">{sizeLabels[registration.camper_taglia]}</p>
                 </div>
-                <div className="bg-white rounded-lg p-4 shadow-sm md:col-span-2 lg:col-span-1">
+                <div className="bg-white rounded-lg p-4 shadow-sm">
+                  <p className="text-sm text-gray-500 mb-1">Fisico</p>
+                  <p className="font-medium text-gray-900">
+                    {registration.camper_altezza} cm • {registration.camper_peso} kg
+                  </p>
+                  <p className="text-sm text-gray-500">Scarpe: EU {registration.camper_numero_scarpe}</p>
+                </div>
+                <div className="bg-white rounded-lg p-4 shadow-sm">
                   <p className="text-sm text-gray-500 mb-1">Esperienza Basket</p>
                   <p className="font-medium text-gray-900 flex items-center gap-2">
                     <span>{experienceLabels[registration.camper_esperienza].icon}</span>
                     {experienceLabels[registration.camper_esperienza].label}
                   </p>
+                  {registration.camper_societa && (
+                    <p className="text-sm text-gray-500">Società: {registration.camper_societa}</p>
+                  )}
+                </div>
+                <div className="bg-white rounded-lg p-4 shadow-sm md:col-span-2 lg:col-span-1">
+                  <p className="text-sm text-gray-500 mb-1">Scuola</p>
+                  <p className="font-medium text-gray-900">{registration.camper_scuola}</p>
+                  <p className="text-sm text-gray-500">Classe: {registration.camper_classe}</p>
                 </div>
                 
                 {/* Allergie - highlighted */}
                 <div className={`rounded-lg p-4 shadow-sm lg:col-span-1 ${hasAllergies ? 'bg-red-50 border-2 border-red-200' : 'bg-white'}`}>
                   <p className={`text-sm mb-1 flex items-center gap-1 ${hasAllergies ? 'text-red-600 font-medium' : 'text-gray-500'}`}>
                     {hasAllergies && <span>⚠️</span>}
-                    Allergie
+                    Allergie / Intolleranze
                   </p>
                   {hasAllergies ? (
-                    <p className="font-semibold text-red-700">{registration.camper_allergie}</p>
+                    <p className="font-semibold text-red-700">{registration.allergie_intolleranze}</p>
                   ) : (
                     <p className="text-gray-400 italic">Nessuna allergia segnalata</p>
                   )}
@@ -243,14 +268,24 @@ export default function RegistrationDetail({
                 <div className={`rounded-lg p-4 shadow-sm lg:col-span-1 ${hasMedicalNotes ? 'bg-orange-50 border-2 border-orange-200' : 'bg-white'}`}>
                   <p className={`text-sm mb-1 flex items-center gap-1 ${hasMedicalNotes ? 'text-orange-600 font-medium' : 'text-gray-500'}`}>
                     {hasMedicalNotes && <span>📋</span>}
-                    Note Mediche
+                    Patologie Note
                   </p>
                   {hasMedicalNotes ? (
-                    <p className="font-semibold text-orange-700">{registration.camper_note_mediche}</p>
+                    <p className="font-semibold text-orange-700">{registration.patologie_note}</p>
                   ) : (
-                    <p className="text-gray-400 italic">Nessuna nota medica</p>
+                    <p className="text-gray-400 italic">Nessuna patologia segnalata</p>
                   )}
                 </div>
+
+                {/* Terapie in corso */}
+                {registration.terapie_in_corso && (
+                  <div className="bg-yellow-50 rounded-lg p-4 shadow-sm border-2 border-yellow-200">
+                    <p className="text-sm text-yellow-600 font-medium mb-1 flex items-center gap-1">
+                      💊 Terapie in Corso
+                    </p>
+                    <p className="font-semibold text-yellow-700">{registration.terapie_in_corso}</p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -265,11 +300,11 @@ export default function RegistrationDetail({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-white rounded-lg p-4 shadow-sm">
                   <p className="text-sm text-gray-500 mb-1">Nome Completo</p>
-                  <p className="font-semibold text-gray-900">{registration.genitore_nome} {registration.genitore_cognome}</p>
+                  <p className="font-semibold text-gray-900">{registration.genitore_nome_cognome}</p>
                 </div>
                 <div className="bg-white rounded-lg p-4 shadow-sm">
                   <p className="text-sm text-gray-500 mb-1">Codice Fiscale</p>
-                  <p className="font-mono font-medium text-gray-900">{registration.genitore_codice_fiscale}</p>
+                  <p className="font-mono font-medium text-gray-900">{registration.genitore_codice_fiscale || 'Non fornito'}</p>
                 </div>
                 <div className="bg-white rounded-lg p-4 shadow-sm">
                   <p className="text-sm text-gray-500 mb-1">Email</p>
@@ -302,40 +337,41 @@ export default function RegistrationDetail({
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    {registration.genitore_indirizzo}
+                    {registration.genitore_indirizzo}, {registration.genitore_cap} {registration.genitore_citta}
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Section 4: Contatto Emergenza */}
-            <div className="bg-red-50 rounded-xl p-6 border border-red-100">
+            {/* Section 4: Consensi */}
+            <div className="bg-green-50 rounded-xl p-6 border border-green-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Contatto di Emergenza
+                Consensi
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-white rounded-lg p-4 shadow-sm">
-                  <p className="text-sm text-gray-500 mb-1">Nome</p>
-                  <p className="font-semibold text-gray-900">{registration.emergenza_nome}</p>
+                <div className="bg-white rounded-lg p-4 shadow-sm flex items-center gap-3">
+                  <span className={`text-2xl ${registration.liberatoria_foto_video ? '✅' : '❌'}`}></span>
+                  <div>
+                    <p className="font-medium text-gray-900">Liberatoria Foto/Video</p>
+                    <p className="text-sm text-gray-500">{registration.liberatoria_foto_video ? 'Accettata' : 'Non accettata'}</p>
+                  </div>
                 </div>
-                <div className="bg-white rounded-lg p-4 shadow-sm">
-                  <p className="text-sm text-gray-500 mb-1">Relazione</p>
-                  <p className="font-medium text-gray-900">{registration.emergenza_relazione}</p>
+                <div className="bg-white rounded-lg p-4 shadow-sm flex items-center gap-3">
+                  <span className={`text-2xl ${registration.accettazione_regolamento ? '✅' : '❌'}`}></span>
+                  <div>
+                    <p className="font-medium text-gray-900">Regolamento Camp</p>
+                    <p className="text-sm text-gray-500">{registration.accettazione_regolamento ? 'Accettato' : 'Non accettato'}</p>
+                  </div>
                 </div>
-                <div className="bg-white rounded-lg p-4 shadow-sm">
-                  <p className="text-sm text-gray-500 mb-1">Telefono</p>
-                  <a 
-                    href={`tel:${registration.emergenza_telefono}`} 
-                    className="font-medium text-red-600 hover:underline flex items-center gap-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                    </svg>
-                    {registration.emergenza_telefono}
-                  </a>
+                <div className="bg-white rounded-lg p-4 shadow-sm flex items-center gap-3">
+                  <span className={`text-2xl ${registration.privacy_policy ? '✅' : '❌'}`}></span>
+                  <div>
+                    <p className="font-medium text-gray-900">Privacy Policy</p>
+                    <p className="text-sm text-gray-500">{registration.privacy_policy ? 'Accettata' : 'Non accettata'}</p>
+                  </div>
                 </div>
               </div>
             </div>

@@ -1,96 +1,68 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import PaymentMethods from "./PaymentMethods";
 
-// Klarna icon for installment display
-const KlarnaSmallIcon = () => (
-  <svg viewBox="0 0 48 32" className="w-8 h-5" aria-label="Klarna">
-    <rect width="48" height="32" rx="4" fill="#FFB3C7" />
-    <text
-      x="24"
-      y="19"
-      textAnchor="middle"
-      fontFamily="Arial, sans-serif"
-      fontWeight="800"
-      fontSize="10"
-      fill="#0A0B09"
-    >
-      Klarna
-    </text>
-  </svg>
-);
+// Check if early bird pricing applies (before Feb 28, 2025)
+const isEarlyBird = () => {
+  const now = new Date();
+  const earlyBirdDeadline = new Date('2025-02-28T23:59:59');
+  return now <= earlyBirdDeadline;
+};
 
 export default function PricingCards() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+  const [earlyBird, setEarlyBird] = useState(true);
+
+  useEffect(() => {
+    setEarlyBird(isEarlyBird());
+  }, []);
 
   const pricingPlans = [
     {
-      title: "PACCHETTO GIORNALIERO",
-      subtitle: "Prova l'esperienza",
-      price: "€250",
-      priceInCents: 25000,
-      originalPrice: null,
-      perDay: "€35/giorno",
-      installment: "3 × €84",
+      id: "standard",
+      title: "CAMP STANDARD",
+      subtitle: "7 giorni di Camp",
+      price: earlyBird ? "€590" : "€610",
+      priceInCents: earlyBird ? 59000 : 61000,
+      originalPrice: earlyBird ? "€610" : null,
+      deposit: "€200",
       features: [
-        { text: "Alloggio Incluso", included: true },
-        { text: "3 Pasti al Giorno", included: true },
-        { text: "Kit Camp Esclusivo", included: true },
-        { text: "Foto e Video", included: false },
-        { text: "Certificato Partecipazione", included: false },
-      ],
-      highlighted: false,
-      badge: null,
-      gradient: "from-slate-600 to-slate-800",
-      buttonGradient: "from-slate-600 to-slate-700",
-      iconBg: "bg-slate-100",
-      iconColor: "text-slate-600",
-    },
-    {
-      title: "SETTIMANA COMPLETA",
-      subtitle: "L'esperienza completa",
-      price: "€450",
-      priceInCents: 45000,
-      originalPrice: "€550",
-      perDay: "€56/giorno",
-      installment: "3 × €150",
-      features: [
-        { text: "Alloggio Incluso", included: true },
-        { text: "3 Pasti al Giorno", included: true },
-        { text: "Kit Camp Esclusivo", included: true },
-        { text: "Foto e Video", included: true },
-        { text: "Certificato Partecipazione", included: true },
+        { text: "7 giorni di Camp: un'esperienza aggregativa unica", included: true },
+        { text: "Soggiorno in pensione completa in villaggio", included: true },
+        { text: "Assicurazione", included: true },
+        { text: "Assistenza H24", included: true },
+        { text: "Kit Mini & Basket Camp", included: true },
       ],
       highlighted: true,
-      badge: "🔥 PIÙ POPOLARE",
-      gradient: "from-brand-orange to-red-500",
-      buttonGradient: "from-brand-orange to-red-500",
-      iconBg: "bg-orange-100",
-      iconColor: "text-brand-orange",
-    },
-    {
-      title: "PACCHETTO WEEKEND",
-      subtitle: "Avventura breve",
-      price: "€150",
-      priceInCents: 15000,
-      originalPrice: null,
-      perDay: "€75/giorno",
-      installment: "3 × €50",
-      features: [
-        { text: "Alloggio Incluso", included: true },
-        { text: "3 Pasti al Giorno", included: true },
-        { text: "Kit Camp Esclusivo", included: false },
-        { text: "Foto e Video", included: false },
-        { text: "Certificato Partecipazione", included: false },
-      ],
-      highlighted: false,
-      badge: null,
+      badge: earlyBird ? "🔥 EARLY BIRD -€20" : "🏀 PIÙ POPOLARE",
       gradient: "from-brand-green to-emerald-600",
       buttonGradient: "from-brand-green to-emerald-600",
       iconBg: "bg-green-100",
       iconColor: "text-brand-green",
+    },
+    {
+      id: "alta_specializzazione",
+      title: "ALTA SPECIALIZZAZIONE",
+      subtitle: "Camp Premium",
+      price: earlyBird ? "€760" : "€800",
+      priceInCents: earlyBird ? 76000 : 80000,
+      originalPrice: earlyBird ? "€800" : null,
+      deposit: "€200",
+      features: [
+        { text: "Tutto incluso nel Camp Standard", included: true },
+        { text: "+7 ore supplementari di tecnica individuale", included: true },
+        { text: "Abbigliamento personalizzato", included: true },
+        { text: "Lavoro specifico e personalizzato", included: true },
+        { text: "Limitato a 30 campers", included: true },
+      ],
+      highlighted: false,
+      badge: "🏆 MAX 30 POSTI",
+      gradient: "from-brand-orange to-red-500",
+      buttonGradient: "from-brand-orange to-red-500",
+      iconBg: "bg-orange-100",
+      iconColor: "text-brand-orange",
     },
   ];
 
@@ -106,6 +78,19 @@ export default function PricingCards() {
         <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-brand-green/5 rounded-full blur-3xl" />
       </div>
 
+      {/* Early Bird Banner */}
+      {earlyBird && (
+        <div className="mb-8 bg-gradient-to-r from-brand-orange to-red-500 rounded-2xl p-4 text-white text-center">
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <span className="text-2xl">⏰</span>
+            <span className="font-bold text-lg">EARLY BIRD ATTIVO!</span>
+          </div>
+          <p className="text-sm text-white/90">
+            Iscriviti entro il <strong>28 Febbraio 2025</strong> per risparmiare fino a €40
+          </p>
+        </div>
+      )}
+
       {/* Section Header */}
       <div className="text-center mb-12 relative">
         <span className="inline-block px-4 py-1 bg-brand-orange/10 text-brand-orange text-sm font-bold rounded-full mb-4">
@@ -115,7 +100,7 @@ export default function PricingCards() {
           SCEGLI IL TUO PACCHETTO
         </h2>
         <p className="text-brand-gray mt-3 max-w-md mx-auto">
-          Trova l&apos;opzione perfetta per vivere un&apos;estate indimenticabile
+          Camp 2025: 29 Giugno - 6 Luglio | Villaggio Bahja, Paola (CS)
         </p>
         
         {/* Decorative line */}
@@ -127,14 +112,14 @@ export default function PricingCards() {
       </div>
 
       {/* Pricing Cards */}
-      <div className="relative grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch pt-6">
+      <div className="relative grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 items-stretch pt-6 max-w-4xl mx-auto">
         {pricingPlans.map((plan, index) => {
           const isHovered = hoveredCard === index;
           const isHighlighted = plan.highlighted;
 
           return (
             <div
-              key={index}
+              key={plan.id}
               className={`relative group overflow-visible ${isHighlighted ? "md:-mt-4 md:mb-4" : ""}`}
               onMouseEnter={() => setHoveredCard(index)}
               onMouseLeave={() => setHoveredCard(null)}
@@ -142,7 +127,7 @@ export default function PricingCards() {
               {/* Badge - positioned outside the card for visibility */}
               {plan.badge && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
-                  <span className="inline-flex items-center gap-1.5 bg-gradient-to-r from-brand-orange to-red-500 text-white text-xs font-bold px-5 py-2.5 rounded-full shadow-lg whitespace-nowrap animate-pulse">
+                  <span className={`inline-flex items-center gap-1.5 bg-gradient-to-r ${plan.gradient} text-white text-xs font-bold px-5 py-2.5 rounded-full shadow-lg whitespace-nowrap ${earlyBird && plan.highlighted ? 'animate-pulse' : ''}`}>
                     {plan.badge}
                   </span>
                 </div>
@@ -150,16 +135,16 @@ export default function PricingCards() {
 
               {/* Highlighted Card Glow Effect */}
               {isHighlighted && (
-                <div className="absolute -inset-1 bg-gradient-to-r from-brand-orange via-red-500 to-brand-orange rounded-3xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity duration-500 animate-pulse" />
+                <div className={`absolute -inset-1 bg-gradient-to-r ${plan.gradient} rounded-3xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity duration-500`} />
               )}
 
               {/* Card */}
               <div
                 className={`relative h-full bg-white rounded-3xl overflow-hidden transition-all duration-500 ${
                   isHighlighted
-                    ? "shadow-2xl border-2 border-brand-orange"
+                    ? "shadow-2xl border-2 border-brand-green"
                     : isHovered
-                    ? "shadow-xl border-2 border-brand-green -translate-y-2"
+                    ? "shadow-xl border-2 border-brand-orange -translate-y-2"
                     : "shadow-lg border border-gray-100"
                 }`}
               >
@@ -179,7 +164,7 @@ export default function PricingCards() {
                     {plan.originalPrice && (
                       <div className="flex items-center justify-center gap-2 mb-1">
                         <span className="text-xl text-gray-400 line-through">{plan.originalPrice}</span>
-                        <span className="text-xs font-bold text-red-500 bg-red-100 px-2 py-0.5 rounded-full">-18%</span>
+                        <span className="text-xs font-bold text-red-500 bg-red-100 px-2 py-0.5 rounded-full">EARLY BIRD</span>
                       </div>
                     )}
                     <div className="flex items-end justify-center gap-1">
@@ -187,13 +172,7 @@ export default function PricingCards() {
                         {plan.price}
                       </span>
                     </div>
-                    <p className="text-sm text-brand-gray mt-2">{plan.perDay}</p>
-                    
-                    {/* Klarna Installment Badge */}
-                    <div className="mt-3 flex items-center justify-center gap-1.5 bg-pink-50 text-pink-700 text-xs font-medium px-3 py-1.5 rounded-full">
-                      <KlarnaSmallIcon />
-                      <span>oppure {plan.installment}</span>
-                    </div>
+                    <p className="text-sm text-brand-gray mt-2">Acconto: {plan.deposit}</p>
                   </div>
 
                   {/* Divider */}
@@ -238,11 +217,7 @@ export default function PricingCards() {
                   {/* CTA Button */}
                   <Link
                     href="/iscrizione"
-                    className={`relative block w-full text-center font-bold py-4 px-8 rounded-2xl transition-all duration-300 overflow-hidden group/btn ${
-                      isHighlighted
-                        ? "bg-gradient-to-r from-brand-orange to-red-500 text-white shadow-lg hover:shadow-xl hover:scale-[1.02]"
-                        : "bg-gradient-to-r " + plan.buttonGradient + " text-white shadow-md hover:shadow-lg hover:scale-[1.02]"
-                    }`}
+                    className={`relative block w-full text-center font-bold py-4 px-8 rounded-2xl transition-all duration-300 overflow-hidden group/btn bg-gradient-to-r ${plan.buttonGradient} text-white shadow-md hover:shadow-lg hover:scale-[1.02]`}
                   >
                     <span className="relative z-10 flex items-center justify-center gap-2">
                       <span>ISCRIVITI ORA</span>
@@ -252,16 +227,6 @@ export default function PricingCards() {
                     </span>
                     <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300" />
                   </Link>
-
-                  {/* Extra info for highlighted */}
-                  {isHighlighted && (
-                    <p className="text-center text-xs text-brand-gray mt-4 flex items-center justify-center gap-1">
-                      <svg className="w-4 h-4 text-brand-green" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      Garanzia soddisfatti o rimborsati
-                    </p>
-                  )}
                 </div>
               </div>
             </div>
@@ -269,23 +234,62 @@ export default function PricingCards() {
         })}
       </div>
 
-      {/* Klarna Info Banner */}
-      <div className="mt-10 bg-gradient-to-r from-pink-50 to-pink-100 border border-pink-200 rounded-2xl p-5">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm">
-              <KlarnaSmallIcon />
+      {/* Bus Transfer Add-on */}
+      <div className="mt-8 max-w-4xl mx-auto">
+        <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-2xl p-5">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm text-2xl">
+                🚌
+              </div>
+              <div>
+                <h4 className="font-bold text-brand-dark">Servizio Transfer Bus</h4>
+                <p className="text-sm text-brand-gray">
+                  Napoli e/o provincia ↔ Villaggio (Andata e Ritorno)
+                </p>
+              </div>
             </div>
-            <div>
-              <h4 className="font-bold text-brand-dark">Paga in 3 rate senza interessi</h4>
-              <p className="text-sm text-brand-gray">
-                Con Klarna puoi dividere il pagamento in 3 comode rate mensili
-              </p>
+            <div className="text-center md:text-right">
+              <p className="text-xs text-brand-gray">Costo aggiuntivo</p>
+              <p className="font-bold text-blue-600 text-2xl">€60</p>
             </div>
           </div>
-          <div className="text-center md:text-right">
-            <p className="text-xs text-brand-gray">Esempio per Settimana Completa</p>
-            <p className="font-bold text-pink-600">3 × €150/mese</p>
+        </div>
+      </div>
+
+      {/* Important Notes */}
+      <div className="mt-10 max-w-4xl mx-auto bg-gray-50 rounded-2xl p-6">
+        <h4 className="font-bold text-brand-dark mb-4 flex items-center gap-2">
+          <span>📋</span> Informazioni Importanti
+        </h4>
+        <div className="grid md:grid-cols-2 gap-4 text-sm">
+          <div className="flex items-start gap-3">
+            <span className="text-brand-green text-lg">💰</span>
+            <div>
+              <p className="font-semibold text-brand-dark">Acconto</p>
+              <p className="text-brand-gray">€200 da versare all&apos;iscrizione</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <span className="text-brand-orange text-lg">📅</span>
+            <div>
+              <p className="font-semibold text-brand-dark">Saldo Completo</p>
+              <p className="text-brand-gray">Entro il 31 Maggio 2025</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <span className="text-blue-500 text-lg">🏨</span>
+            <div>
+              <p className="font-semibold text-brand-dark">Tassa di Soggiorno</p>
+              <p className="text-brand-gray">€1,50/notte per partecipanti 13+ anni</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <span className="text-purple-500 text-lg">🏦</span>
+            <div>
+              <p className="font-semibold text-brand-dark">Bonifico Bancario</p>
+              <p className="text-brand-gray">ASD CA75 Basket Casalnuovo<br />IBAN: IT68S0100503401000000000033</p>
+            </div>
           </div>
         </div>
       </div>
@@ -294,8 +298,8 @@ export default function PricingCards() {
       <div className="mt-10 flex flex-wrap justify-center gap-6">
         {[
           { icon: "🔒", text: "Pagamenti Sicuri" },
-          { icon: "💳", text: "Rate con Klarna" },
-          { icon: "📞", text: "Supporto 24/7" },
+          { icon: "🛡️", text: "Assicurazione Inclusa" },
+          { icon: "📞", text: "Assistenza H24" },
         ].map((badge, i) => (
           <div key={i} className="flex items-center gap-2 text-sm text-brand-gray">
             <span className="text-lg">{badge.icon}</span>

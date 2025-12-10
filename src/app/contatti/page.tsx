@@ -53,7 +53,7 @@ export default function ContattiPage() {
                   </h2>
 
                   <div className="space-y-6">
-                    {/* Address */}
+                    {/* Location */}
                     <div className="flex items-start gap-4">
                       <div className="flex-shrink-0 w-12 h-12 bg-brand-green/10 rounded-full flex items-center justify-center">
                         <svg className="w-6 h-6 text-brand-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -62,10 +62,10 @@ export default function ContattiPage() {
                         </svg>
                       </div>
                       <div>
-                        <h3 className="font-bold text-brand-dark">Indirizzo</h3>
+                        <h3 className="font-bold text-brand-dark">Location Camp 2025</h3>
                         <p className="text-brand-gray">
-                          Via dello Sport, 15<br />
-                          20100 Milano (MI)<br />
+                          Villaggio Residence Bahja****<br />
+                          Paola (CS) - Calabria<br />
                           Italia
                         </p>
                       </div>
@@ -81,12 +81,12 @@ export default function ContattiPage() {
                       <div>
                         <h3 className="font-bold text-brand-dark">Telefono</h3>
                         <p className="text-brand-gray">
-                          <a href="tel:+390212345678" className="hover:text-brand-orange transition-colors">
-                            +39 02 1234567
+                          <a href="tel:+393398775790" className="hover:text-brand-orange transition-colors">
+                            +39 339 877 5790
                           </a>
                         </p>
                         <p className="text-sm text-brand-gray-light">
-                          Lun-Ven: 9:00-18:00
+                          Disponibile anche durante il camp
                         </p>
                       </div>
                     </div>
@@ -111,19 +111,19 @@ export default function ContattiPage() {
                       </div>
                     </div>
 
-                    {/* Office Hours */}
+                    {/* P.IVA and Banking */}
                     <div className="flex items-start gap-4">
                       <div className="flex-shrink-0 w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
                         <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                       </div>
                       <div>
-                        <h3 className="font-bold text-brand-dark">Orari Ufficio</h3>
+                        <h3 className="font-bold text-brand-dark">Dati Fiscali</h3>
                         <div className="text-brand-gray text-sm space-y-1">
-                          <p>Lunedì - Venerdì: 9:00 - 18:00</p>
-                          <p>Sabato: 9:00 - 13:00</p>
-                          <p>Domenica: Chiuso</p>
+                          <p><strong>P.IVA/C.F.:</strong> 92042810637</p>
+                          <p><strong>Beneficiario:</strong> ASD CA75 Basket Casalnuovo</p>
+                          <p><strong>IBAN:</strong> IT68S0100503401000000000033</p>
                         </div>
                       </div>
                     </div>
@@ -142,10 +142,10 @@ export default function ContattiPage() {
                           </svg>
                         </div>
                         <p className="text-brand-dark font-semibold">
-                          Via dello Sport, 15 - Milano
+                          Villaggio Residence Bahja - Paola (CS)
                         </p>
                         <a
-                          href="https://maps.google.com/?q=Via+dello+Sport+15+Milano"
+                          href="https://maps.google.com/?q=Villaggio+Bahja+Paola+CS"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 mt-3 text-brand-green hover:text-brand-green-dark font-medium text-sm"

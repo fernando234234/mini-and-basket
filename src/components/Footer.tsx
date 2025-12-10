@@ -13,8 +13,7 @@ export default function Footer() {
 
   const legalLinks = [
     { href: "/privacy", label: "Privacy Policy" },
-    { href: "/termini", label: "Termini e Condizioni" },
-    { href: "/cookie", label: "Cookie Policy" },
+    { href: "/regolamento", label: "Regolamento Camp" },
   ];
 
   return (
@@ -30,8 +29,8 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed mb-6">
-              Un&apos;esperienza indimenticabile per giovani atleti dai 6 ai 14 anni. 
-              Uniamo l&apos;apprendimento tecnico del basket al divertimento e allo sviluppo personale.
+              Dal 2004, uno dei principali Basket Camp d&apos;Italia per giovani cestisti dagli 11 ai 18 anni.
+              Competenza, Qualità, Affidabilità, Professionalità!
             </p>
             {/* Social Links */}
             <div className="flex gap-3">
@@ -121,16 +120,16 @@ export default function Footer() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 <span className="text-gray-400 text-sm">
-                  Via dello Sport, 15<br />
-                  20100 Milano (MI)
+                  Villaggio Residence Bahja****<br />
+                  Paola (CS) - Calabria
                 </span>
               </li>
               <li className="flex items-center gap-3">
                 <svg className="w-5 h-5 text-brand-orange flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
-                <a href="tel:+390212345678" className="text-gray-400 hover:text-white transition-colors text-sm">
-                  +39 02 1234567
+                <a href="tel:+393398775790" className="text-gray-400 hover:text-white transition-colors text-sm">
+                  +39 339 877 5790
                 </a>
               </li>
               <li className="flex items-center gap-3">
@@ -140,6 +139,14 @@ export default function Footer() {
                 <a href="mailto:info@miniandbasketcamp.it" className="text-gray-400 hover:text-white transition-colors text-sm">
                   info@miniandbasketcamp.it
                 </a>
+              </li>
+              <li className="flex items-center gap-3">
+                <svg className="w-5 h-5 text-purple-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span className="text-gray-400 text-sm">
+                  P.IVA: 92042810637
+                </span>
               </li>
             </ul>
           </div>
@@ -173,7 +180,7 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             {/* Copyright */}
             <p className="text-gray-500 text-sm text-center md:text-left">
-              © {currentYear} Mini & Basket Camp. Tutti i diritti riservati.
+              © {currentYear} Mini & Basket Camp - Since 2004. P.IVA 92042810637
             </p>
 
             {/* Legal Links */}

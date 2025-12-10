@@ -472,9 +472,9 @@ export default function ProgrammaPage() {
                   Affrettati ad Iscriverti!
                 </h2>
                 <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-                  I posti sono limitati. Segui le istruzioni per versare l&apos;anticipo e compila la scheda 
-                  di iscrizione. Per iscriversi è necessario effettuare un versamento di <strong>euro 150,00</strong> o 
-                  dell&apos;intero importo.
+                  I posti sono limitati. Segui le istruzioni per versare l&apos;anticipo e compila la scheda
+                  di iscrizione. Per iscriversi è necessario effettuare un versamento di <strong>€200,00</strong> (anticipo) o
+                  dell&apos;intero importo. Il saldo va effettuato entro il 31 Maggio 2025.
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">

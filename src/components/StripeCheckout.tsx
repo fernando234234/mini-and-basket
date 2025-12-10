@@ -35,12 +35,14 @@ export default function StripeCheckout({
   
   // Map package IDs
   const packageMap: Record<string, PackageType> = {
-    'giornaliero': 'giornaliero',
-    'settimanale': 'completa',
-    'weekend': 'weekend',
+    'standard': 'standard',
+    'alta_specializzazione': 'alta_specializzazione',
+    // Legacy fallbacks
+    'completa': 'standard',
+    'settimanale': 'standard',
   };
 
-  const mappedPackage = packageMap[packageType] || 'completa';
+  const mappedPackage = packageMap[packageType] || 'standard';
   const packageInfo = PACKAGE_PRICES[mappedPackage];
   const stripeConfigured = isStripeConfigured();
 

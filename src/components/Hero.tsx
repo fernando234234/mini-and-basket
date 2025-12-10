@@ -176,7 +176,7 @@ export default function Hero() {
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
           </svg>
-          <span className="text-sm">Centro Sportivo Comunale</span>
+          <span className="text-sm">Villaggio Residence Bahja****, Paola (CS)</span>
         </div>
 
         {/* CTA Buttons */}
@@ -208,8 +208,8 @@ export default function Hero() {
         <div className="mt-12 flex flex-wrap justify-center gap-8 md:gap-12">
           {[
             { value: "100+", label: "Partecipanti" },
-            { value: "8", label: "Giorni" },
-            { value: "10+", label: "Coach" },
+            { value: "7", label: "Giorni" },
+            { value: "15+", label: "Coach" },
           ].map((stat, index) => (
             <div key={index} className="text-center">
               <div className="text-3xl md:text-4xl font-black text-brand-orange">{stat.value}</div>

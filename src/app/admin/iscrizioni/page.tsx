@@ -1,13 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { mockRegistrations } from '@/lib/mockData'
-import { Registration } from '@/types/registration'
+import { mockRegistrations, MockRegistration } from '@/lib/mockData'
 import RegistrationsTable from '@/components/admin/RegistrationsTable'
 
 export default function AdminIscrizioniPage() {
   // In a real app, this would be fetched from Supabase
-  const [registrations, setRegistrations] = useState<Registration[]>(mockRegistrations)
+  const [registrations, setRegistrations] = useState<MockRegistration[]>(mockRegistrations)
   const [reminderSent, setReminderSent] = useState<string | null>(null)
 
   const handleStatusChange = (id: string, status: 'pending' | 'confirmed' | 'cancelled') => {

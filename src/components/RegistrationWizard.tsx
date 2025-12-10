@@ -1,48 +1,63 @@
+
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import type { RegistrationInsert } from "@/types/registration";
+import { tshirtSizes, experienceLevelLabels, packageLabels } from "@/types/registration";
 import StripeCheckout from "./StripeCheckout";
 import { validatePhoneNumber, validateCodiceFiscale, validationMessages } from "@/lib/validation";
+import { isEarlyBird, PACKAGE_PRICES, ADDON_PRICES } from "@/lib/stripe";
 
 // Types
-interface CamperInfo {
-  firstName: string;
-  lastName: string;
-  dateOfBirth: string;
-  tshirtSize: string;
-  experience: string;
-  allergies: string;
-  medicalConditions: string;
-}
-
 interface ParentInfo {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
+  nomeCognome: string;
   codiceFiscale: string;
-  address: string;
-  city: string;
+  citta: string;
   cap: string;
+  indirizzo: string;
+  telefono: string;
+  email: string;
 }
 
-interface EmergencyContact {
-  name: string;
-  relationship: string;
-  phone: string;
+interface CamperInfo {
+  nomeCognome: string;
+  codiceFiscale: string;
+  luogoNascita: string;
+  dataNascita: string;
+  sesso: 'M' | 'F' | '';
+  citta: string;
+  cap: string;
+  indirizzo: string;
+  scuola: string;
+  classe: string;
+  taglia: string;
+  altezza: string;
+  peso: string;
+  numeroScarpe: string;
+  esperienza: string;
+  societa: string;
+}
+
+interface MedicalInfo {
+  allergieIntolleranze: string;
+  patologieNote: string;
+  terapieInCorso: string;
 }
 
 interface FormData {
-  package: string;
-  camper: CamperInfo;
+  packageType: 'standard' | 'alta_specializzazione' | '';
+  busTransfer: boolean;
   parent: ParentInfo;
-  emergency: EmergencyContact;
-  acceptTerms: boolean;
-  acceptPrivacy: boolean;
+  camper: CamperInfo;
+  medical: MedicalInfo;
+  liberatoriaFotoVideo: boolean;
+  accettazioneRegolamento: boolean;
+  privacyPolicy: boolean;
+  codiceInvito: string;
+  sameAddress: boolean;
 }
 
 interface FormErrors {
@@ -52,77 +67,75 @@ interface FormErrors {
 // Package options
 const packages = [
   {
-    id: "giornaliero",
-    title: "PACCHETTO GIORNALIERO",
-    price: "€250",
-    description: "7 giorni di camp",
-    features: ["Alloggio Incluso", "3 Pasti al Giorno", "Kit Camp"],
-    gradient: "from-slate-600 to-slate-800",
-  },
-  {
-    id: "settimanale",
-    title: "SETTIMANA COMPLETA",
-    price: "€450",
-    originalPrice: "€550",
-    description: "8 giorni completi",
-    features: ["Tutto incluso", "Foto e Video", "Certificato"],
-    gradient: "from-brand-orange to-red-500",
-    popular: true,
-  },
-  {
-    id: "weekend",
-    title: "PACCHETTO WEEKEND",
-    price: "€150",
-    description: "2 giorni intensivi",
-    features: ["Alloggio Incluso", "3 Pasti al Giorno"],
+    id: "standard",
+    title: "CAMP STANDARD",
+    price: isEarlyBird() ? "€590" : "€610",
+    originalPrice: isEarlyBird() ? "€610" : null,
+    description: "7 giorni di Camp",
+    features: ["Pensione completa", "Assicurazione", "Kit Camp", "Assistenza H24"],
     gradient: "from-brand-green to-emerald-600",
+  },
+  {
+    id: "alta_specializzazione",
+    title: "ALTA SPECIALIZZAZIONE",
+    price: isEarlyBird() ? "€760" : "€800",
+    originalPrice: isEarlyBird() ? "€800" : null,
+    description: "+7 ore tecnica individuale",
+    features: ["Tutto Standard incluso", "Lavoro personalizzato", "Max 30 posti"],
+    gradient: "from-brand-orange to-red-500",
+    limited: true,
   },
 ];
 
-const tshirtSizes = ["XS", "S", "M", "L", "XL"];
 const experienceLevels = [
-  { value: "none", label: "Nessuna esperienza" },
-  { value: "1-2", label: "1-2 anni" },
-  { value: "3+", label: "3+ anni" },
-];
-const relationships = [
-  "Genitore",
-  "Nonno/Nonna",
-  "Zio/Zia",
-  "Altro familiare",
-  "Altro",
+  { value: "principiante", label: "Non ho mai giocato", icon: "🆕" },
+  { value: "intermedio", label: "Gioco al campetto", icon: "🏀" },
+  { value: "avanzato", label: "Gioco in una squadra", icon: "⭐" },
 ];
 
 export default function RegistrationWizard() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [earlyBird, setEarlyBird] = useState(true);
   const [formData, setFormData] = useState<FormData>({
-    package: "",
-    camper: {
-      firstName: "",
-      lastName: "",
-      dateOfBirth: "",
-      tshirtSize: "",
-      experience: "",
-      allergies: "",
-      medicalConditions: "",
-    },
+    packageType: '',
+    busTransfer: false,
     parent: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      phone: "",
-      codiceFiscale: "",
-      address: "",
-      city: "",
-      cap: "",
+      nomeCognome: '',
+      codiceFiscale: '',
+      citta: '',
+      cap: '',
+      indirizzo: '',
+      telefono: '',
+      email: '',
     },
-    emergency: {
-      name: "",
-      relationship: "",
-      phone: "",
+    camper: {
+      nomeCognome: '',
+      codiceFiscale: '',
+      luogoNascita: '',
+      dataNascita: '',
+      sesso: '',
+      citta: '',
+      cap: '',
+      indirizzo: '',
+      scuola: '',
+      classe: '',
+      taglia: '',
+      altezza: '',
+      peso: '',
+      numeroScarpe: '',
+      esperienza: '',
+      societa: '',
     },
-    acceptTerms: false,
-    acceptPrivacy: false,
+    medical: {
+      allergieIntolleranze: '',
+      patologieNote: '',
+      terapieInCorso: '',
+    },
+    liberatoriaFotoVideo: false,
+    accettazioneRegolamento: false,
+    privacyPolicy: false,
+    codiceInvito: '',
+    sameAddress: true,
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -131,13 +144,16 @@ export default function RegistrationWizard() {
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const router = useRouter();
-  const [showPayment, setShowPayment] = useState(false);
+
+  useEffect(() => {
+    setEarlyBird(isEarlyBird());
+  }, []);
 
   const steps = [
     { number: 1, title: "Pacchetto", icon: "📦" },
-    { number: 2, title: "Atleta", icon: "🏀" },
-    { number: 3, title: "Genitore", icon: "👤" },
-    { number: 4, title: "Emergenza", icon: "🚨" },
+    { number: 2, title: "Genitore", icon: "👤" },
+    { number: 3, title: "Atleta", icon: "🏀" },
+    { number: 4, title: "Medico", icon: "🏥" },
     { number: 5, title: "Conferma", icon: "✅" },
     { number: 6, title: "Pagamento", icon: "💳" },
   ];
@@ -147,78 +163,97 @@ export default function RegistrationWizard() {
 
     switch (step) {
       case 1:
-        if (!formData.package) {
-          newErrors.package = "Seleziona un pacchetto";
+        if (!formData.packageType) {
+          newErrors.packageType = "Seleziona un pacchetto";
         }
         break;
       case 2:
-        if (!formData.camper.firstName.trim()) {
-          newErrors["camper.firstName"] = "Il nome è obbligatorio";
+        if (!formData.parent.nomeCognome.trim()) {
+          newErrors["parent.nomeCognome"] = "Nome e cognome obbligatori";
         }
-        if (!formData.camper.lastName.trim()) {
-          newErrors["camper.lastName"] = "Il cognome è obbligatorio";
+        if (!formData.parent.citta.trim()) {
+          newErrors["parent.citta"] = "Città obbligatoria";
         }
-        if (!formData.camper.dateOfBirth) {
-          newErrors["camper.dateOfBirth"] = "La data di nascita è obbligatoria";
+        if (!formData.parent.cap.trim()) {
+          newErrors["parent.cap"] = "CAP obbligatorio";
         }
-        if (!formData.camper.tshirtSize) {
-          newErrors["camper.tshirtSize"] = "Seleziona una taglia";
+        if (!formData.parent.indirizzo.trim()) {
+          newErrors["parent.indirizzo"] = "Indirizzo obbligatorio";
         }
-        if (!formData.camper.experience) {
-          newErrors["camper.experience"] = "Seleziona il livello di esperienza";
-        }
-        break;
-      case 3:
-        if (!formData.parent.firstName.trim()) {
-          newErrors["parent.firstName"] = "Il nome è obbligatorio";
-        }
-        if (!formData.parent.lastName.trim()) {
-          newErrors["parent.lastName"] = "Il cognome è obbligatorio";
+        if (!formData.parent.telefono.trim()) {
+          newErrors["parent.telefono"] = "Telefono obbligatorio";
+        } else if (!validatePhoneNumber(formData.parent.telefono)) {
+          newErrors["parent.telefono"] = validationMessages.phoneInvalid;
         }
         if (!formData.parent.email.trim()) {
-          newErrors["parent.email"] = "L'email è obbligatoria";
+          newErrors["parent.email"] = "Email obbligatoria";
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.parent.email)) {
           newErrors["parent.email"] = "Inserisci un'email valida";
         }
-        if (!formData.parent.phone.trim()) {
-          newErrors["parent.phone"] = "Il telefono è obbligatorio";
-        } else if (!validatePhoneNumber(formData.parent.phone)) {
-          newErrors["parent.phone"] = validationMessages.phoneInvalid;
+        break;
+      case 3:
+        if (!formData.camper.nomeCognome.trim()) {
+          newErrors["camper.nomeCognome"] = "Nome e cognome obbligatori";
         }
-        if (!formData.parent.codiceFiscale.trim()) {
-          newErrors["parent.codiceFiscale"] = "Il codice fiscale è obbligatorio";
-        } else if (!validateCodiceFiscale(formData.parent.codiceFiscale)) {
-          newErrors["parent.codiceFiscale"] = validationMessages.codiceFiscaleInvalid;
+        if (!formData.camper.codiceFiscale.trim()) {
+          newErrors["camper.codiceFiscale"] = "Codice fiscale obbligatorio";
+        } else if (!validateCodiceFiscale(formData.camper.codiceFiscale)) {
+          newErrors["camper.codiceFiscale"] = validationMessages.codiceFiscaleInvalid;
         }
-        if (!formData.parent.address.trim()) {
-          newErrors["parent.address"] = "L'indirizzo è obbligatorio";
+        if (!formData.camper.luogoNascita.trim()) {
+          newErrors["camper.luogoNascita"] = "Luogo di nascita obbligatorio";
         }
-        if (!formData.parent.city.trim()) {
-          newErrors["parent.city"] = "La città è obbligatoria";
+        if (!formData.camper.dataNascita) {
+          newErrors["camper.dataNascita"] = "Data di nascita obbligatoria";
         }
-        if (!formData.parent.cap.trim()) {
-          newErrors["parent.cap"] = "Il CAP è obbligatorio";
+        if (!formData.camper.sesso) {
+          newErrors["camper.sesso"] = "Seleziona il sesso";
+        }
+        if (!formData.sameAddress) {
+          if (!formData.camper.citta.trim()) {
+            newErrors["camper.citta"] = "Città obbligatoria";
+          }
+          if (!formData.camper.cap.trim()) {
+            newErrors["camper.cap"] = "CAP obbligatorio";
+          }
+          if (!formData.camper.indirizzo.trim()) {
+            newErrors["camper.indirizzo"] = "Indirizzo obbligatorio";
+          }
+        }
+        if (!formData.camper.scuola.trim()) {
+          newErrors["camper.scuola"] = "Scuola obbligatoria";
+        }
+        if (!formData.camper.classe.trim()) {
+          newErrors["camper.classe"] = "Classe obbligatoria";
+        }
+        if (!formData.camper.taglia) {
+          newErrors["camper.taglia"] = "Seleziona una taglia";
+        }
+        if (!formData.camper.altezza.trim()) {
+          newErrors["camper.altezza"] = "Altezza obbligatoria";
+        }
+        if (!formData.camper.peso.trim()) {
+          newErrors["camper.peso"] = "Peso obbligatorio";
+        }
+        if (!formData.camper.numeroScarpe.trim()) {
+          newErrors["camper.numeroScarpe"] = "Numero scarpe obbligatorio";
+        }
+        if (!formData.camper.esperienza) {
+          newErrors["camper.esperienza"] = "Seleziona il livello di esperienza";
         }
         break;
       case 4:
-        if (!formData.emergency.name.trim()) {
-          newErrors["emergency.name"] = "Il nome è obbligatorio";
-        }
-        if (!formData.emergency.relationship) {
-          newErrors["emergency.relationship"] = "Seleziona la relazione";
-        }
-        if (!formData.emergency.phone.trim()) {
-          newErrors["emergency.phone"] = "Il telefono è obbligatorio";
-        } else if (!validatePhoneNumber(formData.emergency.phone)) {
-          newErrors["emergency.phone"] = validationMessages.phoneInvalid;
-        }
+        // Medical info is optional, no validation needed
         break;
       case 5:
-        if (!formData.acceptTerms) {
-          newErrors.acceptTerms = "Devi accettare i termini e condizioni";
+        if (!formData.liberatoriaFotoVideo) {
+          newErrors.liberatoriaFotoVideo = "Devi accettare la liberatoria foto/video";
         }
-        if (!formData.acceptPrivacy) {
-          newErrors.acceptPrivacy = "Devi accettare la privacy policy";
+        if (!formData.accettazioneRegolamento) {
+          newErrors.accettazioneRegolamento = "Devi accettare il regolamento";
+        }
+        if (!formData.privacyPolicy) {
+          newErrors.privacyPolicy = "Devi accettare la privacy policy";
         }
         break;
     }
@@ -243,46 +278,44 @@ export default function RegistrationWizard() {
     setIsSubmitting(true);
     setSubmitError(null);
 
-    // Map package id to the correct type
-    const packageTypeMap: Record<string, 'giornaliero' | 'completa' | 'weekend'> = {
-      'giornaliero': 'giornaliero',
-      'settimanale': 'completa',
-      'weekend': 'weekend'
-    };
-
-    // Map experience to the correct type
-    const experienceMap: Record<string, 'nessuna' | '1-2-anni' | '3+-anni'> = {
-      'none': 'nessuna',
-      '1-2': '1-2-anni',
-      '3+': '3+-anni'
-    };
-
     // Prepare data for Supabase
     const registrationData: RegistrationInsert = {
-      package_type: packageTypeMap[formData.package] || 'completa',
-      camper_nome: formData.camper.firstName,
-      camper_cognome: formData.camper.lastName,
-      camper_data_nascita: formData.camper.dateOfBirth,
-      camper_taglia: formData.camper.tshirtSize as 'XS' | 'S' | 'M' | 'L' | 'XL',
-      camper_esperienza: experienceMap[formData.camper.experience] || 'nessuna',
-      camper_allergie: formData.camper.allergies || undefined,
-      camper_note_mediche: formData.camper.medicalConditions || undefined,
-      genitore_nome: formData.parent.firstName,
-      genitore_cognome: formData.parent.lastName,
+      package_type: formData.packageType as 'standard' | 'alta_specializzazione',
+      bus_transfer: formData.busTransfer,
+      genitore_nome_cognome: formData.parent.nomeCognome,
+      genitore_codice_fiscale: formData.parent.codiceFiscale || undefined,
+      genitore_citta: formData.parent.citta,
+      genitore_cap: formData.parent.cap,
+      genitore_indirizzo: formData.parent.indirizzo,
+      genitore_telefono: formData.parent.telefono,
       genitore_email: formData.parent.email,
-      genitore_telefono: formData.parent.phone,
-      genitore_codice_fiscale: formData.parent.codiceFiscale,
-      genitore_indirizzo: `${formData.parent.address}, ${formData.parent.cap} ${formData.parent.city}`,
-      emergenza_nome: formData.emergency.name,
-      emergenza_relazione: formData.emergency.relationship,
-      emergenza_telefono: formData.emergency.phone,
+      camper_nome_cognome: formData.camper.nomeCognome,
+      camper_codice_fiscale: formData.camper.codiceFiscale,
+      camper_luogo_nascita: formData.camper.luogoNascita,
+      camper_data_nascita: formData.camper.dataNascita,
+      camper_sesso: formData.camper.sesso as 'M' | 'F',
+      camper_citta: formData.sameAddress ? formData.parent.citta : formData.camper.citta,
+      camper_cap: formData.sameAddress ? formData.parent.cap : formData.camper.cap,
+      camper_indirizzo: formData.sameAddress ? formData.parent.indirizzo : formData.camper.indirizzo,
+      camper_scuola: formData.camper.scuola,
+      camper_classe: formData.camper.classe,
+      camper_taglia: formData.camper.taglia as 'XXS' | 'XS' | 'S' | 'M' | 'L' | 'XL',
+      camper_altezza: parseInt(formData.camper.altezza) || 0,
+      camper_peso: parseInt(formData.camper.peso) || 0,
+      camper_numero_scarpe: formData.camper.numeroScarpe,
+      camper_esperienza: formData.camper.esperienza as 'principiante' | 'intermedio' | 'avanzato',
+      camper_societa: formData.camper.societa || undefined,
+      allergie_intolleranze: formData.medical.allergieIntolleranze || undefined,
+      patologie_note: formData.medical.patologieNote || undefined,
+      terapie_in_corso: formData.medical.terapieInCorso || undefined,
+      liberatoria_foto_video: formData.liberatoriaFotoVideo,
+      accettazione_regolamento: formData.accettazioneRegolamento,
+      privacy_policy: formData.privacyPolicy,
       status: 'pending',
-      terms_accepted: formData.acceptTerms,
-      privacy_accepted: formData.acceptPrivacy,
+      codice_invito: formData.codiceInvito || undefined,
     };
 
     try {
-      // Check if Supabase is configured
       if (isSupabaseConfigured()) {
         const { data, error } = await supabase
           .from('registrations')
@@ -299,16 +332,12 @@ export default function RegistrationWizard() {
 
         setRegistrationId(data?.id || null);
       } else {
-        // Supabase not configured - simulate success for development
         console.log('Supabase not configured. Registration data:', registrationData);
-        // Generate a fake ID for development
         setRegistrationId(`DEV-${Date.now().toString(36).toUpperCase()}`);
-        // Simulate API delay
         await new Promise((resolve) => setTimeout(resolve, 1500));
       }
 
       setIsSubmitting(false);
-      // Move to payment step instead of showing success
       setCurrentStep(6);
     } catch (error) {
       console.error('Submit error:', error);
@@ -318,82 +347,85 @@ export default function RegistrationWizard() {
   };
 
   const handlePaymentSuccess = (paymentType: 'full' | 'deposit', sessionId: string) => {
-    // Navigate to success page with registration details
     const params = new URLSearchParams({
       session_id: sessionId,
       registration_id: registrationId || '',
       payment_type: paymentType,
-      camper_name: `${formData.camper.firstName} ${formData.camper.lastName}`,
-      package: formData.package,
+      camper_name: formData.camper.nomeCognome,
+      package: formData.packageType,
       email: formData.parent.email,
     });
     router.push(`/iscrizione/success?${params.toString()}`);
   };
 
   const handlePaymentCancel = () => {
-    // Go back to review step
     setCurrentStep(5);
   };
 
   const handlePayLater = () => {
-    // Skip payment and go to success without payment
     setIsSubmitted(true);
   };
 
-  const updateFormData = (
-    section: keyof FormData,
-    field: string,
-    value: string | boolean
-  ) => {
-    if (section === "acceptTerms" || section === "acceptPrivacy" || section === "package") {
-      setFormData((prev) => ({ ...prev, [section]: value }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [section]: {
-          ...(prev[section] as object),
-          [field]: value,
-        },
-      }));
-    }
-    // Clear error
-    const errorKey = section === "package" || section === "acceptTerms" || section === "acceptPrivacy" 
-      ? section 
-      : `${section}.${field}`;
+  const updateParent = (field: keyof ParentInfo, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      parent: { ...prev.parent, [field]: value },
+    }));
+    const errorKey = `parent.${field}`;
     if (errors[errorKey]) {
       setErrors((prev) => ({ ...prev, [errorKey]: "" }));
     }
   };
 
-  const selectedPackage = packages.find((p) => p.id === formData.package);
+  const updateCamper = (field: keyof CamperInfo, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      camper: { ...prev.camper, [field]: value },
+    }));
+    const errorKey = `camper.${field}`;
+    if (errors[errorKey]) {
+      setErrors((prev) => ({ ...prev, [errorKey]: "" }));
+    }
+  };
+
+  const updateMedical = (field: keyof MedicalInfo, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      medical: { ...prev.medical, [field]: value },
+    }));
+  };
+
+  const selectedPackage = packages.find((p) => p.id === formData.packageType);
+  
+  const calculateTotal = () => {
+    let total = 0;
+    if (formData.packageType === 'standard') {
+      total = earlyBird ? 590 : 610;
+    } else if (formData.packageType === 'alta_specializzazione') {
+      total = earlyBird ? 760 : 800;
+    }
+    if (formData.busTransfer) {
+      total += 60;
+    }
+    return total;
+  };
 
   // Success screen
   if (isSubmitted) {
     return (
       <div className="bg-white rounded-3xl p-8 md:p-12 shadow-xl text-center max-w-2xl mx-auto">
         <div className="w-24 h-24 mx-auto mb-8 bg-gradient-to-br from-brand-green to-emerald-500 rounded-full flex items-center justify-center animate-scale-in">
-          <svg
-            className="w-12 h-12 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 13l4 4L19 7"
-            />
+          <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
         <h2 className="text-3xl font-extrabold text-brand-dark mb-4">
-          Iscrizione Completata!
+          Iscrizione Registrata!
         </h2>
         <p className="text-brand-gray text-lg mb-6">
-          Grazie per aver iscritto {formData.camper.firstName} al Mini & Basket Camp 2025!
+          Grazie per aver iscritto {formData.camper.nomeCognome} al Mini & Basket Camp 2025!
         </p>
 
-        {/* Reference Number */}
         {registrationId && (
           <div className="bg-gray-100 rounded-xl p-4 mb-6">
             <p className="text-sm text-brand-gray mb-1">Numero di riferimento:</p>
@@ -401,23 +433,38 @@ export default function RegistrationWizard() {
           </div>
         )}
 
-        {/* Registration Summary */}
         <div className="bg-brand-green/10 rounded-2xl p-6 mb-6 text-left">
           <h3 className="font-bold text-brand-dark mb-4 text-center">Riepilogo Iscrizione</h3>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-brand-gray">Atleta:</span>
-              <span className="font-semibold text-brand-dark">{formData.camper.firstName} {formData.camper.lastName}</span>
+              <span className="font-semibold text-brand-dark">{formData.camper.nomeCognome}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-brand-gray">Pacchetto:</span>
               <span className="font-semibold text-brand-dark">{selectedPackage?.title}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-brand-gray">Prezzo:</span>
-              <span className="font-bold text-brand-orange">{selectedPackage?.price}</span>
+            {formData.busTransfer && (
+              <div className="flex justify-between">
+                <span className="text-brand-gray">Transfer Bus:</span>
+                <span className="font-semibold text-brand-dark">€60</span>
+              </div>
+            )}
+            <div className="flex justify-between pt-2 border-t">
+              <span className="text-brand-gray">Totale:</span>
+              <span className="font-bold text-brand-orange text-lg">€{calculateTotal()}</span>
             </div>
           </div>
+        </div>
+
+        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-8">
+          <p className="text-yellow-800 font-semibold">
+            ⚠️ Ricorda di completare il pagamento!
+          </p>
+          <p className="text-sm text-yellow-700 mt-1">
+            Acconto di €200 entro l&apos;iscrizione<br />
+            Saldo entro il 31 Maggio 2025
+          </p>
         </div>
 
         <div className="bg-blue-50 rounded-xl p-4 mb-8">
@@ -425,9 +472,6 @@ export default function RegistrationWizard() {
             📧 Ti abbiamo inviato un&apos;email di conferma a:
           </p>
           <p className="text-brand-dark font-bold text-lg">{formData.parent.email}</p>
-          <p className="text-sm text-blue-600 mt-2">
-            Controlla anche la cartella spam se non la trovi.
-          </p>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -437,44 +481,6 @@ export default function RegistrationWizard() {
           >
             Torna alla Home
           </Link>
-          <button
-            onClick={() => {
-              setIsSubmitted(false);
-              setCurrentStep(1);
-              setFormData({
-                package: "",
-                camper: {
-                  firstName: "",
-                  lastName: "",
-                  dateOfBirth: "",
-                  tshirtSize: "",
-                  experience: "",
-                  allergies: "",
-                  medicalConditions: "",
-                },
-                parent: {
-                  firstName: "",
-                  lastName: "",
-                  email: "",
-                  phone: "",
-                  codiceFiscale: "",
-                  address: "",
-                  city: "",
-                  cap: "",
-                },
-                emergency: {
-                  name: "",
-                  relationship: "",
-                  phone: "",
-                },
-                acceptTerms: false,
-                acceptPrivacy: false,
-              });
-            }}
-            className="border-2 border-brand-green text-brand-green font-bold py-3 px-8 rounded-full transition-all duration-300 hover:bg-brand-green hover:text-white"
-          >
-            Nuova Iscrizione
-          </button>
         </div>
       </div>
     );
@@ -485,7 +491,6 @@ export default function RegistrationWizard() {
       {/* Progress Indicator */}
       <div className="mb-8">
         <div className="flex items-center justify-between relative">
-          {/* Progress Line */}
           <div className="absolute top-6 left-0 right-0 h-1 bg-gray-200 -z-10">
             <div
               className="h-full bg-gradient-to-r from-brand-green to-brand-orange transition-all duration-500"
@@ -511,19 +516,13 @@ export default function RegistrationWizard() {
               >
                 {step.number < currentStep ? (
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 ) : (
                   step.icon
                 )}
               </div>
-              <span className="mt-2 text-xs font-semibold hidden sm:block">
-                {step.title}
-              </span>
+              <span className="mt-2 text-xs font-semibold hidden sm:block">{step.title}</span>
             </div>
           ))}
         </div>
@@ -534,59 +533,54 @@ export default function RegistrationWizard() {
         {/* Step 1: Package Selection */}
         {currentStep === 1 && (
           <div className="animate-fade-in">
-            <h2 className="text-2xl font-bold text-brand-dark mb-2">
-              Scegli il tuo pacchetto
-            </h2>
-            <p className="text-brand-gray mb-6">
-              Seleziona il pacchetto più adatto alle tue esigenze
-            </p>
+            <h2 className="text-2xl font-bold text-brand-dark mb-2">Scegli il tuo pacchetto</h2>
+            <p className="text-brand-gray mb-6">Camp 2025: 29 Giugno - 6 Luglio | Villaggio Bahja, Paola (CS)</p>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 relative z-10">
+            {earlyBird && (
+              <div className="mb-6 bg-gradient-to-r from-brand-orange/10 to-red-100 border border-brand-orange/30 rounded-xl p-4">
+                <p className="text-brand-orange font-bold flex items-center gap-2">
+                  <span>⏰</span> Early Bird Attivo! Risparmia fino a €40 - Scade il 28 Feb 2025
+                </p>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               {packages.map((pkg) => (
                 <div
                   key={pkg.id}
                   role="button"
                   tabIndex={0}
                   onClick={() => {
-                    setFormData(prev => ({ ...prev, package: pkg.id }));
-                    if (errors.package) {
-                      setErrors(prev => ({ ...prev, package: "" }));
+                    setFormData(prev => ({ ...prev, packageType: pkg.id as 'standard' | 'alta_specializzazione' }));
+                    if (errors.packageType) {
+                      setErrors(prev => ({ ...prev, packageType: "" }));
                     }
                   }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      setFormData(prev => ({ ...prev, package: pkg.id }));
-                      if (errors.package) {
-                        setErrors(prev => ({ ...prev, package: "" }));
-                      }
+                      setFormData(prev => ({ ...prev, packageType: pkg.id as 'standard' | 'alta_specializzazione' }));
                     }
                   }}
                   className={`relative p-6 rounded-2xl text-left transition-all duration-300 cursor-pointer select-none ${
-                    formData.package === pkg.id
+                    formData.packageType === pkg.id
                       ? "ring-4 ring-brand-green shadow-xl scale-[1.02] bg-brand-green/5"
                       : "border-2 border-gray-200 hover:border-brand-green hover:shadow-lg bg-white"
                   }`}
                 >
-                  {pkg.popular && (
+                  {pkg.limited && (
                     <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-orange text-white text-xs font-bold px-3 py-1 rounded-full">
-                      🔥 Più Popolare
+                      🏆 MAX 30 POSTI
                     </span>
                   )}
-                  <div
-                    className={`h-2 rounded-full bg-gradient-to-r ${pkg.gradient} mb-4`}
-                  />
-                  <h3 className="font-bold text-brand-dark">{pkg.title}</h3>
+                  <div className={`h-2 rounded-full bg-gradient-to-r ${pkg.gradient} mb-4`} />
+                  <h3 className="font-bold text-brand-dark text-lg">{pkg.title}</h3>
                   <div className="flex items-end gap-2 my-2">
-                    <span
-                      className={`text-3xl font-black bg-gradient-to-r ${pkg.gradient} bg-clip-text text-transparent`}
-                    >
+                    <span className={`text-3xl font-black bg-gradient-to-r ${pkg.gradient} bg-clip-text text-transparent`}>
                       {pkg.price}
                     </span>
                     {pkg.originalPrice && (
-                      <span className="text-gray-400 line-through text-sm">
-                        {pkg.originalPrice}
-                      </span>
+                      <span className="text-gray-400 line-through text-sm">{pkg.originalPrice}</span>
                     )}
                   </div>
                   <p className="text-sm text-brand-gray mb-3">{pkg.description}</p>
@@ -600,7 +594,7 @@ export default function RegistrationWizard() {
                       </li>
                     ))}
                   </ul>
-                  {formData.package === pkg.id && (
+                  {formData.packageType === pkg.id && (
                     <div className="absolute top-4 right-4">
                       <div className="w-6 h-6 bg-brand-green rounded-full flex items-center justify-center">
                         <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -612,94 +606,330 @@ export default function RegistrationWizard() {
                 </div>
               ))}
             </div>
-            {errors.package && (
-              <p className="mt-4 text-sm text-red-500">{errors.package}</p>
+            {errors.packageType && (
+              <p className="mt-2 text-sm text-red-500">{errors.packageType}</p>
+            )}
+
+            {/* Bus Transfer Option */}
+            <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+              <label className="flex items-center gap-4 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.busTransfer}
+                  onChange={(e) => setFormData(prev => ({ ...prev, busTransfer: e.target.checked }))}
+                  className="w-5 h-5 rounded border-gray-300 text-brand-green focus:ring-brand-green"
+                />
+                <div className="flex-1">
+                  <span className="font-semibold text-brand-dark flex items-center gap-2">
+                    <span>🚌</span> Transfer Bus Napoli A/R
+                  </span>
+                  <p className="text-sm text-brand-gray">Partenza da Napoli e/o provincia</p>
+                </div>
+                <span className="font-bold text-blue-600">+€60</span>
+              </label>
+            </div>
+
+            {/* Total */}
+            {formData.packageType && (
+              <div className="mt-6 p-4 bg-gray-50 rounded-xl">
+                <div className="flex justify-between items-center">
+                  <span className="text-brand-gray">Totale:</span>
+                  <span className="text-2xl font-black text-brand-dark">€{calculateTotal()}</span>
+                </div>
+                <p className="text-sm text-brand-gray mt-1">Acconto richiesto: €200</p>
+              </div>
             )}
           </div>
         )}
 
-        {/* Step 2: Camper Information */}
+        {/* Step 2: Parent Information */}
         {currentStep === 2 && (
           <div className="animate-fade-in">
-            <h2 className="text-2xl font-bold text-brand-dark mb-2">
-              Informazioni Atleta
-            </h2>
-            <p className="text-brand-gray mb-6">
-              Inserisci i dati del giovane partecipante
-            </p>
+            <h2 className="text-2xl font-bold text-brand-dark mb-2">Dati Genitore/Tutore</h2>
+            <p className="text-brand-gray mb-6">Inserisci i dati del genitore o tutore legale</p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-sm font-semibold text-brand-dark mb-2">
-                  Nome *
+                  Nome e Cognome *
                 </label>
                 <input
                   type="text"
-                  value={formData.camper.firstName}
-                  onChange={(e) => updateFormData("camper", "firstName", e.target.value)}
+                  value={formData.parent.nomeCognome}
+                  onChange={(e) => updateParent("nomeCognome", e.target.value)}
                   className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
-                    errors["camper.firstName"]
-                      ? "border-red-400 bg-red-50"
-                      : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
+                    errors["parent.nomeCognome"] ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
                   }`}
-                  placeholder="Mario"
+                  placeholder="Es: Mario Rossi"
                 />
-                {errors["camper.firstName"] && (
-                  <p className="mt-1 text-sm text-red-500">{errors["camper.firstName"]}</p>
-                )}
+                {errors["parent.nomeCognome"] && <p className="mt-1 text-sm text-red-500">{errors["parent.nomeCognome"]}</p>}
               </div>
 
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-sm font-semibold text-brand-dark mb-2">
-                  Cognome *
+                  Codice Fiscale <span className="text-brand-gray font-normal">(opzionale)</span>
                 </label>
                 <input
                   type="text"
-                  value={formData.camper.lastName}
-                  onChange={(e) => updateFormData("camper", "lastName", e.target.value)}
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
-                    errors["camper.lastName"]
-                      ? "border-red-400 bg-red-50"
-                      : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
-                  }`}
-                  placeholder="Rossi"
+                  value={formData.parent.codiceFiscale}
+                  onChange={(e) => updateParent("codiceFiscale", e.target.value.toUpperCase())}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white transition-all duration-300 focus:outline-none uppercase"
+                  placeholder="RSSMRA80A01H501Z"
+                  maxLength={16}
                 />
-                {errors["camper.lastName"] && (
-                  <p className="mt-1 text-sm text-red-500">{errors["camper.lastName"]}</p>
-                )}
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-brand-dark mb-2">
-                  Data di Nascita *
-                </label>
+                <label className="block text-sm font-semibold text-brand-dark mb-2">Città *</label>
+                <input
+                  type="text"
+                  value={formData.parent.citta}
+                  onChange={(e) => updateParent("citta", e.target.value)}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
+                    errors["parent.citta"] ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
+                  }`}
+                  placeholder="Es: Napoli"
+                />
+                {errors["parent.citta"] && <p className="mt-1 text-sm text-red-500">{errors["parent.citta"]}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-brand-dark mb-2">CAP *</label>
+                <input
+                  type="text"
+                  value={formData.parent.cap}
+                  onChange={(e) => updateParent("cap", e.target.value)}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
+                    errors["parent.cap"] ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
+                  }`}
+                  placeholder="80100"
+                  maxLength={5}
+                />
+                {errors["parent.cap"] && <p className="mt-1 text-sm text-red-500">{errors["parent.cap"]}</p>}
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-brand-dark mb-2">Indirizzo *</label>
+                <input
+                  type="text"
+                  value={formData.parent.indirizzo}
+                  onChange={(e) => updateParent("indirizzo", e.target.value)}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
+                    errors["parent.indirizzo"] ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
+                  }`}
+                  placeholder="Via Roma, 123"
+                />
+                {errors["parent.indirizzo"] && <p className="mt-1 text-sm text-red-500">{errors["parent.indirizzo"]}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-brand-dark mb-2">Telefono *</label>
+                <input
+                  type="tel"
+                  value={formData.parent.telefono}
+                  onChange={(e) => updateParent("telefono", e.target.value)}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
+                    errors["parent.telefono"] ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
+                  }`}
+                  placeholder="+39 333 1234567"
+                />
+                {errors["parent.telefono"] && <p className="mt-1 text-sm text-red-500">{errors["parent.telefono"]}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-brand-dark mb-2">Email *</label>
+                <input
+                  type="email"
+                  value={formData.parent.email}
+                  onChange={(e) => updateParent("email", e.target.value)}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
+                    errors["parent.email"] ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
+                  }`}
+                  placeholder="mario.rossi@email.com"
+                />
+                {errors["parent.email"] && <p className="mt-1 text-sm text-red-500">{errors["parent.email"]}</p>}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Camper Information */}
+        {currentStep === 3 && (
+          <div className="animate-fade-in">
+            <h2 className="text-2xl font-bold text-brand-dark mb-2">Dati Atleta</h2>
+            <p className="text-brand-gray mb-6">Inserisci i dati del partecipante al camp</p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-brand-dark mb-2">Nome e Cognome *</label>
+                <input
+                  type="text"
+                  value={formData.camper.nomeCognome}
+                  onChange={(e) => updateCamper("nomeCognome", e.target.value)}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
+                    errors["camper.nomeCognome"] ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
+                  }`}
+                  placeholder="Es: Marco Rossi"
+                />
+                {errors["camper.nomeCognome"] && <p className="mt-1 text-sm text-red-500">{errors["camper.nomeCognome"]}</p>}
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-brand-dark mb-2">Codice Fiscale *</label>
+                <input
+                  type="text"
+                  value={formData.camper.codiceFiscale}
+                  onChange={(e) => updateCamper("codiceFiscale", e.target.value.toUpperCase())}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none uppercase ${
+                    errors["camper.codiceFiscale"] ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
+                  }`}
+                  placeholder="RSSMRC10A01H501Z"
+                  maxLength={16}
+                />
+                {errors["camper.codiceFiscale"] && <p className="mt-1 text-sm text-red-500">{errors["camper.codiceFiscale"]}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-brand-dark mb-2">Luogo di Nascita *</label>
+                <input
+                  type="text"
+                  value={formData.camper.luogoNascita}
+                  onChange={(e) => updateCamper("luogoNascita", e.target.value)}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
+                    errors["camper.luogoNascita"] ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
+                  }`}
+                  placeholder="Es: Napoli"
+                />
+                {errors["camper.luogoNascita"] && <p className="mt-1 text-sm text-red-500">{errors["camper.luogoNascita"]}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-brand-dark mb-2">Data di Nascita *</label>
                 <input
                   type="date"
-                  value={formData.camper.dateOfBirth}
-                  onChange={(e) => updateFormData("camper", "dateOfBirth", e.target.value)}
+                  value={formData.camper.dataNascita}
+                  onChange={(e) => updateCamper("dataNascita", e.target.value)}
                   className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
-                    errors["camper.dateOfBirth"]
-                      ? "border-red-400 bg-red-50"
-                      : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
+                    errors["camper.dataNascita"] ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
                   }`}
                 />
-                {errors["camper.dateOfBirth"] && (
-                  <p className="mt-1 text-sm text-red-500">{errors["camper.dateOfBirth"]}</p>
-                )}
+                {errors["camper.dataNascita"] && <p className="mt-1 text-sm text-red-500">{errors["camper.dataNascita"]}</p>}
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-brand-dark mb-2">Sesso *</label>
+                <div className="flex gap-4">
+                  {[{ value: 'M', label: 'Maschio' }, { value: 'F', label: 'Femmina' }].map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => updateCamper("sesso", option.value)}
+                      className={`flex-1 py-3 rounded-xl font-bold transition-all duration-300 ${
+                        formData.camper.sesso === option.value
+                          ? "bg-brand-green text-white"
+                          : "bg-gray-100 text-brand-gray hover:bg-brand-green/10"
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+                {errors["camper.sesso"] && <p className="mt-1 text-sm text-red-500">{errors["camper.sesso"]}</p>}
+              </div>
+
+              {/* Address Same as Parent */}
+              <div className="md:col-span-2">
+                <label className="flex items-center gap-3 cursor-pointer p-3 bg-gray-50 rounded-xl">
+                  <input
+                    type="checkbox"
+                    checked={formData.sameAddress}
+                    onChange={(e) => setFormData(prev => ({ ...prev, sameAddress: e.target.checked }))}
+                    className="w-5 h-5 rounded border-gray-300 text-brand-green focus:ring-brand-green"
+                  />
+                  <span className="text-brand-dark font-medium">Residenza uguale al genitore/tutore</span>
+                </label>
+              </div>
+
+              {!formData.sameAddress && (
+                <>
+                  <div>
+                    <label className="block text-sm font-semibold text-brand-dark mb-2">Città *</label>
+                    <input
+                      type="text"
+                      value={formData.camper.citta}
+                      onChange={(e) => updateCamper("citta", e.target.value)}
+                      className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
+                        errors["camper.citta"] ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
+                      }`}
+                    />
+                    {errors["camper.citta"] && <p className="mt-1 text-sm text-red-500">{errors["camper.citta"]}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-brand-dark mb-2">CAP *</label>
+                    <input
+                      type="text"
+                      value={formData.camper.cap}
+                      onChange={(e) => updateCamper("cap", e.target.value)}
+                      className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
+                        errors["camper.cap"] ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
+                      }`}
+                      maxLength={5}
+                    />
+                    {errors["camper.cap"] && <p className="mt-1 text-sm text-red-500">{errors["camper.cap"]}</p>}
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-semibold text-brand-dark mb-2">Indirizzo *</label>
+                    <input
+                      type="text"
+                      value={formData.camper.indirizzo}
+                      onChange={(e) => updateCamper("indirizzo", e.target.value)}
+                      className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
+                        errors["camper.indirizzo"] ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
+                      }`}
+                    />
+                    {errors["camper.indirizzo"] && <p className="mt-1 text-sm text-red-500">{errors["camper.indirizzo"]}</p>}
+                  </div>
+                </>
+              )}
+
+              <div>
+                <label className="block text-sm font-semibold text-brand-dark mb-2">Scuola Frequentata *</label>
+                <input
+                  type="text"
+                  value={formData.camper.scuola}
+                  onChange={(e) => updateCamper("scuola", e.target.value)}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
+                    errors["camper.scuola"] ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
+                  }`}
+                  placeholder="Es: Scuola Media Carducci"
+                />
+                {errors["camper.scuola"] && <p className="mt-1 text-sm text-red-500">{errors["camper.scuola"]}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-brand-dark mb-2">
-                  Taglia T-Shirt *
-                </label>
-                <div className="flex gap-2">
+                <label className="block text-sm font-semibold text-brand-dark mb-2">Classe *</label>
+                <input
+                  type="text"
+                  value={formData.camper.classe}
+                  onChange={(e) => updateCamper("classe", e.target.value)}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
+                    errors["camper.classe"] ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
+                  }`}
+                  placeholder="Es: 2° Media"
+                />
+                {errors["camper.classe"] && <p className="mt-1 text-sm text-red-500">{errors["camper.classe"]}</p>}
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-brand-dark mb-2">Taglia Maglietta *</label>
+                <div className="flex flex-wrap gap-2">
                   {tshirtSizes.map((size) => (
                     <button
                       key={size}
                       type="button"
-                      onClick={() => updateFormData("camper", "tshirtSize", size)}
-                      className={`flex-1 py-3 rounded-xl font-bold transition-all duration-300 ${
-                        formData.camper.tshirtSize === size
+                      onClick={() => updateCamper("taglia", size)}
+                      className={`px-4 py-2 rounded-xl font-bold transition-all duration-300 ${
+                        formData.camper.taglia === size
                           ? "bg-brand-green text-white"
                           : "bg-gray-100 text-brand-gray hover:bg-brand-green/10"
                       }`}
@@ -708,330 +938,141 @@ export default function RegistrationWizard() {
                     </button>
                   ))}
                 </div>
-                {errors["camper.tshirtSize"] && (
-                  <p className="mt-1 text-sm text-red-500">{errors["camper.tshirtSize"]}</p>
-                )}
+                {errors["camper.taglia"] && <p className="mt-1 text-sm text-red-500">{errors["camper.taglia"]}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-brand-dark mb-2">Altezza (cm) *</label>
+                <input
+                  type="number"
+                  value={formData.camper.altezza}
+                  onChange={(e) => updateCamper("altezza", e.target.value)}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
+                    errors["camper.altezza"] ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
+                  }`}
+                  placeholder="165"
+                />
+                {errors["camper.altezza"] && <p className="mt-1 text-sm text-red-500">{errors["camper.altezza"]}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-brand-dark mb-2">Peso (kg) *</label>
+                <input
+                  type="number"
+                  value={formData.camper.peso}
+                  onChange={(e) => updateCamper("peso", e.target.value)}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
+                    errors["camper.peso"] ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
+                  }`}
+                  placeholder="55"
+                />
+                {errors["camper.peso"] && <p className="mt-1 text-sm text-red-500">{errors["camper.peso"]}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-brand-dark mb-2">Numero Scarpe (EU) *</label>
+                <input
+                  type="text"
+                  value={formData.camper.numeroScarpe}
+                  onChange={(e) => updateCamper("numeroScarpe", e.target.value)}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
+                    errors["camper.numeroScarpe"] ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
+                  }`}
+                  placeholder="40"
+                />
+                {errors["camper.numeroScarpe"] && <p className="mt-1 text-sm text-red-500">{errors["camper.numeroScarpe"]}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-brand-dark mb-2">Società Sportiva</label>
+                <input
+                  type="text"
+                  value={formData.camper.societa}
+                  onChange={(e) => updateCamper("societa", e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white transition-all duration-300 focus:outline-none"
+                  placeholder="Es: Basket Napoli ASD"
+                />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-semibold text-brand-dark mb-2">
-                  Esperienza Basket *
-                </label>
+                <label className="block text-sm font-semibold text-brand-dark mb-2">Livello di Esperienza *</label>
                 <div className="grid grid-cols-3 gap-3">
                   {experienceLevels.map((level) => (
                     <button
                       key={level.value}
                       type="button"
-                      onClick={() => updateFormData("camper", "experience", level.value)}
-                      className={`py-3 px-4 rounded-xl font-semibold transition-all duration-300 ${
-                        formData.camper.experience === level.value
+                      onClick={() => updateCamper("esperienza", level.value)}
+                      className={`py-3 px-4 rounded-xl font-semibold transition-all duration-300 flex flex-col items-center gap-1 ${
+                        formData.camper.esperienza === level.value
                           ? "bg-brand-orange text-white"
                           : "bg-gray-100 text-brand-gray hover:bg-brand-orange/10"
                       }`}
                     >
-                      {level.label}
+                      <span className="text-xl">{level.icon}</span>
+                      <span className="text-xs text-center">{level.label}</span>
                     </button>
                   ))}
                 </div>
-                {errors["camper.experience"] && (
-                  <p className="mt-1 text-sm text-red-500">{errors["camper.experience"]}</p>
-                )}
+                {errors["camper.esperienza"] && <p className="mt-1 text-sm text-red-500">{errors["camper.esperienza"]}</p>}
               </div>
+            </div>
+          </div>
+        )}
 
+        {/* Step 4: Medical Information */}
+        {currentStep === 4 && (
+          <div className="animate-fade-in">
+            <h2 className="text-2xl font-bold text-brand-dark mb-2">Informazioni Mediche</h2>
+            <p className="text-brand-gray mb-6">Queste informazioni sono opzionali ma importanti per la sicurezza dell&apos;atleta</p>
+
+            <div className="space-y-6">
               <div>
                 <label className="block text-sm font-semibold text-brand-dark mb-2">
-                  Allergie (opzionale)
+                  Allergie e Intolleranze Alimentari
                 </label>
                 <textarea
-                  value={formData.camper.allergies}
-                  onChange={(e) => updateFormData("camper", "allergies", e.target.value)}
+                  value={formData.medical.allergieIntolleranze}
+                  onChange={(e) => updateMedical("allergieIntolleranze", e.target.value)}
                   className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white transition-all duration-300 focus:outline-none resize-none"
                   rows={3}
-                  placeholder="Es: Allergia alle arachidi..."
+                  placeholder="Es: Allergia alle arachidi, intolleranza al lattosio..."
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-brand-dark mb-2">
-                  Condizioni Mediche (opzionale)
+                  Patologie Note
                 </label>
                 <textarea
-                  value={formData.camper.medicalConditions}
-                  onChange={(e) => updateFormData("camper", "medicalConditions", e.target.value)}
+                  value={formData.medical.patologieNote}
+                  onChange={(e) => updateMedical("patologieNote", e.target.value)}
                   className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white transition-all duration-300 focus:outline-none resize-none"
                   rows={3}
                   placeholder="Es: Asma, diabete..."
                 />
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* Step 3: Parent Information */}
-        {currentStep === 3 && (
-          <div className="animate-fade-in">
-            <h2 className="text-2xl font-bold text-brand-dark mb-2">
-              Informazioni Genitore/Tutore
-            </h2>
-            <p className="text-brand-gray mb-6">
-              Inserisci i dati del genitore o tutore legale
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div>
-                <label className="block text-sm font-semibold text-brand-dark mb-2">
-                  Nome *
-                </label>
-                <input
-                  type="text"
-                  value={formData.parent.firstName}
-                  onChange={(e) => updateFormData("parent", "firstName", e.target.value)}
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
-                    errors["parent.firstName"]
-                      ? "border-red-400 bg-red-50"
-                      : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
-                  }`}
-                  placeholder="Giuseppe"
-                />
-                {errors["parent.firstName"] && (
-                  <p className="mt-1 text-sm text-red-500">{errors["parent.firstName"]}</p>
-                )}
-              </div>
 
               <div>
                 <label className="block text-sm font-semibold text-brand-dark mb-2">
-                  Cognome *
+                  Terapie in Corso
                 </label>
-                <input
-                  type="text"
-                  value={formData.parent.lastName}
-                  onChange={(e) => updateFormData("parent", "lastName", e.target.value)}
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
-                    errors["parent.lastName"]
-                      ? "border-red-400 bg-red-50"
-                      : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
-                  }`}
-                  placeholder="Rossi"
+                <textarea
+                  value={formData.medical.terapieInCorso}
+                  onChange={(e) => updateMedical("terapieInCorso", e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white transition-all duration-300 focus:outline-none resize-none"
+                  rows={3}
+                  placeholder="Specificare farmaci e posologie..."
                 />
-                {errors["parent.lastName"] && (
-                  <p className="mt-1 text-sm text-red-500">{errors["parent.lastName"]}</p>
-                )}
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-brand-dark mb-2">
-                  Email *
-                </label>
-                <input
-                  type="email"
-                  value={formData.parent.email}
-                  onChange={(e) => updateFormData("parent", "email", e.target.value)}
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
-                    errors["parent.email"]
-                      ? "border-red-400 bg-red-50"
-                      : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
-                  }`}
-                  placeholder="giuseppe.rossi@email.com"
-                />
-                {errors["parent.email"] && (
-                  <p className="mt-1 text-sm text-red-500">{errors["parent.email"]}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-brand-dark mb-2">
-                  Telefono *
-                </label>
-                <input
-                  type="tel"
-                  value={formData.parent.phone}
-                  onChange={(e) => updateFormData("parent", "phone", e.target.value)}
-                  onBlur={() => {
-                    if (formData.parent.phone.trim() && !validatePhoneNumber(formData.parent.phone)) {
-                      setErrors(prev => ({ ...prev, "parent.phone": validationMessages.phoneInvalid }));
-                    }
-                  }}
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
-                    errors["parent.phone"]
-                      ? "border-red-400 bg-red-50"
-                      : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
-                  }`}
-                  placeholder="+39 333 1234567"
-                />
-                {errors["parent.phone"] && (
-                  <p className="mt-1 text-sm text-red-500">{errors["parent.phone"]}</p>
-                )}
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-semibold text-brand-dark mb-2">
-                  Codice Fiscale *
-                </label>
-                <input
-                  type="text"
-                  value={formData.parent.codiceFiscale}
-                  onChange={(e) => updateFormData("parent", "codiceFiscale", e.target.value.toUpperCase())}
-                  onBlur={() => {
-                    if (formData.parent.codiceFiscale.trim() && !validateCodiceFiscale(formData.parent.codiceFiscale)) {
-                      setErrors(prev => ({ ...prev, "parent.codiceFiscale": validationMessages.codiceFiscaleInvalid }));
-                    }
-                  }}
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none uppercase ${
-                    errors["parent.codiceFiscale"]
-                      ? "border-red-400 bg-red-50"
-                      : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
-                  }`}
-                  placeholder="RSSGPP80A01H501Z"
-                  maxLength={16}
-                />
-                {errors["parent.codiceFiscale"] && (
-                  <p className="mt-1 text-sm text-red-500">{errors["parent.codiceFiscale"]}</p>
-                )}
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-semibold text-brand-dark mb-2">
-                  Indirizzo *
-                </label>
-                <input
-                  type="text"
-                  value={formData.parent.address}
-                  onChange={(e) => updateFormData("parent", "address", e.target.value)}
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
-                    errors["parent.address"]
-                      ? "border-red-400 bg-red-50"
-                      : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
-                  }`}
-                  placeholder="Via Roma, 123"
-                />
-                {errors["parent.address"] && (
-                  <p className="mt-1 text-sm text-red-500">{errors["parent.address"]}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-brand-dark mb-2">
-                  Città *
-                </label>
-                <input
-                  type="text"
-                  value={formData.parent.city}
-                  onChange={(e) => updateFormData("parent", "city", e.target.value)}
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
-                    errors["parent.city"]
-                      ? "border-red-400 bg-red-50"
-                      : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
-                  }`}
-                  placeholder="Milano"
-                />
-                {errors["parent.city"] && (
-                  <p className="mt-1 text-sm text-red-500">{errors["parent.city"]}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-brand-dark mb-2">
-                  CAP *
-                </label>
-                <input
-                  type="text"
-                  value={formData.parent.cap}
-                  onChange={(e) => updateFormData("parent", "cap", e.target.value)}
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
-                    errors["parent.cap"]
-                      ? "border-red-400 bg-red-50"
-                      : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
-                  }`}
-                  placeholder="20100"
-                  maxLength={5}
-                />
-                {errors["parent.cap"] && (
-                  <p className="mt-1 text-sm text-red-500">{errors["parent.cap"]}</p>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Step 4: Emergency Contact */}
-        {currentStep === 4 && (
-          <div className="animate-fade-in">
-            <h2 className="text-2xl font-bold text-brand-dark mb-2">
-              Contatto di Emergenza
-            </h2>
-            <p className="text-brand-gray mb-6">
-              Inserisci un contatto alternativo in caso di emergenza
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div className="md:col-span-2">
-                <label className="block text-sm font-semibold text-brand-dark mb-2">
-                  Nome Completo *
-                </label>
-                <input
-                  type="text"
-                  value={formData.emergency.name}
-                  onChange={(e) => updateFormData("emergency", "name", e.target.value)}
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
-                    errors["emergency.name"]
-                      ? "border-red-400 bg-red-50"
-                      : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
-                  }`}
-                  placeholder="Maria Bianchi"
-                />
-                {errors["emergency.name"] && (
-                  <p className="mt-1 text-sm text-red-500">{errors["emergency.name"]}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-brand-dark mb-2">
-                  Relazione con l&apos;atleta *
-                </label>
-                <select
-                  value={formData.emergency.relationship}
-                  onChange={(e) => updateFormData("emergency", "relationship", e.target.value)}
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
-                    errors["emergency.relationship"]
-                      ? "border-red-400 bg-red-50"
-                      : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
-                  }`}
-                >
-                  <option value="">Seleziona...</option>
-                  {relationships.map((rel) => (
-                    <option key={rel} value={rel}>
-                      {rel}
-                    </option>
-                  ))}
-                </select>
-                {errors["emergency.relationship"] && (
-                  <p className="mt-1 text-sm text-red-500">{errors["emergency.relationship"]}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-brand-dark mb-2">
-                  Telefono *
-                </label>
-                <input
-                  type="tel"
-                  value={formData.emergency.phone}
-                  onChange={(e) => updateFormData("emergency", "phone", e.target.value)}
-                  onBlur={() => {
-                    if (formData.emergency.phone.trim() && !validatePhoneNumber(formData.emergency.phone)) {
-                      setErrors(prev => ({ ...prev, "emergency.phone": validationMessages.phoneInvalid }));
-                    }
-                  }}
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none ${
-                    errors["emergency.phone"]
-                      ? "border-red-400 bg-red-50"
-                      : "border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white"
-                  }`}
-                  placeholder="+39 333 7654321"
-                />
-                {errors["emergency.phone"] && (
-                  <p className="mt-1 text-sm text-red-500">{errors["emergency.phone"]}</p>
-                )}
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <p className="text-blue-800 text-sm flex items-start gap-2">
+                  <span className="text-lg">ℹ️</span>
+                  <span>
+                    <strong>Certificato medico:</strong> Per partecipare al camp è necessario il certificato per attività 
+                    sportiva agonistica rilasciato dal medico sportivo. Il certificato deve essere consegnato all&apos;arrivo.
+                  </span>
+                </p>
               </div>
             </div>
           </div>
@@ -1040,64 +1081,26 @@ export default function RegistrationWizard() {
         {/* Step 5: Review and Confirm */}
         {currentStep === 5 && (
           <div className="animate-fade-in">
-            <h2 className="text-2xl font-bold text-brand-dark mb-2">
-              Riepilogo e Conferma
-            </h2>
-            <p className="text-brand-gray mb-6">
-              Verifica i dati inseriti e conferma l&apos;iscrizione
-            </p>
+            <h2 className="text-2xl font-bold text-brand-dark mb-2">Riepilogo e Conferma</h2>
+            <p className="text-brand-gray mb-6">Verifica i dati inseriti e accetta i consensi</p>
 
             {/* Summary Cards */}
             <div className="space-y-4 mb-8">
-              {/* Package */}
               <div className="bg-gradient-to-r from-brand-green/10 to-brand-orange/10 rounded-2xl p-5">
                 <h4 className="font-bold text-brand-dark flex items-center gap-2 mb-3">
                   <span>📦</span> Pacchetto Selezionato
                 </h4>
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-brand-dark">
-                    {selectedPackage?.title}
-                  </span>
-                  <span className="text-2xl font-black text-brand-orange">
-                    {selectedPackage?.price}
-                  </span>
+                  <div>
+                    <span className="font-semibold text-brand-dark">{selectedPackage?.title}</span>
+                    {formData.busTransfer && (
+                      <p className="text-sm text-brand-gray">+ Transfer Bus Napoli</p>
+                    )}
+                  </div>
+                  <span className="text-2xl font-black text-brand-orange">€{calculateTotal()}</span>
                 </div>
               </div>
 
-              {/* Camper */}
-              <div className="bg-gray-50 rounded-2xl p-5">
-                <h4 className="font-bold text-brand-dark flex items-center gap-2 mb-3">
-                  <span>🏀</span> Atleta
-                </h4>
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <span className="text-brand-gray">Nome:</span>
-                    <span className="font-semibold text-brand-dark ml-2">
-                      {formData.camper.firstName} {formData.camper.lastName}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-brand-gray">Data di nascita:</span>
-                    <span className="font-semibold text-brand-dark ml-2">
-                      {formData.camper.dateOfBirth}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-brand-gray">Taglia:</span>
-                    <span className="font-semibold text-brand-dark ml-2">
-                      {formData.camper.tshirtSize}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-brand-gray">Esperienza:</span>
-                    <span className="font-semibold text-brand-dark ml-2">
-                      {experienceLevels.find(l => l.value === formData.camper.experience)?.label}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Parent */}
               <div className="bg-gray-50 rounded-2xl p-5">
                 <h4 className="font-bold text-brand-dark flex items-center gap-2 mb-3">
                   <span>👤</span> Genitore/Tutore
@@ -1105,84 +1108,99 @@ export default function RegistrationWizard() {
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
                     <span className="text-brand-gray">Nome:</span>
-                    <span className="font-semibold text-brand-dark ml-2">
-                      {formData.parent.firstName} {formData.parent.lastName}
-                    </span>
+                    <span className="font-semibold text-brand-dark ml-2">{formData.parent.nomeCognome}</span>
                   </div>
                   <div>
                     <span className="text-brand-gray">Email:</span>
-                    <span className="font-semibold text-brand-dark ml-2">
-                      {formData.parent.email}
-                    </span>
+                    <span className="font-semibold text-brand-dark ml-2">{formData.parent.email}</span>
                   </div>
                   <div>
                     <span className="text-brand-gray">Telefono:</span>
-                    <span className="font-semibold text-brand-dark ml-2">
-                      {formData.parent.phone}
-                    </span>
+                    <span className="font-semibold text-brand-dark ml-2">{formData.parent.telefono}</span>
                   </div>
                 </div>
               </div>
 
-              {/* Emergency */}
               <div className="bg-gray-50 rounded-2xl p-5">
                 <h4 className="font-bold text-brand-dark flex items-center gap-2 mb-3">
-                  <span>🚨</span> Contatto Emergenza
+                  <span>🏀</span> Atleta
                 </h4>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
                     <span className="text-brand-gray">Nome:</span>
-                    <span className="font-semibold text-brand-dark ml-2">
-                      {formData.emergency.name}
-                    </span>
+                    <span className="font-semibold text-brand-dark ml-2">{formData.camper.nomeCognome}</span>
                   </div>
                   <div>
-                    <span className="text-brand-gray">Relazione:</span>
-                    <span className="font-semibold text-brand-dark ml-2">
-                      {formData.emergency.relationship}
-                    </span>
+                    <span className="text-brand-gray">Data nascita:</span>
+                    <span className="font-semibold text-brand-dark ml-2">{formData.camper.dataNascita}</span>
                   </div>
                   <div>
-                    <span className="text-brand-gray">Telefono:</span>
+                    <span className="text-brand-gray">Taglia:</span>
+                    <span className="font-semibold text-brand-dark ml-2">{formData.camper.taglia}</span>
+                  </div>
+                  <div>
+                    <span className="text-brand-gray">Esperienza:</span>
                     <span className="font-semibold text-brand-dark ml-2">
-                      {formData.emergency.phone}
+                      {experienceLevels.find(l => l.value === formData.camper.esperienza)?.label}
                     </span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Terms and Conditions */}
+            {/* Consents */}
             <div className="space-y-4 mb-6">
               <label className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
-                formData.acceptTerms ? "border-brand-green bg-brand-green/5" : "border-gray-200 hover:border-brand-green"
+                formData.liberatoriaFotoVideo ? "border-brand-green bg-brand-green/5" : "border-gray-200 hover:border-brand-green"
               }`}>
                 <input
                   type="checkbox"
-                  checked={formData.acceptTerms}
-                  onChange={(e) => updateFormData("acceptTerms", "", e.target.checked)}
+                  checked={formData.liberatoriaFotoVideo}
+                  onChange={(e) => setFormData(prev => ({ ...prev, liberatoriaFotoVideo: e.target.checked }))}
                   className="mt-1 w-5 h-5 rounded border-gray-300 text-brand-green focus:ring-brand-green"
                 />
                 <div>
                   <span className="font-semibold text-brand-dark">
-                    Accetto i Termini e Condizioni *
+                    Liberatoria Foto e Video *
                   </span>
                   <p className="text-sm text-brand-gray mt-1">
-                    Ho letto e accetto i termini e le condizioni del camp.
+                    Autorizzo la pubblicazione di immagini e video realizzati durante le attività del camp.
                   </p>
                 </div>
               </label>
-              {errors.acceptTerms && (
-                <p className="text-sm text-red-500">{errors.acceptTerms}</p>
+              {errors.liberatoriaFotoVideo && (
+                <p className="text-sm text-red-500">{errors.liberatoriaFotoVideo}</p>
               )}
 
               <label className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
-                formData.acceptPrivacy ? "border-brand-green bg-brand-green/5" : "border-gray-200 hover:border-brand-green"
+                formData.accettazioneRegolamento ? "border-brand-green bg-brand-green/5" : "border-gray-200 hover:border-brand-green"
               }`}>
                 <input
                   type="checkbox"
-                  checked={formData.acceptPrivacy}
-                  onChange={(e) => updateFormData("acceptPrivacy", "", e.target.checked)}
+                  checked={formData.accettazioneRegolamento}
+                  onChange={(e) => setFormData(prev => ({ ...prev, accettazioneRegolamento: e.target.checked }))}
+                  className="mt-1 w-5 h-5 rounded border-gray-300 text-brand-green focus:ring-brand-green"
+                />
+                <div>
+                  <span className="font-semibold text-brand-dark">
+                    Accetto il Regolamento del Camp *
+                  </span>
+                  <p className="text-sm text-brand-gray mt-1">
+                    Ho letto e accetto il <Link href="/regolamento" className="text-brand-green underline" target="_blank">regolamento del Mini&Basket Camp</Link>.
+                  </p>
+                </div>
+              </label>
+              {errors.accettazioneRegolamento && (
+                <p className="text-sm text-red-500">{errors.accettazioneRegolamento}</p>
+              )}
+
+              <label className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
+                formData.privacyPolicy ? "border-brand-green bg-brand-green/5" : "border-gray-200 hover:border-brand-green"
+              }`}>
+                <input
+                  type="checkbox"
+                  checked={formData.privacyPolicy}
+                  onChange={(e) => setFormData(prev => ({ ...prev, privacyPolicy: e.target.checked }))}
                   className="mt-1 w-5 h-5 rounded border-gray-300 text-brand-green focus:ring-brand-green"
                 />
                 <div>
@@ -1190,13 +1208,27 @@ export default function RegistrationWizard() {
                     Accetto la Privacy Policy *
                   </span>
                   <p className="text-sm text-brand-gray mt-1">
-                    Autorizzo il trattamento dei dati personali secondo la normativa vigente.
+                    Autorizzo il trattamento dei dati personali secondo il <Link href="/privacy" className="text-brand-green underline" target="_blank">Regolamento Europeo N. 679/2016</Link>.
                   </p>
                 </div>
               </label>
-              {errors.acceptPrivacy && (
-                <p className="text-sm text-red-500">{errors.acceptPrivacy}</p>
+              {errors.privacyPolicy && (
+                <p className="text-sm text-red-500">{errors.privacyPolicy}</p>
               )}
+            </div>
+
+            {/* Invitation Code */}
+            <div className="mt-6">
+              <label className="block text-sm font-semibold text-brand-dark mb-2">
+                Codice Invito <span className="text-brand-gray font-normal">(opzionale)</span>
+              </label>
+              <input
+                type="text"
+                value={formData.codiceInvito}
+                onChange={(e) => setFormData(prev => ({ ...prev, codiceInvito: e.target.value.toUpperCase() }))}
+                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-brand-green bg-gray-50 focus:bg-white transition-all duration-300 focus:outline-none uppercase"
+                placeholder="Inserisci il codice se ne hai uno"
+              />
             </div>
           </div>
         )}
@@ -1204,18 +1236,14 @@ export default function RegistrationWizard() {
         {/* Step 6: Payment */}
         {currentStep === 6 && (
           <div className="animate-fade-in">
-            <h2 className="text-2xl font-bold text-brand-dark mb-2">
-              Pagamento
-            </h2>
-            <p className="text-brand-gray mb-6">
-              Completa il pagamento per confermare la tua iscrizione
-            </p>
+            <h2 className="text-2xl font-bold text-brand-dark mb-2">Pagamento</h2>
+            <p className="text-brand-gray mb-6">Completa il pagamento per confermare la tua iscrizione</p>
 
             <StripeCheckout
-              packageType={formData.package}
+              packageType={formData.packageType}
               registrationData={{
                 id: registrationId || undefined,
-                participantName: `${formData.camper.firstName} ${formData.camper.lastName}`,
+                participantName: formData.camper.nomeCognome,
                 email: formData.parent.email,
               }}
               onSuccess={handlePaymentSuccess}
@@ -1231,7 +1259,7 @@ export default function RegistrationWizard() {
                 Preferisci pagare dopo? <span className="underline">Completa senza pagamento</span>
               </button>
               <p className="text-sm text-brand-gray text-center mt-2">
-                Nota: Il tuo posto sarà riservato ma non confermato fino al pagamento
+                Nota: Il tuo posto sarà riservato ma non confermato fino al pagamento dell&apos;acconto
               </p>
             </div>
           </div>

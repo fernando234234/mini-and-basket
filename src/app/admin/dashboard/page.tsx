@@ -1,9 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { 
-  mockRegistrations, 
-  getRegistrationStats, 
+import {
+  mockRegistrations,
+  getRegistrationStats,
   getRecentRegistrations,
   getSizeDistribution,
   getAgeDistribution,
@@ -42,9 +42,17 @@ export default function AdminDashboardPage() {
   }
 
   const packagePrices = {
-    giornaliero: 250,
-    completa: 450,
-    weekend: 150,
+    standard: 610,
+    alta_specializzazione: 800,
+  }
+
+  // Helper to extract initials from full name
+  const getInitials = (fullName: string) => {
+    const parts = fullName.split(' ')
+    if (parts.length >= 2) {
+      return parts[0].charAt(0) + parts[parts.length - 1].charAt(0)
+    }
+    return fullName.substring(0, 2).toUpperCase()
   }
 
   return (
@@ -136,12 +144,12 @@ export default function AdminDashboardPage() {
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 bg-brand-green/10 rounded-full flex items-center justify-center">
                         <span className="text-brand-green font-medium">
-                          {reg.camper_nome.charAt(0)}{reg.camper_cognome.charAt(0)}
+                          {getInitials(reg.camper_nome_cognome)}
                         </span>
                       </div>
                       <div>
                         <p className="font-medium text-gray-900">
-                          {reg.camper_nome} {reg.camper_cognome}
+                          {reg.camper_nome_cognome}
                         </p>
                         <p className="text-sm text-gray-500">
                           {formatDate(reg.created_at!)} • {reg.genitore_email}
@@ -216,11 +224,10 @@ export default function AdminDashboardPage() {
       {/* Stats by Package */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Iscrizioni per Pacchetto</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[
-            { type: 'giornaliero', label: 'Giornaliero', price: packagePrices.giornaliero, color: 'blue' },
-            { type: 'completa', label: 'Settimana Completa', price: packagePrices.completa, color: 'purple' },
-            { type: 'weekend', label: 'Weekend', price: packagePrices.weekend, color: 'teal' },
+            { type: 'standard' as const, label: 'Camp Standard', price: packagePrices.standard, color: 'blue' },
+            { type: 'alta_specializzazione' as const, label: 'Alta Specializzazione', price: packagePrices.alta_specializzazione, color: 'purple' },
           ].map((pkg) => {
             const count = mockRegistrations.filter(r => r.package_type === pkg.type && r.status !== 'cancelled').length
             const confirmed = mockRegistrations.filter(r => r.package_type === pkg.type && r.status === 'confirmed').length
@@ -345,14 +352,14 @@ export default function AdminDashboardPage() {
           </h2>
           <div className="grid grid-cols-3 gap-4">
             {[
-              { key: 'nessuna', label: 'Principianti', icon: '🌱', color: 'blue' },
-              { key: '1-2-anni', label: '1-2 anni', icon: '🏀', color: 'green' },
-              { key: '3+-anni', label: '3+ anni', icon: '⭐', color: 'purple' },
+              { key: 'principiante' as const, label: 'Principianti', icon: '🌱', color: 'blue' },
+              { key: 'intermedio' as const, label: 'Intermedio', icon: '🏀', color: 'green' },
+              { key: 'avanzato' as const, label: 'Avanzato', icon: '⭐', color: 'purple' },
             ].map((exp) => (
               <div key={exp.key} className={`p-4 bg-${exp.color}-50 rounded-lg text-center`}>
                 <span className="text-2xl">{exp.icon}</span>
                 <p className="text-2xl font-bold text-gray-900 mt-2">
-                  {experienceDistribution[exp.key as keyof typeof experienceDistribution]}
+                  {experienceDistribution[exp.key]}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">{exp.label}</p>
               </div>
