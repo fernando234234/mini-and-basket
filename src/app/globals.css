@@ -1,0 +1,503 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   Custom Styles for Mini & Basket Camp 2025
+   Premium Sports Camp Design System
+   ============================================ */
+
+/* === Base Styles === */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply antialiased;
+}
+
+/* === Text Utilities === */
+.text-shadow {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.text-shadow-lg {
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+}
+
+/* === Background Patterns === */
+.bg-court-pattern {
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.bg-dots-pattern {
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.bg-basketball-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='%23F7941D' stroke-opacity='0.05' stroke-width='1'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3Cpath d='M30 10 L30 50 M10 30 L50 30'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.bg-geometric-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2384C14A' fill-opacity='0.03'%3E%3Cpath d='M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 20.41L18.59 2H20v1.41L1.41 22H0v-1.59zM0 1.41L0 0h1.41l-1.41 1.41z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* === Gradient Utilities === */
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r;
+}
+
+.gradient-border {
+  position: relative;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #84C14A, #F7941D);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* === Animation Keyframes === */
+
+/* Floating Animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+}
+
+@keyframes float-delayed {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-15px) rotate(-2deg);
+  }
+}
+
+/* Slow Spin */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin-slow-reverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+/* Gradient Animation */
+@keyframes gradient {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Pulse Glow */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(247, 148, 29, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(247, 148, 29, 0.8), 0 0 30px rgba(247, 148, 29, 0.4);
+  }
+}
+
+/* Bounce Subtle */
+@keyframes bounce-subtle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Shimmer Effect */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Fade In */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade In Up */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scale In */
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Sparkle Animation */
+@keyframes sparkle-anim {
+  0%, 100% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  75% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+}
+
+/* Slide In Left */
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Slide In Right */
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Basketball Bounce */
+@keyframes basketball-bounce {
+  0%, 100% {
+    transform: translateY(0) scaleY(1);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(-25px) scaleY(1);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+  90% {
+    transform: translateY(0) scaleY(0.95);
+  }
+}
+
+/* === Animation Classes === */
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float-delayed 5s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
+
+.animate-spin-slow-reverse {
+  animation: spin-slow-reverse 25s linear infinite;
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient 4s ease infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.5s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.5s ease-out;
+}
+
+.animate-basketball-bounce {
+  animation: basketball-bounce 1.5s infinite;
+}
+
+/* Sparkle Effect */
+.sparkle {
+  position: absolute;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 1.5rem;
+  animation: sparkle-anim 2s infinite ease-in-out;
+  opacity: 0;
+}
+
+/* === Hover Effects === */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+.hover-scale {
+  transition: transform 0.3s ease;
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+.hover-glow {
+  transition: box-shadow 0.3s ease;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(247, 148, 29, 0.4);
+}
+
+/* === Card Styles === */
+.card-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.5s ease;
+}
+
+.card-3d:hover {
+  transform: perspective(1000px) rotateY(5deg) rotateX(5deg) translateZ(10px);
+}
+
+/* === Button Styles === */
+.btn-primary {
+  @apply inline-flex items-center justify-center font-bold py-3 px-8 rounded-full transition-all duration-300;
+  @apply bg-gradient-to-r from-brand-green to-emerald-500 text-white;
+  @apply hover:shadow-lg hover:shadow-brand-green/30 hover:scale-105;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center font-bold py-3 px-8 rounded-full transition-all duration-300;
+  @apply bg-gradient-to-r from-brand-orange to-red-500 text-white;
+  @apply hover:shadow-lg hover:shadow-brand-orange/30 hover:scale-105;
+}
+
+.btn-outline {
+  @apply inline-flex items-center justify-center font-bold py-3 px-8 rounded-full transition-all duration-300;
+  @apply border-2 border-white text-white backdrop-blur-sm;
+  @apply hover:bg-white hover:text-brand-dark;
+}
+
+/* === Timeline Styles (Legacy Support) === */
+.best-value-badge {
+  transform: translateY(-50%);
+}
+
+.timeline-item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 2rem;
+  left: 100%;
+  width: 100%;
+  transform: translateY(-50%);
+  border-top: 2px dashed #d1d5db;
+}
+
+.timeline-item-container {
+  width: calc(100% / 5);
+}
+
+.timeline-item-connector::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  right: -50%;
+  top: 2rem;
+  transform: translateY(-50%);
+  border-top: 2px dashed #d1d5db;
+  z-index: -1;
+}
+
+/* === Glassmorphism === */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* === Scrollbar Styling === */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #84C14A, #F7941D);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #73A942, #e8850a);
+}
+
+/* === Selection Styling === */
+::selection {
+  background: rgba(247, 148, 29, 0.3);
+  color: inherit;
+}
+
+/* === Focus Styles === */
+*:focus-visible {
+  outline: 2px solid #F7941D;
+  outline-offset: 2px;
+}
+
+/* === Responsive Typography === */
+@layer utilities {
+  .text-responsive-sm {
+    @apply text-sm md:text-base;
+  }
+
+  .text-responsive-base {
+    @apply text-base md:text-lg;
+  }
+
+  .text-responsive-lg {
+    @apply text-lg md:text-xl lg:text-2xl;
+  }
+
+  .text-responsive-xl {
+    @apply text-xl md:text-2xl lg:text-3xl;
+  }
+
+  .text-responsive-2xl {
+    @apply text-2xl md:text-3xl lg:text-4xl;
+  }
+
+  .text-responsive-3xl {
+    @apply text-3xl md:text-4xl lg:text-5xl;
+  }
+}
+
+/* === Section Decorators === */
+.section-divider {
+  @apply relative;
+}
+
+.section-divider::after {
+  content: '';
+  @apply absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-1 rounded-full;
+  background: linear-gradient(90deg, #84C14A, #F7941D);
+}
+
+/* === Loading States === */
+.skeleton {
+  @apply relative overflow-hidden bg-gray-200 rounded;
+}
+
+.skeleton::after {
+  content: '';
+  @apply absolute inset-0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  animation: shimmer 1.5s infinite;
+}
+
+/* === Decorative Elements === */
+.decorative-circle {
+  @apply absolute rounded-full opacity-10 pointer-events-none;
+}
+
+.decorative-basketball {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='45' fill='none' stroke='%23F7941D' stroke-width='3'/%3E%3Cpath d='M50 5 L50 95 M5 50 L95 50' stroke='%23F7941D' stroke-width='2'/%3E%3Cpath d='M50 5 C70 25 70 75 50 95' fill='none' stroke='%23F7941D' stroke-width='2'/%3E%3Cpath d='M50 5 C30 25 30 75 50 95' fill='none' stroke='%23F7941D' stroke-width='2'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}

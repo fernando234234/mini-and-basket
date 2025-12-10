@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+
+<html lang="it"><head>
+<style>
+.timeline-item-connector::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    right: -50%;
+    top: 2rem; 
+    transform: translateY(-50%);
+    border-top: 2px dashed #d1d5db;
+    z-index: -1;
+}
+</style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mini &amp; Basket Camp 2025</title>
+<!-- Tailwind CSS v3 with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Custom Configuration -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'brand-beige': '#FFF9F0',
+            'brand-green': '#84C14A',
+            'brand-green-dark': '#73A942',
+            'brand-orange': '#F7941D',
+            'brand-dark': '#333333',
+            'brand-gray': '#555555',
+          },
+          fontFamily: {
+            sans: ['Poppins', 'sans-serif'],
+          },
+          boxShadow: {
+             'subtle': '0 4px 15px rgba(0, 0, 0, 0.05)',
+             'strong': '0 8px 25px rgba(0, 0, 0, 0.1)',
+          }
+        }
+      }
+    }
+  </script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<style data-purpose="custom-styles">
+    /* Custom styles for elements that are complex for Tailwind alone */
+    body {
+      background-color: #FFF9F0;
+      color: #333333;
+      font-family: 'Poppins', sans-serif;
+    }
+    .best-value-badge {
+      transform: translateY(-50%);
+    }
+    .timeline-item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 2rem; /* Center vertically on the icon */
+      left: 100%;
+      width: 100%;
+      transform: translateY(-50%);
+      border-top: 2px dashed #d1d5db; /* gray-300 */
+    }
+     .timeline-item-container {
+        width: calc(100% / 5); /* 20% width for each item */
+    }
+    .sparkle {
+      position: absolute;
+      color: rgba(255, 255, 255, 0.3);
+      font-size: 1.5rem;
+      animation: sparkle-anim 2s infinite ease-in-out;
+      opacity: 0;
+    }
+    @keyframes sparkle-anim {
+      0%, 100% { transform: scale(0.5); opacity: 0; }
+      50% { opacity: 1; }
+      75% { transform: scale(1.2); opacity: 0; }
+    }
+  </style>
+<style>
+.text-shadow {
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+</style></head>
+<body class="bg-brand-beige text-brand-dark">
+<div class="max-w-[1440px] mx-auto" id="page-container">
+<!-- BEGIN: Main Page Layout -->
+<main class="grid grid-cols-1 xl:grid-cols-3 gap-8 p-4 md:p-8">
+<!-- Left Column -->
+<div class="xl:col-span-2 space-y-12">
+<!-- BEGIN: Hero Section -->
+<header class="relative bg-black rounded-2xl overflow-hidden text-white text-center py-24 px-6 flex flex-col items-center justify-center min-h-[450px]">
+<!-- Background Carousel -->
+<div class="absolute inset-0">
+<!-- Slide 1 (Active) -->
+<div class="absolute inset-0 w-full h-full bg-cover bg-center opacity-30" style="background-image: url('https://placeholder.pics/svg/300');"></div>
+<!-- Add more slides here if needed, hidden by default -->
+</div>
+<!-- Carousel Navigation -->
+<button class="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 p-2 rounded-full transition-colors">
+<svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 p-2 rounded-full transition-colors">
+<svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w.org/2000/svg"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<!-- Sparkle Effects -->
+<div class="absolute inset-0 pointer-events-none" data-purpose="sparkle-container">
+<span class="sparkle" style="top: 20%; left: 15%; animation-delay: 0s;">✨</span>
+<span class="sparkle" style="top: 70%; left: 10%; animation-delay: 0.5s;">✦</span>
+<span class="sparkle" style="top: 30%; left: 85%; animation-delay: 1s;">✨</span>
+<span class="sparkle" style="top: 80%; left: 90%; animation-delay: 1.5s;">✦</span>
+<span class="sparkle" style="top: 50%; left: 50%; animation-delay: 0.2s;">✨</span>
+</div>
+<!-- Content Overlay -->
+<div class="relative z-10 flex flex-col items-center text-shadow">
+<h1 class="text-4xl md:text-6xl font-extrabold uppercase tracking-wide">Mini &amp; Basket</h1>
+<h1 class="text-4xl md:text-6xl font-extrabold uppercase tracking-wide text-brand-orange">Camp 2025</h1>
+<p class="mt-4 text-lg md:text-xl text-gray-200">29 Giugno - 6 Luglio 2025</p>
+<div class="mt-8 flex flex-col sm:flex-row gap-4">
+<a class="bg-brand-green hover:bg-brand-green-dark text-white font-bold py-3 px-8 rounded-full transition-colors duration-300 shadow-lg" href="#">ISCRIVITI ORA</a>
+<a class="bg-transparent border-2 border-white text-white font-bold py-3 px-8 rounded-full hover:bg-white hover:text-black transition-all duration-300" href="#">SCOPRI DI PIÙ</a>
+</div>
+</div>
+</header>
+<!-- END: Hero Section -->
+<!-- BEGIN: Info Bar -->
+<section class="bg-gradient-to-r from-brand-green to-brand-orange text-white rounded-2xl p-6 shadow-md" data-purpose="info-bar">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+<div class="flex flex-col items-center">
+<svg class="h-8 w-8 mb-2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21.5 12.5c0-5.25-4.25-9.5-9.5-9.5S2.5 7.25 2.5 12.5s4.25 9.5 9.5 9.5s9.5-4.25 9.5-9.5z"></path><path d="M15.5 15.5c-1.55 1.55-4.45 1.55-6 0c-1.55-1.55-1.55-4.45 0-6c1.55-1.55 4.45-1.55 6 0"></path></svg>
+<span class="font-bold">100+ CAMPERS</span>
+</div>
+<div class="flex flex-col items-center">
+<svg class="h-8 w-8 mb-2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+<span class="font-bold">10+ COACHES</span>
+</div>
+<div class="flex flex-col items-center">
+<svg class="h-8 w-8 mb-2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect height="18" rx="2" ry="2" width="18" x="3" y="4"></rect><line x1="16" x2="16" y1="2" y2="6"></line><line x1="8" x2="8" y1="2" y2="6"></line><line x1="3" x2="21" y1="10" y2="10"></line></svg>
+<span class="font-bold">1 SETTIMANA DI SPORT</span>
+</div>
+<div class="flex flex-col items-center">
+<svg class="h-8 w-8 mb-2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+<span class="font-bold">TUTTO INCLUSO</span>
+</div>
+</div>
+</section>
+<!-- END: Info Bar -->
+<!-- BEGIN: Experience Section -->
+<section aria-labelledby="experience-heading" id="experience">
+<div class="grid md:grid-cols-2 gap-8 items-center">
+<div class="space-y-4">
+<h2 class="text-3xl font-bold text-brand-dark" id="experience-heading">UN'ESPERIENZA INDIMENTICABILE</h2>
+<p class="text-brand-gray">
+                Mini &amp; Basket Camp offre un ambiente unico per giovani atleti dai 6 ai 14 anni. Uniamo l'apprendimento tecnico del basket al divertimento e allo sviluppo personale, sotto la guida di allenatori esperti.
+              </p>
+</div>
+<div>
+<img alt="Coach explaining a drill to a group of young campers." class="rounded-2xl shadow-lg w-full h-auto object-cover" src="https://placeholder.pics/svg/300"/>
+</div>
+</div>
+</section>
+<!-- END: Experience Section -->
+<!-- BEGIN: Program Highlights Section -->
+<section aria-labelledby="program-heading" class="text-center" id="program">
+<h2 class="text-3xl font-bold text-brand-dark" id="program-heading">PROGRAM HIGHLIGHTS</h2>
+<p class="text-brand-gray uppercase text-sm mt-1">PROGRAMMA GIORNALIERO</p>
+<div class="mt-12 flex justify-between items-start">
+<!-- Timeline Item -->
+<div class="timeline-item-container relative flex-shrink-0" data-purpose="timeline-item">
+<div class="relative flex flex-col items-center text-center timeline-item timeline-item-connector">
+<div class="bg-brand-green rounded-full h-16 w-16 flex items-center justify-center text-white shadow-md">
+<svg class="h-8 w-8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><line x1="12" x2="12" y1="20" y2="10"></line><line x1="18" x2="18" y1="20" y2="4"></line><line x1="6" x2="6" y1="20" y2="16"></line></svg>
+</div>
+<p class="mt-2 font-semibold text-sm">ALLENAMENTI TECNICI</p>
+</div>
+</div>
+<!-- Timeline Item -->
+<div class="timeline-item-container relative flex-shrink-0" data-purpose="timeline-item">
+<div class="relative flex flex-col items-center text-center timeline-item timeline-item-connector">
+<div class="bg-brand-green rounded-full h-16 w-16 flex items-center justify-center text-white shadow-md">
+<svg class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" stroke-linecap="round" stroke-linejoin="round"></path><path d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+<p class="mt-2 font-semibold text-sm">PARTITE E TORNEI</p>
+</div>
+</div>
+<!-- Timeline Item (Highlighted) -->
+<div class="timeline-item-container relative flex-shrink-0" data-purpose="timeline-item">
+<div class="relative flex flex-col items-center text-center timeline-item timeline-item-connector">
+<div class="bg-brand-orange rounded-full h-16 w-16 flex items-center justify-center text-white shadow-lg scale-110">
+<svg class="h-8 w-8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+</div>
+<p class="mt-2 font-semibold text-sm">ATTIVITÀ RICREATIVE</p>
+<!-- Pop-out list -->
+<div class="absolute top-full mt-4 bg-white p-3 rounded-lg shadow-subtle text-left text-xs w-40 border z-10">
+<div class="absolute bottom-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-b-8 border-b-white"></div>
+<ul class="list-disc list-inside text-gray-600 space-y-1">
+<li>Allenamenti Tecnici</li>
+<li>Partite e Tornei</li>
+<li>Attività Ricreative</li>
+<li>Pranzo e Riposo</li>
+<li>Workshop &amp; Ospiti</li>
+</ul>
+</div>
+</div>
+</div>
+<!-- Timeline Item -->
+<div class="timeline-item-container relative flex-shrink-0" data-purpose="timeline-item">
+<div class="relative flex flex-col items-center text-center timeline-item timeline-item-connector">
+<div class="bg-brand-green rounded-full h-16 w-16 flex items-center justify-center text-white shadow-md">
+<svg class="h-8 w-8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M2 9.5c0-2.8 2.2-5 5-5h10c2.8 0 5 2.2 5 5v10c0 .8-.7 1.5-1.5 1.5H3.5C2.7 21 2 20.3 2 19.5V9.5zM2 9.5h20M7 14h.01M12 14h.01M17 14h.01M7 18h.01M12 18h.01M17 18h.01"></path></svg>
+</div>
+<p class="mt-2 font-semibold text-sm">PRANZO E RIPOSO</p>
+</div>
+</div>
+<!-- Timeline Item -->
+<div class="timeline-item-container relative flex-shrink-0" data-purpose="timeline-item">
+<div class="relative flex flex-col items-center text-center">
+<div class="bg-brand-green rounded-full h-16 w-16 flex items-center justify-center text-white shadow-md">
+<svg class="h-8 w-8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
+</div>
+<p class="mt-2 font-semibold text-sm">WORKSHOP &amp; OSPITI</p>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Program Highlights Section -->
+<!-- BEGIN: Facilities Section -->
+<section aria-labelledby="facilities-heading" id="facilities">
+<h2 class="text-3xl font-bold text-brand-dark mb-6" id="facilities-heading">FACILITIES</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+<div class="relative rounded-2xl overflow-hidden shadow-lg group">
+<img alt="Modern indoor basketball court." class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300" src="https://placeholder.pics/svg/300"/>
+<div class="absolute inset-0 bg-black bg-opacity-40"></div>
+<p class="absolute bottom-4 left-4 text-white font-bold text-lg">PALESTRE ALL'AVANGUARDIA</p>
+</div>
+<div class="relative rounded-2xl overflow-hidden shadow-lg group">
+<img alt="Sunny outdoor sports facilities." class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300" src="https://placeholder.pics/svg/300"/>
+<div class="absolute inset-0 bg-black bg-opacity-40"></div>
+<p class="absolute bottom-4 left-4 text-white font-bold text-lg">STRUTTURE ESTERNE</p>
+</div>
+<div class="relative rounded-2xl overflow-hidden shadow-lg group">
+<img alt="Comfortable and colorful relaxation and play area." class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300" src="https://placeholder.pics/svg/300"/>
+<div class="absolute inset-0 bg-black bg-opacity-40"></div>
+<p class="absolute bottom-4 left-4 text-white font-bold text-lg">AREE RELAX E GIOCO</p>
+</div>
+<div class="relative rounded-2xl overflow-hidden shadow-lg group">
+<img alt="Healthy and delicious food served in the cafeteria." class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300" src="https://placeholder.pics/svg/300"/>
+<div class="absolute inset-0 bg-black bg-opacity-40"></div>
+<p class="absolute bottom-4 left-4 text-white font-bold text-lg">MENSE DI QUALITÀ</p>
+</div>
+</div>
+</section>
+<!-- END: Facilities Section -->
+<!-- BEGIN: Pricing Section -->
+<section aria-labelledby="pricing-heading" class="text-center" id="pricing">
+<h2 class="text-3xl font-bold text-brand-dark mb-2" id="pricing-heading">PRICING CARDS</h2>
+<div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+<!-- Pricing Card 1 -->
+<div class="bg-white rounded-2xl p-6 shadow-subtle border border-gray-200">
+<h3 class="text-xl font-bold text-brand-dark">PACCHETTO GIORNALIERO</h3>
+<p class="text-5xl font-extrabold text-brand-dark my-4">€250</p>
+<ul class="space-y-2 text-brand-gray">
+<li>Alloggio Incluso</li>
+<li>3 Pasti al Giorno</li>
+<li>Kit Camp Esclusivo</li>
+</ul>
+<a class="mt-6 block bg-brand-green hover:bg-brand-green-dark text-white font-bold py-3 px-8 rounded-full transition-colors duration-300" href="#">ISCRIVITI ORA</a>
+</div>
+<!-- Pricing Card 2 (Highlighted) -->
+<div class="relative bg-white rounded-2xl p-6 shadow-strong border-2 border-brand-orange transform scale-105">
+<span class="best-value-badge absolute top-0 left-1/2 -translate-x-1/2 bg-brand-orange text-white text-xs font-bold px-3 py-1 rounded-full uppercase">Best Value</span>
+<p class="text-6xl font-extrabold text-brand-dark my-4">€450</p>
+<ul class="space-y-2 text-brand-gray">
+<li>Alloggio Incluso</li>
+<li>3 Pasti al Giorno</li>
+<li>Kit Camp Esclusivo</li>
+</ul>
+<a class="mt-6 block bg-brand-green hover:bg-brand-green-dark text-white font-bold py-3 px-8 rounded-full transition-colors duration-300" href="#">ISCRIVITI ORA</a>
+</div>
+<!-- Pricing Card 3 -->
+<div class="bg-white rounded-2xl p-6 shadow-subtle border border-gray-200">
+<h3 class="text-xl font-bold text-brand-dark">PACCHETTO WEEKEND</h3>
+<p class="text-5xl font-extrabold text-brand-dark my-4">€150</p>
+<ul class="space-y-2 text-brand-gray">
+<li>Alloggio Incluso</li>
+<li>3 Pasti al Giorno</li>
+<li>Kit Camp Esclusivo</li>
+</ul>
+<a class="mt-6 block bg-brand-green hover:bg-brand-green-dark text-white font-bold py-3 px-8 rounded-full transition-colors duration-300" href="#">ISCRIVITI ORA</a>
+</div>
+</div>
+</section>
+<!-- END: Pricing Section -->
+</div>
+<!-- Right Column (Sidebar) -->
+<div class="xl:col-span-1 space-y-16">
+<!-- BEGIN: Testimonials Section -->
+<section aria-labelledby="testimonials-heading" id="testimonials">
+<h2 class="text-2xl font-extrabold text-center mb-6" id="testimonials-heading">TESTIMONIALS</h2>
+<div class="relative" data-purpose="testimonial-carousel">
+<div class="overflow-hidden relative">
+<div class="flex transition-transform duration-300 ease-in-out">
+<!-- Testimonial 1 -->
+<div class="w-full md:w-1/3 flex-shrink-0 px-2">
+<div class="bg-white rounded-2xl p-6 text-center shadow-subtle h-full">
+<img alt="Avatar of Maria R." class="w-20 h-20 rounded-full mx-auto mb-4 border-4 border-brand-green" src="https://placeholder.pics/svg/300"/>
+<p class="text-brand-gray italic">"Mio figlio è tornato entusiasta! Un'organizzazione impeccabile e un ambiente fantastico."</p>
+<p class="mt-4 font-bold">- Maria R.</p>
+</div>
+</div>
+<!-- Testimonial 2 -->
+<div class="w-full md:w-1/3 flex-shrink-0 px-2">
+<div class="bg-white rounded-2xl p-6 text-center shadow-subtle h-full">
+<img alt="Avatar of Paolo F." class="w-20 h-20 rounded-full mx-auto mb-4 border-4 border-brand-green" src="https://placeholder.pics/svg/300"/>
+<p class="text-brand-gray italic">"Mio figlio si è formato non solo come giocatore, ma anche come persona, su modo che avete reso un'esperienza unica e un servizio raro."</p>
+<p class="mt-4 font-bold">- Paolo F.</p>
+</div>
+</div>
+<!-- Testimonial 3 -->
+<div class="w-full md:w-1/3 flex-shrink-0 px-2">
+<div class="bg-white rounded-2xl p-6 text-center shadow-subtle h-full">
+<img alt="Avatar of Laura B." class="w-20 h-20 rounded-full mx-auto mb-4 border-4 border-brand-green" src="https://placeholder.pics/svg/300"/>
+<p class="text-brand-gray italic">"Mio figlio si è messo in gioco e ha conosciuto la sua vera conoscenza in un'esperienza fantastica."</p>
+<p class="mt-4 font-bold">- Laura B.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Carousel Navigation -->
+<button class="absolute top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow-md hover:bg-gray-100 transition left-0">
+<svg class="h-6 w-6 text-gray-500" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<button class="absolute top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow-md hover:bg-gray-100 transition right-0">
+<svg class="h-6 w-6 text-gray-500" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<!-- Carousel Pagination -->
+<div class="flex justify-center space-x-2 mt-4">
+<button class="w-2.5 h-2.5 bg-brand-green rounded-full"></button>
+<button class="w-2.5 h-2.5 bg-gray-300 rounded-full"></button>
+<button class="w-2.5 h-2.5 bg-gray-300 rounded-full"></button>
+</div>
+</div>
+</section>
+<!-- END: Testimonials Section -->
+<!-- BEGIN: Staff Preview Section -->
+<section aria-labelledby="staff-heading" id="staff">
+<h2 class="text-2xl font-extrabold text-center mb-6" id="staff-heading">STAFF PREVIEW</h2>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+<div class="flex flex-col items-center">
+<img alt="Avatar of Marco Rossi" class="w-24 h-24 rounded-full mb-2 border-4 border-gray-200" src="https://placeholder.pics/svg/300"/>
+<h3 class="font-bold">MARCO ROSSI</h3>
+<p class="text-sm text-brand-gray">Capo Allenstore</p>
+</div>
+<div class="flex flex-col items-center">
+<img alt="Avatar of Laura Bianchi" class="w-24 h-24 rounded-full mb-2 border-4 border-brand-green" src="https://placeholder.pics/svg/300"/>
+<h3 class="font-bold">LAURA BIANCHI</h3>
+<p class="text-sm text-brand-gray">Preparatrice Atletica</p>
+</div>
+<div class="flex flex-col items-center">
+<img alt="Avatar of Anna Rossi" class="w-24 h-24 rounded-full mb-2 border-4 border-gray-200" src="https://placeholder.pics/svg/300"/>
+<h3 class="font-bold">ANNA ROSSI</h3>
+<p class="text-sm text-brand-gray">Allenatore</p>
+</div>
+<div class="flex flex-col items-center">
+<img alt="Avatar of Ananna Banchi" class="w-24 h-24 rounded-full mb-2 border-4 border-gray-200" src="https://placeholder.pics/svg/300"/>
+<h3 class="font-bold">ANANNA BANCHI</h3>
+<p class="text-sm text-brand-gray">Atletica</p>
+</div>
+</div>
+</section>
+<!-- END: Staff Preview Section -->
+<!-- BEGIN: Gallery Preview Section -->
+<section aria-labelledby="gallery-heading" id="gallery">
+<h2 class="text-2xl font-extrabold text-center mb-6" id="gallery-heading">GALLERY PREVIEW</h2>
+<div class="grid grid-cols-3 gap-2">
+<img alt="Gallery image 1" class="rounded-lg shadow-sm w-full h-24 object-cover" src="https://placeholder.pics/svg/300"/>
+<img alt="Gallery image 2" class="rounded-lg shadow-sm w-full h-24 object-cover" src="https://placeholder.pics/svg/300"/>
+<img alt="Gallery image 3" class="rounded-lg shadow-sm w-full h-24 object-cover" src="https://placeholder.pics/svg/300"/>
+<img alt="Gallery image 4" class="rounded-lg shadow-sm w-full h-24 object-cover" src="https://placeholder.pics/svg/300"/>
+<img alt="Gallery image 5" class="rounded-lg shadow-sm w-full h-24 object-cover" src="https://placeholder.pics/svg/300"/>
+<a class="bg-brand-dark text-white rounded-lg flex items-center justify-center text-center p-2 hover:bg-brand-gray transition-colors" href="#">
+<span class="font-bold text-sm">VISTA TUTTE LE FOTO</span>
+</a>
+</div>
+</section>
+<!-- END: Gallery Preview Section -->
+<!-- BEGIN: Partners & Sponsors Section -->
+<section aria-labelledby="sponsors-heading" id="sponsors">
+<h2 class="text-2xl font-extrabold text-center mb-6" id="sponsors-heading">PARTNERS &amp; SPONSORS</h2>
+<div class="grid grid-cols-4 gap-4 items-center grayscale opacity-60">
+<img alt="Supabase Logo" src="https://placeholder.pics/svg/300"/>
+<img alt="Netlify Logo" src="https://placeholder.pics/svg/300"/>
+<img alt="Nike Logo" src="https://placeholder.pics/svg/300"/>
+<img alt="Sport Logo" src="https://placeholder.pics/svg/300"/>
+<img alt="Sponsor Logo" src="https://placeholder.pics/svg/300"/>
+<img alt="Sponsor Logo" src="https://placeholder.pics/svg/300"/>
+<img alt="Sponsor Logo" src="https://placeholder.pics/svg/300"/>
+<img alt="Sponsor Logo" src="https://placeholder.pics/svg/300"/>
+</div>
+</section>
+<!-- END: Partners & Sponsors Section -->
+</div>
+</main>
+<!-- END: Main Page Layout -->
+<!-- BEGIN: Final CTA Section -->
+<section class="bg-brand-green text-white my-8 mx-4 md:mx-8 rounded-2xl p-12 text-center relative overflow-hidden">
+<svg class="h-24 w-24 absolute top-4 left-4 text-white opacity-10" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<svg class="h-24 w-24 absolute bottom-4 right-4 text-white opacity-10" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<!-- Subtle lightning bolt icons -->
+<svg class="h-24 w-24 absolute top-4 left-4 text-white opacity-10" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<svg class="h-24 w-24 absolute bottom-4 right-4 text-white opacity-10" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<div class="relative z-10">
+<h2 class="text-3xl font-extrabold uppercase">Non perdere l'opportunità! Posti limitati.</h2>
+<p class="mt-2 max-w-2xl mx-auto">Unisciti a noi per un'estate indimenticabile.</p>
+<a class="mt-8 inline-block bg-transparent border-2 border-white text-white font-bold py-3 px-8 rounded-full hover:bg-white hover:text-brand-green transition-all duration-300" href="#">ISCRIVITI ORA</a>
+</div>
+</section>
+<!-- END: Final CTA Section -->
+<!-- BEGIN: Footer -->
+<footer class="bg-brand-dark text-gray-300 p-8">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+<div class="flex space-x-6">
+<a class="hover:text-white" href="#">About Us</a>
+<a class="hover:text-white" href="#">Contact</a>
+<a class="hover:text-white" href="#">FAQ</a>
+<a class="hover:text-white" href="#">Privacy Policy</a>
+</div>
+<div class="flex space-x-4 mt-4 md:mt-0">
+<a class="hover:text-white" href="#">
+<svg class="h-6 w-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect height="20" rx="5" ry="5" width="20" x="2" y="2"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
+</a>
+<a class="hover:text-white" href="#">
+<svg class="h-6 w-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+</a>
+<a class="hover:text-white" href="#">
+<svg class="h-6 w-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+</a>
+</div>
+</div>
+</footer>
+<!-- END: Footer -->
+</div>
+</body></html>
