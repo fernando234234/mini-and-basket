@@ -19,18 +19,21 @@ export const isStripeConfigured = () => {
   return !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 };
 
-// Check if early bird pricing applies (before Feb 28, 2025)
+// Check if early bird pricing applies (before Feb 28, 2026)
 export const isEarlyBird = () => {
   const now = new Date();
-  const earlyBirdDeadline = new Date('2025-02-28T23:59:59');
+  const earlyBirdDeadline = new Date('2026-02-28T23:59:59');
   return now <= earlyBirdDeadline;
 };
+
+// Early bird deadline for display
+export const EARLY_BIRD_DEADLINE = '28 febbraio 2026';
 
 // Price configuration for different packages
 // Prices in cents for Stripe
 export const PACKAGE_PRICES = {
   standard: {
-    name: 'Camp Standard 2025',
+    name: 'Camp Standard 2026',
     fullPrice: 61000, // €610 in cents
     earlyBirdPrice: 59000, // €590 early bird
     depositPrice: 20000, // €200 deposit in cents
@@ -39,13 +42,14 @@ export const PACKAGE_PRICES = {
     displayDeposit: '€200',
   },
   alta_specializzazione: {
-    name: 'Alta Specializzazione 2025',
+    name: 'Alta Specializzazione 2026',
     fullPrice: 80000, // €800 in cents
     earlyBirdPrice: 76000, // €760 early bird
     depositPrice: 20000, // €200 deposit in cents
     displayPrice: '€800',
     displayEarlyBird: '€760',
     displayDeposit: '€200',
+    maxSpots: 20, // Only 20 campers
   },
 } as const;
 

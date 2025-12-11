@@ -42,8 +42,8 @@ export default function InfoBar() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
       ),
-      value: "29 GIU",
-      label: "6 LUGLIO 2025",
+      value: "28 GIU",
+      label: "5 LUGLIO 2026",
       tooltip: "Una settimana di sport, divertimento e nuove amicizie",
       href: "/programma",
       delay: "200ms",

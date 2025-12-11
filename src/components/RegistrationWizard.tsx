@@ -80,7 +80,7 @@ const packages = [
     price: isEarlyBird() ? "€760" : "€800",
     originalPrice: isEarlyBird() ? "€800" : null,
     description: "+7 ore tecnica individuale",
-    features: ["Tutto Standard incluso", "Lavoro personalizzato", "Max 30 posti"],
+    features: ["Tutto Standard incluso", "Lavoro personalizzato", "Max 20 posti"],
     gradient: "from-brand-orange to-red-500",
     limited: true,
   },
@@ -414,7 +414,7 @@ export default function RegistrationWizard() {
           Iscrizione Registrata!
         </h2>
         <p className="text-brand-gray text-lg mb-6">
-          Grazie per aver iscritto {formData.camper.nomeCognome} al Mini & Basket Camp 2025!
+          Grazie per aver iscritto {formData.camper.nomeCognome} al Mini & Basket Camp 2026!
         </p>
 
         {registrationId && (
@@ -454,7 +454,7 @@ export default function RegistrationWizard() {
           </p>
           <p className="text-sm text-yellow-700 mt-1">
             Acconto di €200 entro l&apos;iscrizione<br />
-            Saldo entro il 31 Maggio 2025
+            Saldo entro il 31 Maggio 2026
           </p>
         </div>
 
@@ -525,12 +525,12 @@ export default function RegistrationWizard() {
         {currentStep === 1 && (
           <div className="animate-fade-in">
             <h2 className="text-2xl font-bold text-brand-dark mb-2">Scegli il tuo pacchetto</h2>
-            <p className="text-brand-gray mb-6">Camp 2025: 29 Giugno - 6 Luglio | Villaggio Bahja, Paola (CS)</p>
+            <p className="text-brand-gray mb-6">Camp 2026: 28 Giugno - 5 Luglio | Villaggio Bahja, Paola (CS)</p>
 
             {earlyBird && (
               <div className="mb-6 bg-gradient-to-r from-brand-orange/10 to-red-100 border border-brand-orange/30 rounded-xl p-4">
                 <p className="text-brand-orange font-bold flex items-center gap-2">
-                  <span>⏰</span> Early Bird Attivo! Risparmia fino a €40 - Scade il 28 Feb 2025
+                  <span>⏰</span> Early Bird Attivo! Risparmia fino a €40 - Scade il 28 Feb 2026
                 </p>
               </div>
             )}
@@ -561,7 +561,7 @@ export default function RegistrationWizard() {
                 >
                   {pkg.limited && (
                     <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-orange text-white text-xs font-bold px-3 py-1 rounded-full">
-                      🏆 MAX 30 POSTI
+                      🏆 MAX 20 POSTI
                     </span>
                   )}
                   <div className={`h-2 rounded-full bg-gradient-to-r ${pkg.gradient} mb-4`} />

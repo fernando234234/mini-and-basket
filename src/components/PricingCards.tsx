@@ -4,10 +4,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import PaymentMethods from "./PaymentMethods";
 
-// Check if early bird pricing applies (before Feb 28, 2025)
+// Check if early bird pricing applies (before Feb 28, 2026)
 const isEarlyBird = () => {
   const now = new Date();
-  const earlyBirdDeadline = new Date('2025-02-28T23:59:59');
+  const earlyBirdDeadline = new Date('2026-02-28T23:59:59');
   return now <= earlyBirdDeadline;
 };
 
@@ -55,10 +55,10 @@ export default function PricingCards() {
         { text: "+7 ore supplementari di tecnica individuale", included: true },
         { text: "Abbigliamento personalizzato", included: true },
         { text: "Lavoro specifico e personalizzato", included: true },
-        { text: "Limitato a 30 campers", included: true },
+        { text: "Limitato a 20 campers", included: true },
       ],
       highlighted: false,
-      badge: "🏆 MAX 30 POSTI",
+      badge: "🏆 MAX 20 POSTI",
       gradient: "from-brand-orange to-red-500",
       buttonGradient: "from-brand-orange to-red-500",
       iconBg: "bg-orange-100",
@@ -86,7 +86,7 @@ export default function PricingCards() {
             <span className="font-bold text-lg">EARLY BIRD ATTIVO!</span>
           </div>
           <p className="text-sm text-white/90">
-            Iscriviti entro il <strong>28 Febbraio 2025</strong> per risparmiare fino a €40
+            Iscriviti entro il <strong>28 Febbraio 2026</strong> per risparmiare fino a €40
           </p>
         </div>
       )}
@@ -100,7 +100,7 @@ export default function PricingCards() {
           SCEGLI IL TUO PACCHETTO
         </h2>
         <p className="text-brand-gray mt-3 max-w-md mx-auto">
-          Camp 2025: 29 Giugno - 6 Luglio | Villaggio Bahja, Paola (CS)
+          Camp 2026: 28 Giugno - 5 Luglio | Villaggio Bahja, Paola (CS)
         </p>
         
         {/* Decorative line */}
@@ -274,7 +274,7 @@ export default function PricingCards() {
             <span className="text-brand-orange text-lg">📅</span>
             <div>
               <p className="font-semibold text-brand-dark">Saldo Completo</p>
-              <p className="text-brand-gray">Entro il 31 Maggio 2025</p>
+              <p className="text-brand-gray">Entro il 31 Maggio 2026</p>
             </div>
           </div>
           <div className="flex items-start gap-3">

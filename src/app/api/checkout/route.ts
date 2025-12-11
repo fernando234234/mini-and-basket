@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
           price_data: {
             currency: 'eur',
             product_data: {
-              name: `Mini & Basket Camp 2025 - ${packageInfo.name}`,
+              name: `Mini & Basket Camp 2026 - ${packageInfo.name}`,
               description: paymentType === 'deposit'
                 ? `Acconto per ${packageInfo.name} - Saldo da pagare: €${((packageInfo.fullPrice - packageInfo.depositPrice) / 100).toFixed(0)}`
                 : `Pagamento completo per ${packageInfo.name}`,
@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
       invoice_creation: {
         enabled: true,
         invoice_data: {
-          description: `Iscrizione Mini & Basket Camp 2025 - ${packageInfo.name}`,
+          description: `Iscrizione Mini & Basket Camp 2026 - ${packageInfo.name}`,
           metadata: metadata,
           footer: 'Grazie per aver scelto Mini & Basket Camp! 🏀',
           custom_fields: [

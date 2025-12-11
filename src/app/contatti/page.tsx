@@ -6,8 +6,8 @@ import ContactForm from "@/components/ContactForm";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Contatti | Mini & Basket Camp 2025",
-  description: "Contattaci per qualsiasi informazione sul Mini & Basket Camp 2025. Siamo sempre disponibili per rispondere alle tue domande.",
+  title: "Contatti | Mini & Basket Camp 2026",
+  description: "Contattaci per qualsiasi informazione sul Mini & Basket Camp 2026. Siamo sempre disponibili per rispondere alle tue domande.",
 };
 
 export default function ContattiPage() {
@@ -62,7 +62,7 @@ export default function ContattiPage() {
                         </svg>
                       </div>
                       <div>
-                        <h3 className="font-bold text-brand-dark">Location Camp 2025</h3>
+                        <h3 className="font-bold text-brand-dark">Location Camp 2026</h3>
                         <p className="text-brand-gray">
                           Villaggio Residence Bahja****<br />
                           Paola (CS) - Calabria<br />

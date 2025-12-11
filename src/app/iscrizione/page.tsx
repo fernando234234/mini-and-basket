@@ -6,8 +6,8 @@ import RegistrationWizard from "@/components/RegistrationWizard";
 import PaymentInfo from "@/components/PaymentInfo";
 
 export const metadata: Metadata = {
-  title: "Iscrizione | Mini & Basket Camp 2025",
-  description: "Iscriviti al Mini & Basket Camp 2025. Compila il modulo di iscrizione e assicura un posto al tuo giovane atleta.",
+  title: "Iscrizione | Mini & Basket Camp 2026",
+  description: "Iscriviti al Mini & Basket Camp 2026. Compila il modulo di iscrizione e assicura un posto al tuo giovane atleta.",
 };
 
 export default function IscrizionePage() {
@@ -34,10 +34,10 @@ export default function IscrizionePage() {
                 </div>
                 <div className="text-center md:text-left flex-1">
                   <h3 className="font-bold text-brand-dark text-lg">
-                    Mini & Basket Camp 2025
+                    Mini & Basket Camp 2026
                   </h3>
                   <p className="text-brand-gray">
-                    29 Giugno - 6 Luglio 2025 • Villaggio Residence Bahja, Paola (CS)
+                    28 Giugno - 5 Luglio 2026 • Villaggio Residence Bahja, Paola (CS)
                   </p>
                 </div>
                 <div className="flex items-center gap-4">

@@ -5,8 +5,8 @@ import Footer from "@/components/Footer";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Il Programma | Mini & Basket Camp 2025",
-  description: "Scopri il programma completo del Mini & Basket Camp 2025: una settimana di basket, divertimento e crescita al Villaggio Residence Bahja di Paola.",
+  title: "Il Programma | Mini & Basket Camp 2026",
+  description: "Scopri il programma completo del Mini & Basket Camp 2026: una settimana di basket, divertimento e crescita al Villaggio Residence Bahja di Paola.",
 };
 
 export default function ProgrammaPage() {
@@ -77,7 +77,7 @@ export default function ProgrammaPage() {
           <PageHero
             title="IL PROGRAMMA"
             subtitle="Un'esperienza unica di basket, crescita e divertimento"
-            badge="📋 Edizione 2025"
+            badge="📋 Edizione 2026"
             backgroundImage="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1200&q=80"
             gradient="green"
           />
@@ -85,7 +85,7 @@ export default function ProgrammaPage() {
           {/* Intro Section */}
           <section className="mt-16 text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 bg-brand-orange/10 px-4 py-2 rounded-full mb-6">
-              <span className="text-brand-orange font-bold">📅 29 Giugno - 6 Luglio 2025</span>
+              <span className="text-brand-orange font-bold">📅 28 Giugno - 5 Luglio 2026</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-extrabold text-brand-dark">
               Benvenuti al <span className="text-brand-green">Mini & Basket Camp</span>
@@ -171,12 +171,12 @@ export default function ProgrammaPage() {
             </div>
           </section>
 
-          {/* Edizione 2025 Section */}
+          {/* Edizione 2026 Section */}
           <section className="mt-20">
             <div className="text-center mb-12">
               <span className="text-sm font-bold text-brand-orange uppercase tracking-widest">Nuova Edizione</span>
               <h2 className="text-3xl md:text-4xl font-extrabold text-brand-dark mt-2">
-                CAMP 2025
+                CAMP 2026
               </h2>
               <div className="mt-3 flex items-center justify-center gap-2">
                 <span className="w-12 h-1 bg-brand-green rounded-full" />
@@ -267,7 +267,7 @@ export default function ProgrammaPage() {
                       <span className="text-white/80 ml-2">di tecnica individuale</span>
                     </div>
                     <div className="bg-white/20 rounded-lg px-4 py-2">
-                      <span className="font-bold">Max 30</span>
+                      <span className="font-bold">Max 20</span>
                       <span className="text-white/80 ml-2">campers</span>
                     </div>
                   </div>
@@ -474,7 +474,7 @@ export default function ProgrammaPage() {
                 <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
                   I posti sono limitati. Segui le istruzioni per versare l&apos;anticipo e compila la scheda
                   di iscrizione. Per iscriversi è necessario effettuare un versamento di <strong>€200,00</strong> (anticipo) o
-                  dell&apos;intero importo. Il saldo va effettuato entro il 31 Maggio 2025.
+                  dell&apos;intero importo. Il saldo va effettuato entro il 31 Maggio 2026.
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">

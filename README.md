@@ -6,10 +6,11 @@ A modern, responsive website redesign for Mini & Basket Camp - a youth basketbal
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.4-38B2AC)
 ![Supabase](https://img.shields.io/badge/Supabase-Optional-3ECF8E)
+![Vercel](https://img.shields.io/badge/Vercel-Ready-black)
 
 ## 🌐 Demo
 
-**Live Site:** [Coming Soon - To be deployed on Netlify]
+**Live Site:** [Coming Soon - To be deployed on Vercel]
 
 **Admin Panel:** `/admin`
 - Email: `admin@miniandbasketcamp.it`
@@ -83,45 +84,49 @@ npm run build
 
 The build output will be in the `.next` folder.
 
-## 🌐 Deploying to Netlify
+## 🌐 Deploying to Vercel (Recommended)
 
-### Option 1: Deploy via Netlify UI
+Vercel is the recommended deployment platform because they created Next.js and provide the best native support.
 
-1. Push your code to a Git repository (GitHub, GitLab, or Bitbucket)
-2. Log in to [Netlify](https://www.netlify.com)
-3. Click "Add new site" → "Import an existing project"
-4. Connect your Git provider and select the repository
-5. Netlify will auto-detect the settings from `netlify.toml`
-6. Click "Deploy site"
+### Quick Deploy
 
-### Option 2: Deploy via Netlify CLI
+1. Push your code to GitHub
+2. Go to [vercel.com](https://vercel.com) and import your repository
+3. Vercel auto-detects Next.js settings (no config needed!)
+4. Add environment variables (see below)
+5. Click Deploy
 
-1. Install Netlify CLI
-   ```bash
-   npm install -g netlify-cli
-   ```
+### Via Vercel CLI
 
-2. Login to Netlify
-   ```bash
-   netlify login
-   ```
+```bash
+# Install Vercel CLI
+npm install -g vercel
 
-3. Initialize and deploy
-   ```bash
-   netlify init
-   netlify deploy --prod
-   ```
+# Login and deploy
+vercel login
+vercel --prod
+```
 
-### Environment Variables for Production
+### Environment Variables
 
-In Netlify Dashboard → Site settings → Environment variables, add:
+Add these in Vercel Dashboard → Project Settings → Environment Variables:
 
 | Variable | Description | Required |
 |----------|-------------|----------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL | No (demo mode if empty) |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key | No (demo mode if empty) |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL | Yes |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key | Yes |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key | Yes |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe publishable key | Yes |
+| `STRIPE_SECRET_KEY` | Stripe secret key | Yes |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret | Yes |
 
-> **Note:** The site works in "demo mode" without Supabase configured. All data will be mock data and registrations won't be saved to a database.
+> **⚠️ Important:** After deploying, update your Stripe webhook URL to `https://your-project.vercel.app/api/webhook` and get a new webhook secret.
+
+For detailed setup instructions, see [`docs/VERCEL_SETUP.md`](docs/VERCEL_SETUP.md).
+
+### Alternative: Netlify
+
+The project also supports Netlify deployment. See `netlify.toml` for configuration.
 
 ## 🗄️ Database Setup (Optional)
 
@@ -153,7 +158,10 @@ If you want to use a real database:
 │   │   └── supabase.ts     # Supabase client
 │   └── types/              # TypeScript types
 ├── docs/                   # Documentation
-├── netlify.toml           # Netlify configuration
+│   ├── VERCEL_SETUP.md    # Vercel deployment guide
+│   ├── STRIPE_SETUP.md    # Stripe payment setup
+│   └── ...
+├── netlify.toml           # Netlify configuration (legacy)
 └── package.json
 ```
 
@@ -162,8 +170,9 @@ If you want to use a real database:
 - **Framework:** Next.js 14 (App Router)
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS
-- **Database:** Supabase (optional)
-- **Deployment:** Netlify
+- **Database:** Supabase
+- **Payments:** Stripe
+- **Deployment:** Vercel (recommended) or Netlify
 - **Icons:** Heroicons (via SVG)
 - **Images:** Next.js Image Optimization
 

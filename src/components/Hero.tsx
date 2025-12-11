@@ -148,14 +148,14 @@ export default function Hero() {
         {/* Badge */}
         <div className="mb-6 inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20">
           <span className="w-2 h-2 bg-brand-green rounded-full animate-pulse" />
-          <span className="text-sm font-medium">Iscrizioni Aperte 2025</span>
+          <span className="text-sm font-medium">Iscrizioni Aperte 2026</span>
         </div>
 
         {/* Main Title */}
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-black uppercase tracking-tight">
           <span className="block text-white drop-shadow-lg">Mini & Basket</span>
           <span className="block bg-gradient-to-r from-brand-orange via-yellow-400 to-brand-orange bg-clip-text text-transparent animate-gradient">
-            Camp 2025
+            Camp 2026
           </span>
         </h1>
 
@@ -166,7 +166,7 @@ export default function Hero() {
             <svg className="w-5 h-5 text-brand-orange" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
             </svg>
-            29 Giugno - 6 Luglio 2025
+            28 Giugno - 5 Luglio 2026
           </span>
           <span className="w-8 h-px bg-gradient-to-l from-transparent to-white/50" />
         </div>
