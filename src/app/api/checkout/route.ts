@@ -134,10 +134,9 @@ export async function POST(request: NextRequest) {
         },
       ],
       
-      // Consent collection
+      // Consent collection (promotions removed - not available in Italy)
       consent_collection: {
         terms_of_service: 'required',
-        promotions: 'auto',
       },
       
       // Invoice creation for receipts
