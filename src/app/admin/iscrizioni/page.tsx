@@ -1,32 +1,51 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { MockRegistration, mockRegistrations } from '@/lib/mockData'
-import { getRegistrations, updateRegistrationStatus } from '@/lib/database'
-import { isSupabaseConfigured } from '@/lib/supabase'
+import { MockRegistration } from '@/lib/mockData'
 import RegistrationsTable from '@/components/admin/RegistrationsTable'
+
+// Types for API response
+interface RegistrationsApiResponse {
+  data: MockRegistration[]
+  source: 'supabase' | 'mock'
+  message?: string
+  error?: string
+}
 
 export default function AdminIscrizioniPage() {
   const [registrations, setRegistrations] = useState<MockRegistration[]>([])
   const [loading, setLoading] = useState(true)
   const [reminderSent, setReminderSent] = useState<string | null>(null)
+  const [dataSource, setDataSource] = useState<'supabase' | 'mock'>('mock')
+  const [apiError, setApiError] = useState<string | null>(null)
 
-  // Fetch registrations on mount
-  useEffect(() => {
-    const fetchRegistrations = async () => {
-      setLoading(true)
-      try {
-        const data = await getRegistrations()
-        setRegistrations(data as MockRegistration[])
-      } catch (error) {
-        console.error('Error fetching registrations:', error)
-        // Fallback to mock data on error
-        setRegistrations(mockRegistrations)
-      } finally {
-        setLoading(false)
+  // Fetch registrations from API route
+  const fetchRegistrations = async () => {
+    setLoading(true)
+    setApiError(null)
+    try {
+      const response = await fetch('/api/admin/registrations')
+      const result: RegistrationsApiResponse = await response.json()
+      
+      setRegistrations(result.data)
+      setDataSource(result.source)
+      
+      if (result.error) {
+        setApiError(result.error)
+        console.warn('[Admin] API returned with error:', result.error)
       }
+      
+      console.log(`[Admin] Loaded ${result.data.length} registrations from ${result.source}`)
+    } catch (error) {
+      console.error('[Admin] Error fetching registrations:', error)
+      setApiError(error instanceof Error ? error.message : 'Errore di rete')
+    } finally {
+      setLoading(false)
     }
+  }
 
+  // Fetch on mount
+  useEffect(() => {
     fetchRegistrations()
   }, [])
 
@@ -39,13 +58,23 @@ export default function AdminIscrizioniPage() {
     )
 
     try {
-      await updateRegistrationStatus(id, status)
-      console.log(`Status changed for ${id} to ${status}`)
+      const response = await fetch('/api/admin/registrations', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status })
+      })
+      
+      const result = await response.json()
+      
+      if (!response.ok || result.error) {
+        throw new Error(result.error || 'Failed to update status')
+      }
+      
+      console.log(`[Admin] Status changed for ${id} to ${status}`)
     } catch (error) {
-      console.error('Error updating status:', error)
+      console.error('[Admin] Error updating status:', error)
       // Revert on error - refetch data
-      const data = await getRegistrations()
-      setRegistrations(data as MockRegistration[])
+      await fetchRegistrations()
     }
   }
 
@@ -73,9 +102,6 @@ export default function AdminIscrizioniPage() {
       .reduce((sum, r) => sum + (r.amount_due || 0), 0),
   }
 
-  // Show Supabase status
-  const supabaseStatus = isSupabaseConfigured()
-
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -85,12 +111,26 @@ export default function AdminIscrizioniPage() {
           <p className="text-gray-500">Visualizza e gestisci tutte le iscrizioni al camp</p>
         </div>
         {/* Data Source Indicator */}
-        <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-          supabaseStatus
-            ? 'bg-green-100 text-green-800'
-            : 'bg-yellow-100 text-yellow-800'
-        }`}>
-          {supabaseStatus ? '🟢 Database Live' : '🟡 Demo Mode (Mock Data)'}
+        <div className="flex items-center gap-2">
+          {apiError && (
+            <div className="px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+              ⚠️ {apiError}
+            </div>
+          )}
+          <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+            dataSource === 'supabase'
+              ? 'bg-green-100 text-green-800'
+              : 'bg-yellow-100 text-yellow-800'
+          }`}>
+            {dataSource === 'supabase' ? '🟢 Database Live' : '🟡 Demo Mode (Mock Data)'}
+          </div>
+          <button
+            onClick={fetchRegistrations}
+            disabled={loading}
+            className="px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50"
+          >
+            🔄 Aggiorna
+          </button>
         </div>
       </div>
 

@@ -1,24 +1,70 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import {
-  mockRegistrations,
-  getRegistrationStats,
-  getRecentRegistrations,
-  getSizeDistribution,
-  getAgeDistribution,
-  getExperienceDistribution,
-  getSpecialNeedsCount
-} from '@/lib/mockData'
+import { MockRegistration } from '@/lib/mockData'
 import StatsCard from '@/components/admin/StatsCard'
 
+// Types for API response
+interface StatsApiResponse {
+  stats: {
+    total: number
+    pending: number
+    confirmed: number
+    cancelled: number
+    revenue: number
+    pendingPayments: number
+  }
+  sizeDistribution: Record<string, number>
+  ageDistribution: Record<string, number>
+  experienceDistribution: {
+    principiante: number
+    intermedio: number
+    avanzato: number
+  }
+  specialNeeds: {
+    withAllergies: number
+    withMedicalNotes: number
+    withAnyNotes: number
+    total: number
+  }
+  packageDistribution: {
+    standard: { total: number; confirmed: number }
+    alta_specializzazione: { total: number; confirmed: number }
+  }
+  recentRegistrations: MockRegistration[]
+  source: 'supabase' | 'mock'
+  message?: string
+  error?: string
+}
+
 export default function AdminDashboardPage() {
-  const stats = getRegistrationStats()
-  const recentRegistrations = getRecentRegistrations(5)
-  const sizeDistribution = getSizeDistribution()
-  const ageDistribution = getAgeDistribution()
-  const experienceDistribution = getExperienceDistribution()
-  const specialNeeds = getSpecialNeedsCount()
+  const [data, setData] = useState<StatsApiResponse | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [dataSource, setDataSource] = useState<'supabase' | 'mock'>('mock')
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
+
+  const fetchStats = async () => {
+    setLoading(true)
+    try {
+      const response = await fetch('/api/admin/stats')
+      const result: StatsApiResponse = await response.json()
+      
+      setData(result)
+      setDataSource(result.source)
+      setLastUpdated(new Date())
+      
+      console.log(`[Dashboard] Loaded stats from ${result.source}`)
+    } catch (error) {
+      console.error('[Dashboard] Error fetching stats:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchStats()
+  }, [])
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('it-IT', {
@@ -55,6 +101,19 @@ export default function AdminDashboardPage() {
     return fullName.substring(0, 2).toUpperCase()
   }
 
+  if (loading || !data) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-brand-green border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-500">Caricamento dashboard...</p>
+        </div>
+      </div>
+    )
+  }
+
+  const { stats, sizeDistribution, ageDistribution, experienceDistribution, specialNeeds, packageDistribution, recentRegistrations } = data
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -63,8 +122,24 @@ export default function AdminDashboardPage() {
           <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-gray-500">Panoramica generale del camp</p>
         </div>
-        <div className="text-sm text-gray-500">
-          Ultimo aggiornamento: {new Date().toLocaleTimeString('it-IT')}
+        <div className="flex items-center gap-3">
+          <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+            dataSource === 'supabase'
+              ? 'bg-green-100 text-green-800'
+              : 'bg-yellow-100 text-yellow-800'
+          }`}>
+            {dataSource === 'supabase' ? '🟢 Database Live' : '🟡 Demo Mode'}
+          </div>
+          <button
+            onClick={fetchStats}
+            disabled={loading}
+            className="px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50"
+          >
+            🔄 Aggiorna
+          </button>
+          <div className="text-sm text-gray-500">
+            {lastUpdated.toLocaleTimeString('it-IT')}
+          </div>
         </div>
       </div>
 
@@ -229,8 +304,7 @@ export default function AdminDashboardPage() {
             { type: 'standard' as const, label: 'Camp Standard', price: packagePrices.standard, color: 'blue' },
             { type: 'alta_specializzazione' as const, label: 'Alta Specializzazione', price: packagePrices.alta_specializzazione, color: 'purple' },
           ].map((pkg) => {
-            const count = mockRegistrations.filter(r => r.package_type === pkg.type && r.status !== 'cancelled').length
-            const confirmed = mockRegistrations.filter(r => r.package_type === pkg.type && r.status === 'confirmed').length
+            const pkgData = packageDistribution[pkg.type]
             return (
               <div key={pkg.type} className={`p-4 bg-${pkg.color}-50 rounded-lg border border-${pkg.color}-100`}>
                 <div className="flex items-center justify-between mb-2">
@@ -239,11 +313,11 @@ export default function AdminDashboardPage() {
                 </div>
                 <div className="flex items-end justify-between">
                   <div>
-                    <p className="text-2xl font-bold text-gray-900">{count}</p>
+                    <p className="text-2xl font-bold text-gray-900">{pkgData.total}</p>
                     <p className="text-sm text-gray-500">iscrizioni</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-semibold text-brand-green">{confirmed}</p>
+                    <p className="text-lg font-semibold text-brand-green">{pkgData.confirmed}</p>
                     <p className="text-sm text-gray-500">confermate</p>
                   </div>
                 </div>
