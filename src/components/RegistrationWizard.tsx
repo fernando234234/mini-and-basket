@@ -4,7 +4,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import type { RegistrationInsert } from "@/types/registration";
 import { tshirtSizes, experienceLevelLabels, packageLabels } from "@/types/registration";
 import StripeCheckout from "./StripeCheckout";
@@ -316,32 +315,24 @@ export default function RegistrationWizard() {
     };
 
     try {
-      if (isSupabaseConfigured()) {
-        const { data, error } = await supabase
-          .from('registrations')
-          .insert([registrationData])
-          .select()
-          .single();
-
-        if (error) {
-          console.error('Supabase error:', error);
-          setSubmitError('Si è verificato un errore durante l\'invio. Riprova più tardi.');
-          setIsSubmitting(false);
-          return;
-        }
-
-        setRegistrationId(data?.id || null);
-      } else {
-        console.log('Supabase not configured. Registration data:', registrationData);
-        setRegistrationId(`DEV-${Date.now().toString(36).toUpperCase()}`);
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Call the API route which uses the service role key to bypass RLS
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(registrationData),
+      });
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Si è verificato un errore durante l\'invio');
       }
 
+      setRegistrationId(result.registrationId || null);
       setIsSubmitting(false);
       setCurrentStep(6);
     } catch (error) {
       console.error('Submit error:', error);
-      setSubmitError('Si è verificato un errore imprevisto. Riprova più tardi.');
+      setSubmitError(error instanceof Error ? error.message : 'Si è verificato un errore imprevisto. Riprova più tardi.');
       setIsSubmitting(false);
     }
   };

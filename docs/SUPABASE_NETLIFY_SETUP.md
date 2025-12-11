@@ -270,14 +270,29 @@ After running the SQL, verify the tables exist:
 
 ---
 
-## 4. Create Admin User (Optional)
+## 4. Create Admin User (REQUIRED for Admin Access)
 
-To access the admin dashboard:
+⚠️ **Important:** The admin dashboard requires a Supabase authenticated user. You MUST create a user manually.
+
+### Steps to Create Admin User:
 
 1. Go to [Authentication](https://app.supabase.com/project/fzmueqalhxnkddadmtno/auth/users)
 2. Click **Add User** → **Create new user**
-3. Enter admin email and password
-4. The admin can then log in at `/admin`
+3. Enter your admin credentials:
+   - **Email:** Your admin email (e.g., `admin@miniandbasketcamp.it`)
+   - **Password:** A secure password (at least 8 characters)
+4. Click **Create User**
+5. The admin can now log in at `/admin` with these credentials
+
+### Note About Demo Credentials
+
+The demo credentials (`Demo@demo.com` / `demo123`) shown in the admin login form are just placeholders. They will NOT work unless you create a user with those exact credentials in the Supabase dashboard.
+
+### Why is this needed?
+
+- Supabase Auth requires real users in its database
+- Unlike the public registration (which uses an API route with service role), admin authentication must go through Supabase Auth
+- This ensures only authorized users can view registration data
 
 ---
 
@@ -319,3 +334,40 @@ Run `npm run dev` to test the connection.
 ### Admin can't see registrations
 - Admin needs to be logged in (authenticated)
 - Check RLS policies allow authenticated reads
+
+### Registration form gives 401 error
+- The registration form uses an API route (`/api/register`) that bypasses RLS with the service role key
+- Ensure `SUPABASE_SERVICE_ROLE_KEY` is set in Netlify environment variables
+- The API route is in `src/app/api/register/route.ts`
+
+### Admin login doesn't work
+- You must create the admin user manually in Supabase Dashboard
+- Go to Authentication → Users → Add User
+- Create a user with your desired email/password
+- Use those same credentials at `/admin`
+
+---
+
+## Architecture Notes
+
+### Registration Flow
+
+The registration form works like this:
+
+1. User fills out the multi-step registration wizard
+2. On submit, the form calls `POST /api/register`
+3. The API route uses `supabaseAdmin` (service role client) to bypass RLS
+4. This allows anonymous users to insert registrations without authentication
+5. After successful insert, the user proceeds to payment
+
+This is necessary because:
+- RLS policies block anonymous inserts by default
+- We don't want to require users to authenticate just to register
+- The service role key is only used server-side (secure)
+
+### Admin Authentication Flow
+
+1. Admin visits `/admin`
+2. If not logged in, redirected to login form
+3. Login uses Supabase Auth with email/password
+4. Once authenticated, admin can view registrations (RLS allows `authenticated` role)
