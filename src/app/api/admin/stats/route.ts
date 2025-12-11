@@ -162,7 +162,7 @@ export async function GET() {
     // If Supabase is not configured, use mock data
     if (!isConfigured) {
       console.log('[API Stats] Supabase not configured, using mock data')
-      const result = calculateStats(mockRegistrations)
+      const result = calculateStats(mockRegistrations as unknown as RegistrationData[])
       return NextResponse.json({
         ...result,
         source: 'mock',
@@ -188,7 +188,7 @@ export async function GET() {
     if (error) {
       console.error('[API Stats] Error fetching registrations:', error)
       // Return mock data as fallback
-      const result = calculateStats(mockRegistrations)
+      const result = calculateStats(mockRegistrations as unknown as RegistrationData[])
       return NextResponse.json({
         ...result,
         source: 'mock',
@@ -214,7 +214,7 @@ export async function GET() {
     })
   } catch (error) {
     console.error('[API Stats] Unexpected error:', error)
-    const result = calculateStats(mockRegistrations)
+    const result = calculateStats(mockRegistrations as unknown as RegistrationData[])
     return NextResponse.json({
       ...result,
       source: 'mock',
