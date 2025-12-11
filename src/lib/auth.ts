@@ -43,9 +43,12 @@ export const getCurrentUser = async (): Promise<AuthUser | null> => {
 
 // Sign in with email and password
 export const signIn = async (email: string, password: string): Promise<{ user: AuthUser | null; error: string | null }> => {
+  // Normalize email: lowercase and trim whitespace
+  const normalizedEmail = email.toLowerCase().trim()
+  
   // If Supabase is not configured, use demo mode
   if (!isSupabaseConfigured()) {
-    if (email === DEMO_CREDENTIALS.email && password === DEMO_CREDENTIALS.password) {
+    if (normalizedEmail === DEMO_CREDENTIALS.email.toLowerCase() && password === DEMO_CREDENTIALS.password) {
       const demoUser: AuthUser = {
         id: 'demo-user-1',
         email: DEMO_CREDENTIALS.email,
@@ -62,12 +65,24 @@ export const signIn = async (email: string, password: string): Promise<{ user: A
   // Use Supabase auth
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
-      email,
+      email: normalizedEmail,
       password,
     })
     
     if (error) {
-      return { user: null, error: error.message }
+      // Provide more helpful error messages
+      let errorMessage = error.message
+      
+      if (error.message === 'Invalid login credentials') {
+        errorMessage = 'Credenziali non valide. Verifica email e password.'
+      } else if (error.message === 'Email not confirmed') {
+        errorMessage = 'Email non confermata. Controlla la tua casella email per il link di conferma.'
+      } else if (error.message.includes('rate limit')) {
+        errorMessage = 'Troppi tentativi. Riprova tra qualche minuto.'
+      }
+      
+      console.error('Supabase auth error:', error.message)
+      return { user: null, error: errorMessage }
     }
     
     if (data.user) {
@@ -84,7 +99,7 @@ export const signIn = async (email: string, password: string): Promise<{ user: A
     return { user: null, error: 'Errore durante il login' }
   } catch (error) {
     console.error('Sign in error:', error)
-    return { user: null, error: 'Errore di connessione' }
+    return { user: null, error: 'Errore di connessione al server' }
   }
 }
 
