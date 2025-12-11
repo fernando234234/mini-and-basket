@@ -139,7 +139,7 @@ function calculateStats(registrations: RegistrationData[]) {
     experienceDistribution: experienceDistribution as { principiante: number; intermedio: number; avanzato: number },
     specialNeeds,
     packageDistribution,
-    recentRegistrations: recentRegistrations as MockRegistration[],
+    recentRegistrations,
   }
 }
 
