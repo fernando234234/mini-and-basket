@@ -122,7 +122,8 @@ export default function TestPaymentPage() {
         // Use Stripe.js to redirect
         const stripe = await getStripe();
         if (stripe) {
-          const { error: stripeError } = await stripe.redirectToCheckout({
+          // Cast to any to access redirectToCheckout which exists on client-side Stripe
+          const { error: stripeError } = await (stripe as any).redirectToCheckout({
             sessionId: checkoutResult.sessionId,
           });
           if (stripeError) {

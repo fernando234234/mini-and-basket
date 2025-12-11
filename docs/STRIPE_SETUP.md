@@ -2,7 +2,78 @@
 
 Questa guida spiega come configurare Stripe per il sistema di pagamenti del Mini & Basket Camp.
 
-## 📋 Indice
+---
+
+## ⚡ QUICK START - Risposte Veloci
+
+### ❓ Devo creare Prodotti in Stripe?
+
+**NO!** Non è necessario creare prodotti nel dashboard Stripe.
+
+Il nostro sistema usa **dynamic pricing** (prezzi dinamici) con `price_data`. Questo significa che:
+- I prezzi sono definiti nel codice (`src/lib/stripe.ts`)
+- Ogni checkout crea la line item dinamicamente
+- Non servono Product o Price preconfigurati su Stripe
+
+```typescript
+// Esempio da checkout/route.ts - il prezzo viene creato al volo
+line_items: [{
+  price_data: {
+    currency: 'eur',
+    product_data: {
+      name: 'Mini & Basket Camp 2025 - Camp Standard',
+      description: 'Pagamento completo per Camp Standard',
+    },
+    unit_amount: 61000, // €610 in centesimi
+  },
+  quantity: 1,
+}]
+```
+
+### 💰 Prezzi Configurati
+
+I prezzi sono definiti in `src/lib/stripe.ts`:
+
+| Pacchetto | Prezzo Pieno | Early Bird | Acconto |
+|-----------|--------------|------------|---------|
+| Standard | €610 | €590 | €200 |
+| Alta Specializzazione | €800 | €760 | €200 |
+| Transfer Bus | +€60 | - | - |
+
+**Early Bird** scade automaticamente il 28 Febbraio 2025.
+
+### 🔑 Variabili d'Ambiente Richieste
+
+```bash
+# .env.local
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxxx  # O pk_live_xxxx per produzione
+STRIPE_SECRET_KEY=sk_test_xxxx                    # O sk_live_xxxx per produzione
+STRIPE_WEBHOOK_SECRET=whsec_xxxx                  # Dal webhook configurato
+```
+
+### 🪝 Webhook - Come Configurarlo
+
+1. Vai su [Stripe Dashboard → Developers → Webhooks](https://dashboard.stripe.com/webhooks)
+2. Clicca **Add endpoint**
+3. **URL Endpoint**: `https://TUO-DOMINIO.com/api/webhook`
+4. **Eventi da selezionare**:
+   - `checkout.session.completed`
+   - `payment_intent.succeeded`
+   - `payment_intent.payment_failed`
+5. Copia il **Signing secret** (inizia con `whsec_`)
+6. Salvalo in `STRIPE_WEBHOOK_SECRET`
+
+### ✅ Checklist Minima per Andare Live
+
+1. [ ] Crea account Stripe (se non l'hai già)
+2. [ ] Copia le chiavi API live dal dashboard
+3. [ ] Configura il webhook con l'URL di produzione
+4. [ ] Imposta le 3 variabili d'ambiente su Netlify
+5. [ ] Fai un test payment reale di €1
+
+---
+
+## 📋 Indice Completo
 
 1. [Configurazione Account](#configurazione-account)
 2. [Branding Dashboard](#branding-dashboard)

@@ -2,17 +2,18 @@ import { loadStripe, Stripe } from '@stripe/stripe-js';
 
 let stripePromise: Promise<Stripe | null> | null = null;
 
-export const getStripe = () => {
+export async function getStripe(): Promise<Stripe | null> {
+  const key = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+  if (!key) {
+    console.warn('Stripe publishable key not configured - running in demo mode');
+    return null;
+  }
+  
   if (!stripePromise) {
-    const key = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
-    if (!key) {
-      console.warn('Stripe publishable key not configured - running in demo mode');
-      return null;
-    }
     stripePromise = loadStripe(key);
   }
   return stripePromise;
-};
+}
 
 export const isStripeConfigured = () => {
   return !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
