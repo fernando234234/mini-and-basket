@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { supabaseAdmin } from '@/lib/supabase';
+import { getSupabaseAdmin } from '@/lib/supabase';
 
 // Initialize Stripe only if secret key is available
 const stripe = process.env.STRIPE_SECRET_KEY
@@ -15,6 +15,7 @@ export async function POST(request: NextRequest) {
   console.log('[Webhook] ============================================');
   console.log('[Webhook] Received webhook request at:', new Date().toISOString());
   
+  // Check Stripe configuration
   if (!stripe) {
     console.log('[Webhook] ERROR: Stripe not configured (missing STRIPE_SECRET_KEY)');
     return NextResponse.json(
@@ -31,7 +32,20 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  console.log('[Webhook] Stripe and webhook secret are configured');
+  // Check Supabase configuration at runtime
+  const { client: supabaseAdmin, isConfigured: supabaseConfigured, error: supabaseError } = getSupabaseAdmin();
+  
+  console.log('[Webhook] Environment check:');
+  console.log('[Webhook]   - Stripe: configured');
+  console.log('[Webhook]   - Webhook secret: configured');
+  console.log('[Webhook]   - Supabase admin:', supabaseConfigured ? 'configured' : `NOT CONFIGURED - ${supabaseError}`);
+  console.log('[Webhook]   - NEXT_PUBLIC_SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL ? 'set' : 'NOT SET');
+  console.log('[Webhook]   - SUPABASE_SERVICE_ROLE_KEY:', process.env.SUPABASE_SERVICE_ROLE_KEY ? 'set (length: ' + process.env.SUPABASE_SERVICE_ROLE_KEY.length + ')' : 'NOT SET');
+  
+  if (!supabaseConfigured) {
+    console.log('[Webhook] WARNING: Supabase not configured - database updates will be skipped!');
+    // Continue processing but log clearly that DB updates won't work
+  }
 
   const body = await request.text();
   const signature = request.headers.get('stripe-signature');
@@ -106,6 +120,18 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
   console.log('[Webhook] Payment status:', payment_status);
   console.log('[Webhook] Raw metadata:', JSON.stringify(metadata, null, 2));
 
+  // Get Supabase admin client with runtime check
+  const { client: supabaseAdmin, isConfigured: supabaseConfigured, error: supabaseError } = getSupabaseAdmin();
+  
+  if (!supabaseConfigured) {
+    console.error('[Webhook] CRITICAL: Supabase admin client not configured!');
+    console.error('[Webhook] Error:', supabaseError);
+    console.error('[Webhook] Cannot update database - payment received but not recorded!');
+    console.error('[Webhook] Manual intervention required for session:', session.id);
+    // We still return success to Stripe to prevent retries, but log the error
+    return;
+  }
+
   // Extract registration data from metadata
   // IMPORTANT: The checkout API uses snake_case keys, so we need to check both formats
   const registrationId = metadata?.registration_id || metadata?.registrationId;
@@ -124,6 +150,8 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
   if (!registrationId) {
     console.log('[Webhook] WARNING: No registration ID found in metadata!');
     console.log('[Webhook] Available metadata keys:', Object.keys(metadata || {}));
+    console.log('[Webhook] This payment will not be linked to a registration.');
+    console.log('[Webhook] Manual intervention may be required for session:', session.id);
     return;
   }
 
@@ -138,6 +166,7 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
 
   try {
     console.log('[Webhook] Attempting to update registration in Supabase...');
+    console.log('[Webhook] Using Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
     
     // First, check if the registration exists
     const { data: existingReg, error: fetchError } = await supabaseAdmin
@@ -148,6 +177,12 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
     
     if (fetchError) {
       console.error('[Webhook] ERROR fetching existing registration:', fetchError);
+      console.error('[Webhook] This could mean:');
+      console.error('[Webhook]   1. Registration ID does not exist in database');
+      console.error('[Webhook]   2. Database connection issue');
+      console.error('[Webhook]   3. RLS policy blocking access (should not happen with service role)');
+    } else if (!existingReg) {
+      console.error('[Webhook] Registration not found for ID:', registrationId);
     } else {
       console.log('[Webhook] Existing registration found:', JSON.stringify(existingReg, null, 2));
     }
@@ -174,6 +209,10 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
       console.error('[Webhook] Error code:', updateError.code);
       console.error('[Webhook] Error message:', updateError.message);
       console.error('[Webhook] Error details:', updateError.details);
+      console.error('[Webhook] Error hint:', updateError.hint);
+    } else if (!updateData || updateData.length === 0) {
+      console.error('[Webhook] WARNING: Update returned no data - registration may not exist');
+      console.error('[Webhook] Registration ID:', registrationId);
     } else {
       console.log('[Webhook] SUCCESS! Registration updated:', JSON.stringify(updateData, null, 2));
     }
@@ -207,11 +246,17 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
       console.error('[Webhook] ERROR creating payment record:', paymentError);
       console.error('[Webhook] Error code:', paymentError.code);
       console.error('[Webhook] Error message:', paymentError.message);
+      console.error('[Webhook] Error hint:', paymentError.hint);
     } else {
       console.log('[Webhook] SUCCESS! Payment record created:', JSON.stringify(paymentData, null, 2));
     }
   } catch (err) {
     console.error('[Webhook] EXCEPTION in Supabase operations:', err);
+    if (err instanceof Error) {
+      console.error('[Webhook] Exception name:', err.name);
+      console.error('[Webhook] Exception message:', err.message);
+      console.error('[Webhook] Exception stack:', err.stack);
+    }
   }
 
   // TODO: Send confirmation email
@@ -225,6 +270,15 @@ async function handleFailedPayment(paymentIntent: Stripe.PaymentIntent) {
   console.log('[Webhook] Error message:', paymentIntent.last_payment_error?.message);
   console.log('[Webhook] Error type:', paymentIntent.last_payment_error?.type);
   console.log('[Webhook] Metadata:', JSON.stringify(paymentIntent.metadata, null, 2));
+
+  // Get Supabase admin client with runtime check
+  const { client: supabaseAdmin, isConfigured: supabaseConfigured, error: supabaseError } = getSupabaseAdmin();
+  
+  if (!supabaseConfigured) {
+    console.error('[Webhook] CRITICAL: Supabase admin client not configured for failed payment handling!');
+    console.error('[Webhook] Error:', supabaseError);
+    return;
+  }
 
   // Try to find and update the registration if we have metadata
   // Check both snake_case and camelCase keys
@@ -246,6 +300,8 @@ async function handleFailedPayment(paymentIntent: Stripe.PaymentIntent) {
 
       if (error) {
         console.error('[Webhook] ERROR updating registration payment status:', error);
+      } else if (!data || data.length === 0) {
+        console.error('[Webhook] WARNING: No registration found to update for ID:', registrationId);
       } else {
         console.log('[Webhook] SUCCESS! Updated registration to failed:', JSON.stringify(data, null, 2));
       }
