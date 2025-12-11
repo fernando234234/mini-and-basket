@@ -1,12 +1,68 @@
 "use client";
 
-import { useEffect, useState, Suspense, useCallback } from "react";
+import { useEffect, useState, Suspense, useCallback, Component, ReactNode } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { PACKAGE_PRICES, PackageType } from "@/lib/stripe";
 import { generateCalendarEvent, downloadCalendarFile } from "@/lib/calendar";
 import PaymentMethods from "@/components/PaymentMethods";
 import BasketballShotAnimation from "@/components/BasketballShotAnimation";
+
+// Error Boundary component
+interface ErrorBoundaryProps {
+  children: ReactNode;
+  fallback?: ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error?: Error;
+}
+
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('[SuccessPage] Error caught by boundary:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || (
+        <div className="min-h-screen bg-gradient-to-br from-brand-green/10 to-brand-orange/10 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-8 md:p-12 shadow-xl text-center max-w-md">
+            <div className="w-20 h-20 mx-auto mb-6 bg-green-100 rounded-full flex items-center justify-center">
+              <svg className="w-10 h-10 text-brand-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-extrabold text-brand-dark mb-4">
+              Pagamento Completato! 🎉
+            </h1>
+            <p className="text-brand-gray mb-6">
+              La tua iscrizione è stata confermata. Riceverai una email di conferma con tutti i dettagli.
+            </p>
+            <Link
+              href="/"
+              className="inline-block bg-gradient-to-r from-brand-green to-emerald-500 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 hover:shadow-lg hover:scale-105"
+            >
+              Torna alla Home
+            </Link>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 // Payment method display info
 const PAYMENT_METHOD_LABELS: Record<string, { label: string; icon: string }> = {
@@ -71,13 +127,24 @@ function SuccessContent() {
   const packageIdParam = searchParams.get("package");
   const emailParam = searchParams.get("email");
 
-  // Map package IDs
+  // Map package IDs with safe fallback
   const packageMap: Record<string, PackageType> = {
     standard: "standard",
     alta_specializzazione: "alta_specializzazione",
     // Legacy fallbacks
     completa: "standard",
     settimanale: "standard",
+  };
+
+  // Default package info as fallback
+  const defaultPackageInfo = {
+    name: 'Camp Standard 2025',
+    fullPrice: 61000,
+    earlyBirdPrice: 59000,
+    depositPrice: 20000,
+    displayPrice: '€610',
+    displayEarlyBird: '€590',
+    displayDeposit: '€200',
   };
 
   // Fetch session data from Stripe with timeout and fallback
@@ -179,8 +246,9 @@ function SuccessContent() {
   const packageId = sessionData?.metadata?.package_type || packageIdParam;
   const email = sessionData?.customer_email || emailParam;
   
-  const mappedPackage = packageMap[packageId || ""] || "completa";
-  const packageInfo = PACKAGE_PRICES[mappedPackage];
+  const mappedPackage = packageMap[packageId || ""] || "standard";
+  // Safe access with fallback to prevent undefined errors
+  const packageInfo = PACKAGE_PRICES[mappedPackage as PackageType] || defaultPackageInfo;
   
   // Get payment method info
   const paymentMethodType = sessionData?.payment_method?.type || sessionData?.payment_method_types?.[0];
@@ -250,12 +318,20 @@ function SuccessContent() {
       <div className="max-w-2xl mx-auto">
         {/* Success Card */}
         <div className="bg-white rounded-3xl p-8 md:p-12 shadow-xl text-center">
-          {/* Basketball Shot Animation */}
+          {/* Basketball Shot Animation - wrapped in try-catch via error boundary */}
           <div className="mb-8">
-            <BasketballShotAnimation
-              onComplete={handleAnimationComplete}
-              autoPlay={true}
-            />
+            <ErrorBoundary
+              fallback={
+                <div className="w-24 h-24 mx-auto bg-gradient-to-br from-brand-green to-emerald-500 rounded-full flex items-center justify-center">
+                  <span className="text-4xl">🏀</span>
+                </div>
+              }
+            >
+              <BasketballShotAnimation
+                onComplete={handleAnimationComplete}
+                autoPlay={true}
+              />
+            </ErrorBoundary>
           </div>
 
           {/* Success Icon - Shows after animation */}
@@ -571,15 +647,17 @@ function SuccessContent() {
 
 export default function SuccessPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-brand-green/10 to-brand-orange/10 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-brand-green border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-brand-gray">Caricamento...</p>
+    <ErrorBoundary>
+      <Suspense fallback={
+        <div className="min-h-screen bg-gradient-to-br from-brand-green/10 to-brand-orange/10 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-brand-green border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-brand-gray">Caricamento...</p>
+          </div>
         </div>
-      </div>
-    }>
-      <SuccessContent />
-    </Suspense>
+      }>
+        <SuccessContent />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
