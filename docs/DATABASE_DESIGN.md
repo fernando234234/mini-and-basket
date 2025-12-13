@@ -104,11 +104,26 @@ erDiagram
         jsonb metadata
     }
 
-    GALLERY_PHOTOS {
+    GALLERY_COLLECTIONS {
         uuid id PK
         timestamp created_at
         timestamp updated_at
+        text name
+        text slug UK
+        text description
+        text cover_image_url
+        integer year
+        text collection_type
+        integer order_index
+    }
+
+    GALLERY_PHOTOS {
+        uuid id PK
+        uuid collection_id FK
+        timestamp created_at
+        timestamp updated_at
         text url
+        text storage_path
         text alt_text
         integer year
         text category
@@ -139,6 +154,7 @@ erDiagram
     }
 
     REGISTRATIONS ||--o{ PAYMENTS : has
+    GALLERY_COLLECTIONS ||--o{ GALLERY_PHOTOS : contains
 ```
 
 ---
@@ -262,21 +278,56 @@ CREATE INDEX idx_payments_status ON payments(status);
 CREATE INDEX idx_payments_stripe_session ON payments(stripe_session_id);
 ```
 
-### 3. gallery_photos
+### 3. gallery_collections
+
+Gallery collections for organizing photos by event/camp.
+
+```sql
+CREATE TABLE gallery_collections (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    
+    -- Collection info
+    name TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
+    description TEXT,
+    cover_image_url TEXT,
+    year INTEGER,
+    collection_type TEXT NOT NULL DEFAULT 'camp' CHECK (collection_type IN ('camp', 'one_day_camp', 'event')),
+    order_index INTEGER DEFAULT 0
+);
+
+-- Indexes for gallery_collections
+CREATE INDEX idx_gallery_collections_slug ON gallery_collections(slug);
+CREATE INDEX idx_gallery_collections_year ON gallery_collections(year);
+CREATE INDEX idx_gallery_collections_type ON gallery_collections(collection_type);
+CREATE INDEX idx_gallery_collections_order ON gallery_collections(order_index);
+
+-- Trigger for updated_at
+CREATE TRIGGER update_gallery_collections_updated_at
+    BEFORE UPDATE ON gallery_collections
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+```
+
+### 4. gallery_photos
 
 Gallery management for camp photos.
 
 ```sql
 CREATE TABLE gallery_photos (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    collection_id UUID REFERENCES gallery_collections(id) ON DELETE SET NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     
     -- Photo data
     url TEXT NOT NULL,
+    storage_path TEXT,
     alt_text TEXT NOT NULL,
-    year INTEGER NOT NULL,
-    category TEXT NOT NULL CHECK (category IN ('allenamenti', 'partite', 'attivita', 'gruppo')),
+    year INTEGER, -- nullable, can use collection year
+    category TEXT, -- nullable for flexibility
     
     -- Display options
     featured BOOLEAN DEFAULT false,
@@ -287,6 +338,7 @@ CREATE TABLE gallery_photos (
 CREATE INDEX idx_gallery_year ON gallery_photos(year);
 CREATE INDEX idx_gallery_category ON gallery_photos(category);
 CREATE INDEX idx_gallery_featured ON gallery_photos(featured) WHERE featured = true;
+CREATE INDEX idx_gallery_photos_collection ON gallery_photos(collection_id);
 
 -- Trigger for updated_at
 CREATE TRIGGER update_gallery_photos_updated_at
@@ -295,7 +347,7 @@ CREATE TRIGGER update_gallery_photos_updated_at
     EXECUTE FUNCTION update_updated_at_column();
 ```
 
-### 4. contact_submissions
+### 5. contact_submissions
 
 Contact form submissions.
 
@@ -345,6 +397,7 @@ $$ language 'plpgsql';
 | Parent Table | Child Table | Relationship | Foreign Key |
 |--------------|-------------|--------------|-------------|
 | registrations | payments | One-to-Many | payments.registration_id → registrations.id |
+| gallery_collections | gallery_photos | One-to-Many | gallery_photos.collection_id → gallery_collections.id |
 
 ---
 
@@ -365,12 +418,21 @@ $$ language 'plpgsql';
 | idx_payments_status | status | Filter by payment status |
 | idx_payments_stripe_session | stripe_session_id | Webhook lookup |
 
+### Gallery Collections Table
+| Index Name | Column(s) | Purpose |
+|------------|-----------|---------|
+| idx_gallery_collections_slug | slug | URL slug lookup |
+| idx_gallery_collections_year | year | Filter by year |
+| idx_gallery_collections_type | collection_type | Filter by type |
+| idx_gallery_collections_order | order_index | Sort order |
+
 ### Gallery Photos Table
 | Index Name | Column(s) | Purpose |
 |------------|-----------|---------|
 | idx_gallery_year | year | Filter by year |
 | idx_gallery_category | category | Filter by category |
 | idx_gallery_featured | featured (partial) | Get featured photos |
+| idx_gallery_photos_collection | collection_id | Lookup by collection |
 
 ### Contact Submissions Table
 | Index Name | Column(s) | Purpose |

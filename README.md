@@ -1,141 +1,128 @@
-# 🏀 Mini & Basket Camp 2025
+# Mini & Basket Camp - Website
 
-A modern, responsive website redesign for Mini & Basket Camp - a youth basketball camp in Italy.
+Basketball summer camp registration website for Mini & Basket Camp (since 2004).
 
 ![Next.js](https://img.shields.io/badge/Next.js-14.2-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.4-38B2AC)
-![Supabase](https://img.shields.io/badge/Supabase-Optional-3ECF8E)
-![Vercel](https://img.shields.io/badge/Vercel-Ready-black)
+![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E)
+![Stripe](https://img.shields.io/badge/Stripe-Payments-635BFF)
+![Vercel](https://img.shields.io/badge/Vercel-Deployed-black)
 
-## 🌐 Demo
+## 🚀 Live Site
 
-**Live Site:** [Coming Soon - To be deployed on Vercel]
+- **Production**: https://mini-and-basket.vercel.app/
+- **Admin Dashboard**: https://mini-and-basket.vercel.app/admin
 
-**Admin Panel:** `/admin`
-- Email: `admin@miniandbasketcamp.it`
-- Password: `demo123`
+## 🛠️ Tech Stack
 
-## ✨ Features
+- **Frontend**: Next.js 14 (App Router), React 18, TypeScript
+- **Styling**: Tailwind CSS
+- **Database**: Supabase (PostgreSQL)
+- **Payments**: Stripe (Checkout)
+- **Hosting**: Vercel
+- **Storage**: Supabase Storage
 
-### Public Website
-- 🏠 **Home** - Hero section, program highlights, testimonials, gallery preview
-- 📅 **Programma** - Detailed camp schedule and activities
-- 👥 **Staff** - Meet our coaches and trainers
-- 📸 **Galleria** - Photo gallery with filtering by year and category
-- 📝 **Iscrizione** - Multi-step registration wizard
-- ❓ **FAQ** - Frequently asked questions
-- 📞 **Contatti** - Contact form and information
+## 📋 Features
 
-### Admin Panel
-- 📊 **Dashboard** - Registration statistics and overview
-- 📋 **Iscrizioni** - Manage and view all registrations
-- 🖼️ **Galleria** - Upload and manage gallery photos
+### Public Pages
+- Homepage with hero, pricing, staff preview
+- Program details (Programma)
+- Staff page with 14 professional trainers
+- Gallery with 20 collections, 7,487 photos
+- FAQ with accordion
+- Contact form
+- Registration wizard with validation
+- Privacy policy and Rules pages
 
-### Technical Features
-- 📱 Fully responsive design
-- 🎨 Modern UI with smooth animations
-- 🔒 Demo mode (works without Supabase)
-- 🚀 Optimized for performance
-- ♿ Accessibility-focused
+### Payment Integration
+- Stripe Checkout with 6 payment methods
+- Early bird pricing (before Feb 28, 2026)
+- Deposit option (€100) or full payment
+- Webhook for automatic status updates
 
-## 🚀 Getting Started
+### Admin Dashboard
+- Registration management (CRM)
+- Gallery management
+- Statistics and analytics
+
+## 🔧 Setup
 
 ### Prerequisites
-- Node.js 18+ 
+- Node.js 18+
 - npm or yarn
+- Supabase account
+- Stripe account
 
-### Installation
+### Environment Variables
+Copy `.env.local.example` to `.env.local`:
+```bash
+cp .env.local.example .env.local
+```
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/your-username/mini-basket-camp.git
-   cd mini-basket-camp
-   ```
+Fill in:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+### Local Development
+```bash
+npm install
+npm run dev
+```
 
-3. **Set up environment variables**
-   
-   Create a `.env.local` file in the root directory:
-   ```env
-   # Leave empty for demo mode, or add your Supabase credentials
-   NEXT_PUBLIC_SUPABASE_URL=
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=
-   ```
+Open [http://localhost:3000](http://localhost:3000) to view the site.
 
-4. **Run the development server**
-   ```bash
-   npm run dev
-   ```
-
-5. **Open your browser**
-   
-   Navigate to [http://localhost:3000](http://localhost:3000)
-
-## 📦 Building for Production
+## 📦 Production Build
 
 ```bash
 npm run build
+npm run start
 ```
 
-The build output will be in the `.next` folder.
-
-## 🌐 Deploying to Vercel (Recommended)
-
-Vercel is the recommended deployment platform because they created Next.js and provide the best native support.
+## 🌐 Deploying to Vercel
 
 ### Quick Deploy
 
 1. Push your code to GitHub
 2. Go to [vercel.com](https://vercel.com) and import your repository
-3. Vercel auto-detects Next.js settings (no config needed!)
-4. Add environment variables (see below)
+3. Vercel auto-detects Next.js settings
+4. Add environment variables
 5. Click Deploy
 
 ### Via Vercel CLI
 
 ```bash
-# Install Vercel CLI
 npm install -g vercel
-
-# Login and deploy
 vercel login
 vercel --prod
 ```
 
-### Environment Variables
+## 📖 Documentation
 
-Add these in Vercel Dashboard → Project Settings → Environment Variables:
+- [Vercel Setup](docs/VERCEL_SETUP.md) - Deployment and webhook configuration
+- [Stripe Setup](docs/STRIPE_SETUP.md) - Payment integration guide
+- [Database Design](docs/DATABASE_DESIGN.md) - Schema and migrations
+- [Architecture](docs/ARCHITECTURE.md) - Project structure and data flow
+- [Supabase Setup](docs/SUPABASE_NETLIFY_SETUP.md) - Database configuration
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL | Yes |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key | Yes |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key | Yes |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe publishable key | Yes |
-| `STRIPE_SECRET_KEY` | Stripe secret key | Yes |
-| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret | Yes |
+## 🔐 Admin Access
 
-> **⚠️ Important:** After deploying, update your Stripe webhook URL to `https://your-project.vercel.app/api/webhook` and get a new webhook secret.
+**Demo Login:**
+- Email: `Demo@demo.com`
+- Password: `demo123`
 
-For detailed setup instructions, see [`docs/VERCEL_SETUP.md`](docs/VERCEL_SETUP.md).
+## 📅 Camp 2026 Info
 
-### Alternative: Netlify
-
-The project also supports Netlify deployment. See `netlify.toml` for configuration.
-
-## 🗄️ Database Setup (Optional)
-
-If you want to use a real database:
-
-1. Create a [Supabase](https://supabase.com) project
-2. Run the SQL schema from `docs/supabase-schema.sql`
-3. Add your Supabase credentials to the environment variables
-4. Set up Row Level Security (RLS) policies as needed
+- **Dates**: 28 Giugno - 5 Luglio 2026
+- **Location**: Villaggio Residence Bahja****, Paola (CS)
+- **Pricing**:
+  - Standard: €610 (€590 early bird)
+  - Alta Specializzazione: €800 (€760 early bird)
+- **Early Bird Deadline**: 28 Febbraio 2026
 
 ## 📁 Project Structure
 
@@ -143,56 +130,26 @@ If you want to use a real database:
 ├── src/
 │   ├── app/                 # Next.js App Router pages
 │   │   ├── admin/          # Admin panel pages
+│   │   ├── api/            # API routes (checkout, webhooks)
 │   │   ├── contatti/       # Contact page
 │   │   ├── faq/            # FAQ page
-│   │   ├── galleria/       # Gallery page
-│   │   ├── iscrizione/     # Registration page
-│   │   ├── programma/      # Program page
-│   │   ├── staff/          # Staff page
-│   │   └── page.tsx        # Home page
+│   │   ├── galleria/       # Gallery pages
+│   │   ├── iscrizione/     # Registration wizard
+│   │   ├── privacy/        # Privacy policy
+│   │   ├── programma/      # Program details
+│   │   ├── regolamento/    # Rules page
+│   │   └── staff/          # Staff page
 │   ├── components/         # React components
 │   │   └── admin/          # Admin-specific components
 │   ├── lib/                # Utilities and config
-│   │   ├── auth.ts         # Authentication helpers
-│   │   ├── mockData.ts     # Demo/mock data
-│   │   └── supabase.ts     # Supabase client
 │   └── types/              # TypeScript types
 ├── docs/                   # Documentation
-│   ├── VERCEL_SETUP.md    # Vercel deployment guide
-│   ├── STRIPE_SETUP.md    # Stripe payment setup
-│   └── ...
-├── netlify.toml           # Netlify configuration (legacy)
-└── package.json
+├── public/                 # Static assets
+├── scripts/                # Utility scripts
+└── supabase/              # Database migrations
 ```
 
-## 🎨 Tech Stack
-
-- **Framework:** Next.js 14 (App Router)
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS
-- **Database:** Supabase
-- **Payments:** Stripe
-- **Deployment:** Vercel (recommended) or Netlify
-- **Icons:** Heroicons (via SVG)
-- **Images:** Next.js Image Optimization
-
-## 🔐 Admin Access
-
-### Demo Mode
-When Supabase is not configured, the admin panel works in demo mode:
-- **Email:** `admin@miniandbasketcamp.it`
-- **Password:** `demo123`
-
-### Production Mode
-Configure your own admin users in Supabase Authentication.
-
-## 📝 License
-
-This project is proprietary and created for Mini & Basket Camp.
-
-## 👨‍💻 Development
-
-### Available Scripts
+## 👨‍💻 Available Scripts
 
 | Command | Description |
 |---------|-------------|
@@ -200,17 +157,19 @@ This project is proprietary and created for Mini & Basket Camp.
 | `npm run build` | Build for production |
 | `npm run start` | Start production server |
 | `npm run lint` | Run ESLint |
+| `npm run upload-gallery` | Upload gallery photos to Supabase |
 
-### Code Style
+## 🔒 Security
 
-- TypeScript strict mode enabled
-- ESLint for code quality
-- Prettier for formatting (recommended)
+- Row Level Security (RLS) enabled on all tables
+- Service role key never exposed to client
+- Stripe webhook signature verification
+- HTTPS enforced in production
 
-## 📞 Support
+## 📝 License
 
-For questions about the website, please contact the development team.
+This project is proprietary and created for Mini & Basket Camp.
 
 ---
 
-Made with ❤️ for Mini & Basket Camp 2025
+Made with ❤️ for Mini & Basket Camp

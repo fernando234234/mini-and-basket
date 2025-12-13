@@ -55,7 +55,7 @@ STRIPE_WEBHOOK_SECRET=whsec_xxxx                  # Dal webhook configurato
 
 1. Vai su [Stripe Dashboard → Developers → Webhooks](https://dashboard.stripe.com/webhooks)
 2. Clicca **Add endpoint**
-3. **URL Endpoint**: `https://TUO-DOMINIO.com/api/webhook`
+3. **URL Endpoint**: `https://mini-and-basket.vercel.app/api/webhook` (o il tuo dominio personalizzato)
 4. **Eventi da selezionare**:
    - `checkout.session.completed`
    - `payment_intent.succeeded`
@@ -67,8 +67,8 @@ STRIPE_WEBHOOK_SECRET=whsec_xxxx                  # Dal webhook configurato
 
 1. [ ] Crea account Stripe (se non l'hai già)
 2. [ ] Copia le chiavi API live dal dashboard
-3. [ ] Configura il webhook con l'URL di produzione
-4. [ ] Imposta le 3 variabili d'ambiente su Netlify
+3. [ ] Configura il webhook con l'URL di produzione Vercel
+4. [ ] Imposta le 3 variabili d'ambiente su Vercel
 5. [ ] Fai un test payment reale di €1
 
 ---
@@ -204,7 +204,7 @@ Klarna permette il pagamento in 3 rate senza interessi:
 
 1. Vai su **Developers** → **Webhooks**
 2. Clicca **Add endpoint**
-3. URL endpoint: `https://miniandbasketcamp.it/api/webhook`
+3. URL endpoint: `https://mini-and-basket.vercel.app/api/webhook` (o il tuo dominio)
 4. Seleziona gli eventi
 
 ### Eventi da Sottoscrivere
