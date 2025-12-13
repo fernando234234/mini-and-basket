@@ -112,7 +112,7 @@ export default function PhotoUploader({ onSubmit, onCancel, initialData, isEditi
                   Anno *
                 </label>
                 <select
-                  value={formData.year}
+                  value={formData.year ?? new Date().getFullYear()}
                   onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) })}
                   required
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-green focus:border-transparent"
@@ -127,7 +127,7 @@ export default function PhotoUploader({ onSubmit, onCancel, initialData, isEditi
                   Categoria *
                 </label>
                 <select
-                  value={formData.category}
+                  value={formData.category ?? 'allenamenti'}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value as GalleryPhotoInsert['category'] })}
                   required
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-green focus:border-transparent"
@@ -146,7 +146,7 @@ export default function PhotoUploader({ onSubmit, onCancel, initialData, isEditi
               </label>
               <input
                 type="number"
-                value={formData.sort_order}
+                value={formData.sort_order ?? 0}
                 onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })}
                 min="0"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-green focus:border-transparent"

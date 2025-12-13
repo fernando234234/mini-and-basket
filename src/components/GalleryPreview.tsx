@@ -1,53 +1,155 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { GalleryPhoto, GalleryCollection } from "@/types/gallery";
+
+interface GalleryPreviewPhoto extends GalleryPhoto {
+  collection?: GalleryCollection;
+}
 
 export default function GalleryPreview() {
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [photos, setPhotos] = useState<GalleryPreviewPhoto[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const galleryImages = [
+  // Fallback images if Supabase is not configured or has no data
+  const fallbackImages = [
     {
-      src: "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400&q=80",
-      alt: "Basketball action shot",
+      id: "fallback-1",
+      url: "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400&q=80",
+      alt_text: "Basketball action shot",
       label: "Azione",
+      featured: true,
     },
     {
-      src: "https://images.unsplash.com/photo-1574623452334-1e0ac2b3ccb4?w=400&q=80",
-      alt: "Team training session",
+      id: "fallback-2",
+      url: "https://images.unsplash.com/photo-1574623452334-1e0ac2b3ccb4?w=400&q=80",
+      alt_text: "Team training session",
       label: "Training",
+      featured: false,
     },
     {
-      src: "https://images.unsplash.com/photo-1519861531473-9200262188bf?w=400&q=80",
-      alt: "Basketball on court",
+      id: "fallback-3",
+      url: "https://images.unsplash.com/photo-1519861531473-9200262188bf?w=400&q=80",
+      alt_text: "Basketball on court",
       label: "Campo",
+      featured: false,
     },
     {
-      src: "https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=400&q=80",
-      alt: "Young athletes",
+      id: "fallback-4",
+      url: "https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=400&q=80",
+      alt_text: "Young athletes",
       label: "Team",
+      featured: true,
     },
     {
-      src: "https://images.unsplash.com/photo-1608245449230-4ac19066d2d0?w=400&q=80",
-      alt: "Basketball game",
+      id: "fallback-5",
+      url: "https://images.unsplash.com/photo-1608245449230-4ac19066d2d0?w=400&q=80",
+      alt_text: "Basketball game",
       label: "Partita",
+      featured: false,
     },
   ];
+
+  useEffect(() => {
+    const fetchRecentPhotos = async () => {
+      if (!isSupabaseConfigured()) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // Fetch recent featured photos first, then other recent photos
+        const { data: featuredPhotos, error: featuredError } = await supabase
+          .from('gallery_photos')
+          .select('*, collection:gallery_collections(*)')
+          .eq('featured', true)
+          .order('created_at', { ascending: false })
+          .limit(3);
+
+        if (featuredError) {
+          console.error('Error fetching featured photos:', featuredError);
+        }
+
+        // Fetch additional recent photos
+        const { data: recentPhotos, error: recentError } = await supabase
+          .from('gallery_photos')
+          .select('*, collection:gallery_collections(*)')
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (recentError) {
+          console.error('Error fetching recent photos:', recentError);
+        }
+
+        // Combine and deduplicate photos
+        const allPhotos = [...(featuredPhotos || []), ...(recentPhotos || [])];
+        const uniquePhotos = allPhotos.reduce((acc: GalleryPreviewPhoto[], photo) => {
+          if (!acc.find(p => p.id === photo.id)) {
+            acc.push(photo);
+          }
+          return acc;
+        }, []);
+
+        // Take first 5 unique photos
+        const previewPhotos = uniquePhotos.slice(0, 5);
+
+        if (previewPhotos.length > 0) {
+          setPhotos(previewPhotos);
+        }
+      } catch (error) {
+        console.error('Error fetching gallery preview:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecentPhotos();
+  }, []);
+
+  // Use fetched photos or fallback to static images
+  const displayPhotos = photos.length > 0 ? photos : fallbackImages.map(img => ({
+    ...img,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  } as GalleryPreviewPhoto));
 
   const navigateImage = (direction: "prev" | "next") => {
     if (selectedImage === null) return;
     if (direction === "prev") {
       setSelectedImage(
-        selectedImage === 0 ? galleryImages.length - 1 : selectedImage - 1
+        selectedImage === 0 ? displayPhotos.length - 1 : selectedImage - 1
       );
     } else {
       setSelectedImage(
-        selectedImage === galleryImages.length - 1 ? 0 : selectedImage + 1
+        selectedImage === displayPhotos.length - 1 ? 0 : selectedImage + 1
       );
     }
   };
+
+  if (loading) {
+    return (
+      <section aria-labelledby="gallery-heading" id="gallery" className="relative">
+        <div className="text-center mb-6">
+          <span className="inline-block px-3 py-1 bg-brand-green/10 text-brand-green text-xs font-bold rounded-full mb-3">
+            📸 I Nostri Momenti
+          </span>
+          <h2 className="text-2xl font-extrabold text-brand-dark" id="gallery-heading">
+            GALLERY
+          </h2>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className={`bg-gray-200 animate-pulse rounded-2xl ${i === 0 || i === 3 ? 'row-span-2 min-h-[200px]' : 'h-24'}`} />
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section aria-labelledby="gallery-heading" id="gallery" className="relative">
@@ -66,13 +168,15 @@ export default function GalleryPreview() {
 
       {/* Masonry-style Grid */}
       <div className="grid grid-cols-3 gap-2">
-        {galleryImages.map((image, index) => {
+        {displayPhotos.map((photo, index) => {
           const isLarge = index === 0 || index === 3;
           const isHovered = hoveredIndex === index;
+          const label = photo.collection?.name || 
+            (photo.featured ? 'In Evidenza' : 'Foto');
 
           return (
             <div
-              key={index}
+              key={photo.id}
               className={`relative overflow-hidden rounded-2xl cursor-pointer group ${
                 isLarge ? "row-span-2" : ""
               }`}
@@ -82,11 +186,11 @@ export default function GalleryPreview() {
             >
               <div className={`relative ${isLarge ? "h-full min-h-[200px]" : "h-24"}`}>
                 <Image
-                  alt={image.alt}
+                  alt={photo.alt_text || `Foto ${index + 1}`}
                   className={`w-full h-full object-cover transition-all duration-500 ${
                     isHovered ? "scale-110 blur-[1px]" : "scale-100"
                   }`}
-                  src={image.src}
+                  src={photo.url}
                   fill
                   sizes={isLarge ? "(max-width: 768px) 33vw, 200px" : "(max-width: 768px) 33vw, 100px"}
                 />
@@ -103,7 +207,7 @@ export default function GalleryPreview() {
                   isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
                 }`}>
                   <span className="text-xs font-bold text-white bg-brand-orange/80 backdrop-blur-sm px-2 py-1 rounded-full">
-                    {image.label}
+                    {label}
                   </span>
                 </div>
 
@@ -191,8 +295,8 @@ export default function GalleryPreview() {
           >
             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
               <Image
-                src={galleryImages[selectedImage].src}
-                alt={galleryImages[selectedImage].alt}
+                src={displayPhotos[selectedImage].url}
+                alt={displayPhotos[selectedImage].alt_text || `Foto ${selectedImage + 1}`}
                 width={800}
                 height={600}
                 className="w-full h-auto"
@@ -203,12 +307,13 @@ export default function GalleryPreview() {
             <div className="flex items-center justify-between mt-4 px-2">
               <div className="flex items-center gap-3">
                 <span className="px-3 py-1 bg-brand-orange rounded-full text-sm font-bold text-white">
-                  {galleryImages[selectedImage].label}
+                  {displayPhotos[selectedImage].collection?.name || 
+                   (displayPhotos[selectedImage].featured ? 'In Evidenza' : 'Galleria')}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-white/60">
                 <span className="text-sm">
-                  {selectedImage + 1} / {galleryImages.length}
+                  {selectedImage + 1} / {displayPhotos.length}
                 </span>
               </div>
             </div>
@@ -249,9 +354,9 @@ export default function GalleryPreview() {
 
           {/* Thumbnail Strip */}
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-            {galleryImages.map((img, index) => (
+            {displayPhotos.map((photo, index) => (
               <button
-                key={index}
+                key={photo.id}
                 onClick={(e) => {
                   e.stopPropagation();
                   setSelectedImage(index);
@@ -263,8 +368,8 @@ export default function GalleryPreview() {
                 }`}
               >
                 <Image
-                  src={img.src}
-                  alt={img.alt}
+                  src={photo.url}
+                  alt={photo.alt_text || `Thumbnail ${index + 1}`}
                   width={48}
                   height={48}
                   className="w-full h-full object-cover"

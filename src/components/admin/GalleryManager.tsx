@@ -23,7 +23,7 @@ export default function GalleryManager({ photos, onAdd, onUpdate, onDelete }: Ga
     const matchesYear = yearFilter === 'all' || photo.year === parseInt(yearFilter)
     const matchesCategory = categoryFilter === 'all' || photo.category === categoryFilter
     return matchesYear && matchesCategory
-  }).sort((a, b) => a.sort_order - b.sort_order)
+  }).sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
 
   const handleAdd = (data: GalleryPhotoInsert) => {
     onAdd(data)
@@ -166,7 +166,7 @@ export default function GalleryManager({ photos, onAdd, onUpdate, onDelete }: Ga
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-xs text-gray-500">{photo.year}</span>
                   <span className="text-xs text-gray-300">•</span>
-                  <span className="text-xs text-gray-500">{getCategoryLabel(photo.category)}</span>
+                  <span className="text-xs text-gray-500">{getCategoryLabel(photo.category || '')}</span>
                 </div>
               </div>
             </div>
@@ -228,7 +228,7 @@ export default function GalleryManager({ photos, onAdd, onUpdate, onDelete }: Ga
                   />
                   <div>
                     <p className="font-medium text-gray-900">{deletingPhoto.alt_text}</p>
-                    <p className="text-sm text-gray-500">{deletingPhoto.year} • {getCategoryLabel(deletingPhoto.category)}</p>
+                    <p className="text-sm text-gray-500">{deletingPhoto.year} • {getCategoryLabel(deletingPhoto.category || '')}</p>
                   </div>
                 </div>
               </div>

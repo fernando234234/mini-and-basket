@@ -3,80 +3,16 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { GalleryPhoto } from "@/types/gallery";
-import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
-interface GalleryGridProps {
-  photos?: GalleryPhoto[];
-  collectionId?: string;
-  showFilters?: boolean;
-  maxPhotos?: number;
+interface CollectionGalleryGridProps {
+  photos: GalleryPhoto[];
+  collectionName: string;
 }
 
-/**
- * GalleryGrid - Displays a grid of photos with lightbox functionality
- * 
- * Can work in two modes:
- * 1. Pass `photos` prop directly to display specific photos
- * 2. Pass `collectionId` to fetch photos from that collection
- * 3. If neither is passed, fetches recent photos from Supabase
- */
-export default function GalleryGrid({ 
-  photos: initialPhotos, 
-  collectionId,
-  showFilters = false,
-  maxPhotos 
-}: GalleryGridProps) {
-  const [photos, setPhotos] = useState<GalleryPhoto[]>(initialPhotos || []);
+export default function CollectionGalleryGrid({ photos, collectionName }: CollectionGalleryGridProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const [loading, setLoading] = useState(!initialPhotos);
-
-  // Fetch photos if not provided as prop
-  useEffect(() => {
-    if (initialPhotos) {
-      setPhotos(initialPhotos);
-      setLoading(false);
-      return;
-    }
-
-    const fetchPhotos = async () => {
-      if (!isSupabaseConfigured()) {
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      
-      try {
-        let query = supabase
-          .from('gallery_photos')
-          .select('*')
-          .order('created_at', { ascending: false });
-        
-        if (collectionId) {
-          query = query.eq('collection_id', collectionId);
-        }
-        
-        if (maxPhotos) {
-          query = query.limit(maxPhotos);
-        }
-        
-        const { data, error } = await query;
-        
-        if (error) {
-          console.error('Error fetching photos:', error);
-        } else if (data) {
-          setPhotos(data);
-        }
-      } catch (error) {
-        console.error('Error fetching photos:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPhotos();
-  }, [initialPhotos, collectionId, maxPhotos]);
+  const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
 
   // Handle keyboard navigation
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -114,41 +50,27 @@ export default function GalleryGrid({
     }
   };
 
-  const displayPhotos = maxPhotos ? photos.slice(0, maxPhotos) : photos;
-  const currentPhoto = selectedIndex !== null ? displayPhotos[selectedIndex] : null;
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="w-10 h-10 border-4 border-brand-green border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
-  if (displayPhotos.length === 0) {
-    return (
-      <div className="text-center py-12 bg-white rounded-2xl shadow-lg">
-        <div className="text-4xl mb-4">📷</div>
-        <p className="text-brand-gray">Nessuna foto disponibile</p>
-      </div>
-    );
-  }
+  const currentPhoto = selectedIndex !== null ? photos[selectedIndex] : null;
 
   return (
     <div>
       {/* Results Count */}
-      {showFilters && (
-        <div className="bg-white rounded-2xl p-4 shadow-lg mb-6">
+      <div className="bg-white rounded-2xl p-4 shadow-lg mb-6">
+        <div className="flex items-center justify-between">
           <p className="text-sm text-brand-gray">
-            <span className="font-bold text-brand-dark">{displayPhotos.length}</span> foto trovate
+            <span className="font-bold text-brand-dark">{photos.length}</span> foto in questa collezione
+          </p>
+          <p className="text-xs text-brand-gray">
+            Clicca su una foto per ingrandirla
           </p>
         </div>
-      )}
+      </div>
 
       {/* Photo Grid - Masonry Style */}
       <div className="columns-2 sm:columns-3 lg:columns-4 xl:columns-5 gap-3 space-y-3">
-        {displayPhotos.map((photo, index) => {
+        {photos.map((photo, index) => {
           const isHovered = hoveredIndex === index;
+          // Vary aspect ratios for visual interest
           const aspectRatio = photo.featured 
             ? "aspect-[3/4]" 
             : index % 5 === 0 
@@ -170,14 +92,26 @@ export default function GalleryGrid({
                   isHovered ? "shadow-xl scale-[1.02]" : ""
                 }`}
               >
+                {/* Loading placeholder */}
+                {isLoading[photo.id] && (
+                  <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
+                    <svg className="w-8 h-8 text-gray-400 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  </div>
+                )}
+                
                 <Image
                   src={photo.url}
-                  alt={photo.alt_text || `Foto ${index + 1}`}
+                  alt={photo.alt_text || `${collectionName} - Foto ${index + 1}`}
                   fill
                   className={`object-cover transition-all duration-500 ${
                     isHovered ? "scale-110" : "scale-100"
                   }`}
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
+                  onLoadingComplete={() => setIsLoading(prev => ({ ...prev, [photo.id]: false }))}
+                  onLoad={() => setIsLoading(prev => ({ ...prev, [photo.id]: false }))}
                 />
 
                 {/* Overlay */}
@@ -193,10 +127,19 @@ export default function GalleryGrid({
                 {photo.featured && (
                   <div className="absolute top-2 left-2">
                     <span className="px-2 py-1 bg-brand-orange text-white text-xs font-bold rounded-full shadow-lg">
-                      ⭐
+                      ⭐ In Evidenza
                     </span>
                   </div>
                 )}
+
+                {/* Photo Number */}
+                <div className={`absolute bottom-2 right-2 transition-all duration-300 ${
+                  isHovered ? "opacity-100" : "opacity-0"
+                }`}>
+                  <span className="px-2 py-1 bg-white/20 backdrop-blur-sm text-white text-xs rounded-full">
+                    {index + 1} / {photos.length}
+                  </span>
+                </div>
 
                 {/* Zoom Icon */}
                 <div
@@ -249,7 +192,7 @@ export default function GalleryGrid({
             <div className="relative w-full h-[70vh] rounded-2xl overflow-hidden shadow-2xl">
               <Image
                 src={currentPhoto.url}
-                alt={currentPhoto.alt_text || `Foto ${selectedIndex + 1}`}
+                alt={currentPhoto.alt_text || `${collectionName} - Foto ${selectedIndex + 1}`}
                 fill
                 className="object-contain bg-black"
                 sizes="100vw"
@@ -260,6 +203,9 @@ export default function GalleryGrid({
             {/* Image Info */}
             <div className="flex items-center justify-between mt-4 px-2">
               <div className="flex items-center gap-3">
+                <span className="px-3 py-1 bg-brand-orange rounded-full text-sm font-bold text-white">
+                  {collectionName}
+                </span>
                 {currentPhoto.featured && (
                   <span className="px-3 py-1 bg-yellow-500 rounded-full text-sm font-bold text-white">
                     ⭐ In Evidenza
@@ -268,7 +214,7 @@ export default function GalleryGrid({
               </div>
               <div className="flex items-center gap-2 text-white/60">
                 <span className="text-sm">
-                  {selectedIndex + 1} / {displayPhotos.length}
+                  {selectedIndex + 1} / {photos.length}
                 </span>
               </div>
             </div>
@@ -315,6 +261,34 @@ export default function GalleryGrid({
               Chiudi
             </span>
           </div>
+
+          {/* Thumbnail Strip - Show for smaller collections */}
+          {photos.length <= 20 && (
+            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex gap-2 max-w-[90vw] overflow-x-auto pb-2 px-4">
+              {photos.map((photo, index) => (
+                <button
+                  key={photo.id}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedIndex(index);
+                  }}
+                  className={`flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden transition-all duration-300 ${
+                    selectedIndex === index
+                      ? "ring-2 ring-brand-orange scale-110"
+                      : "opacity-50 hover:opacity-100"
+                  }`}
+                >
+                  <Image
+                    src={photo.url}
+                    alt={`Thumbnail ${index + 1}`}
+                    width={48}
+                    height={48}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
