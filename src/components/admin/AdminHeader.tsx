@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { signOut, isDemoMode, AuthUser } from '@/lib/auth'
+import { useState, useEffect } from 'react'
+import { signOut, isDemoMode, getUserRole, AuthUser, AdminRole } from '@/lib/auth'
 import { useRouter } from 'next/navigation'
 
 interface AdminHeaderProps {
@@ -11,7 +11,14 @@ interface AdminHeaderProps {
 export default function AdminHeader({ user }: AdminHeaderProps) {
   const router = useRouter()
   const [showDropdown, setShowDropdown] = useState(false)
+  const [userRole, setUserRole] = useState<AdminRole | null>(null)
   const demoMode = isDemoMode()
+
+  useEffect(() => {
+    if (user?.id) {
+      getUserRole(user.id).then(setUserRole)
+    }
+  }, [user?.id])
 
   const handleSignOut = async () => {
     await signOut()
@@ -51,7 +58,18 @@ export default function AdminHeader({ user }: AdminHeaderProps) {
                 {user?.name?.charAt(0) || user?.email?.charAt(0) || 'A'}
               </div>
               <div className="text-left hidden sm:block">
-                <p className="text-sm font-medium text-gray-900">{user?.name || 'Admin'}</p>
+                <p className="text-sm font-medium text-gray-900 flex items-center gap-2">
+                  {user?.name || 'Admin'}
+                  {userRole && (
+                    <span className={`px-1.5 py-0.5 rounded text-xs font-medium ${
+                      userRole === 'admin'
+                        ? 'bg-purple-100 text-purple-800'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {userRole === 'admin' ? 'Admin' : 'Sub-Admin'}
+                    </span>
+                  )}
+                </p>
                 <p className="text-xs text-gray-500">{user?.email}</p>
               </div>
               <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
